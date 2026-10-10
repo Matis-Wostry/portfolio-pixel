@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import Player from '../objects/Player.js';
 import GameControls from '../input/GameControls.js';
 import GameUI from '../ui/GameUI.js';
+import InteractionSystem from '../systems/InteractionSystem.js';
 
 const TILESETS = [
   { tiledName: 'Sol',        key: 'Sol' },
@@ -35,11 +36,13 @@ export default class GameScene extends Phaser.Scene {
       onCancel: () => this.controls.reset(),
     });
     this.events.once('shutdown', () => {
+      this.interactions?.destroy();
       this.ui.destroy();
       this.controls.destroy();
     });
     // --- Tilemap ---
     const map = this.make.tilemap({ key: 'chambre' });
+    this.interactions = new InteractionSystem(this, map);
 
     // Ajoute chaque tileset (ignore silencieusement s'il n'existe pas dans la map)
     const tilesets = TILESETS.map(({ tiledName, key }) => {
@@ -88,6 +91,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   _createLayer(map, layerName, tilesets) {
+    if (!map.layers.some((layer) => layer.name === layerName)) return null;
     const layer = map.createLayer(layerName, tilesets, 0, 0);
     if (!layer) {
       console.warn(`Calque introuvable : "${layerName}" — ce n'est pas bloquant.`);
@@ -99,5 +103,6 @@ export default class GameScene extends Phaser.Scene {
   update() {
     if (!this.player) return;
     this.player.update(this.controls.getDirection());
+    this.ui.setTarget(this.interactions.update(this.player.getFeet()));
   }
 }
