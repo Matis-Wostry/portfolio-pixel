@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeZone, selectTarget } from '../src/systems/interactions.mjs';
+import { normalizeZone, normalizeZones, selectTarget } from '../src/systems/interactions.mjs';
 
 const zone = (id, x = 100) => ({ id, label: id, action: 'projets', x, y: 100, width: 32, height: 32, radius: 32 });
 
@@ -27,4 +27,13 @@ test('nearest target wins with a stable identifier tie break', () => {
   assert.equal(selectTarget([zone('b'), zone('a')], { x: 100, y: 110 })?.id, 'a');
   assert.equal(selectTarget([zone('b', 150), zone('a')], { x: 145, y: 110 })?.id, 'b');
   assert.equal(selectTarget([zone('a')], { x: NaN, y: 0 }), null);
+});
+
+test('malformed properties do not crash the room and duplicate ids are ignored', () => {
+  assert.equal(normalizeZone({ ...zone('a'), properties: 'invalid' }), null);
+  assert.equal(normalizeZone({ ...zone('a'), properties: [null] }), null);
+  const warnings = [];
+  const result = normalizeZones([zone('a'), zone('a', 200), zone('b'), { ...zone('c'), action: 'invalid' }], (object) => warnings.push(object));
+  assert.deepEqual(result.map(({ id }) => id), ['a', 'b']);
+  assert.equal(warnings.length, 2);
 });

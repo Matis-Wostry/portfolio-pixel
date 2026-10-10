@@ -1,21 +1,13 @@
-import { normalizeZone, selectTarget } from './interactions.mjs';
+import { normalizeZones, selectTarget } from './interactions.mjs';
 import { DEMO_ZONES } from '../data/interactables.js';
 
 export default class InteractionSystem {
   constructor(scene, map) {
     const layer = map.getObjectLayer('objets_interaction');
-    this.zones = [];
+    this.zones = normalizeZones(layer ? layer.objects : DEMO_ZONES);
     this.markers = [];
     this.target = null;
-    const ids = new Set();
-    (layer ? layer.objects : DEMO_ZONES).forEach((object) => {
-      const zone = normalizeZone(object);
-      if (!zone || ids.has(zone.id)) {
-        console.warn('Zone interactive ignorée : rectangle, propriétés ou identifiant invalides.', object);
-        return;
-      }
-      ids.add(zone.id);
-      this.zones.push(zone);
+    this.zones.forEach((zone) => {
       if (!layer) {
         const marker = scene.add.rectangle(zone.x + zone.width / 2, zone.y + zone.height / 2, zone.width, zone.height, 0x4e392d)
           .setStrokeStyle(2, 0xd8b889).setDepth(zone.y + zone.height);

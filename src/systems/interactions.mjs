@@ -2,7 +2,9 @@ export const ACTIONS = new Set(['projets', 'skills', 'about', 'contact']);
 
 export function normalizeZone(object) {
   if (!object || object.ellipse || object.polygon || object.polyline || object.gid || object.point || (object.rotation ?? 0) !== 0) return null;
-  const properties = Object.fromEntries((object.properties ?? []).map(({ name, value }) => [name, value]));
+  const entries = object.properties ?? [];
+  if (!Array.isArray(entries) || entries.some((entry) => !entry || typeof entry.name !== 'string')) return null;
+  const properties = Object.fromEntries(entries.map(({ name, value }) => [name, value]));
   const zone = {
     id: properties.id ?? object.id,
     label: properties.label ?? object.label ?? object.name,
@@ -15,6 +17,19 @@ export function normalizeZone(object) {
   if (![zone.x, zone.y, zone.width, zone.height, zone.radius].every(Number.isFinite)) return null;
   if (zone.width <= 0 || zone.height <= 0 || zone.radius < 0) return null;
   return zone;
+}
+
+export function normalizeZones(objects, warn = (object) => console.warn('Zone interactive ignorée : rectangle, propriétés ou identifiant invalides.', object)) {
+  const ids = new Set();
+  const zones = [];
+  if (!Array.isArray(objects)) { warn(objects); return zones; }
+  objects.forEach((object) => {
+    const zone = normalizeZone(object);
+    if (!zone || ids.has(zone.id)) { warn(object); return; }
+    ids.add(zone.id);
+    zones.push(zone);
+  });
+  return zones;
 }
 
 export function selectTarget(zones, feet) {

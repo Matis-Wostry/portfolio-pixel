@@ -76,3 +76,17 @@ test('blur, hidden document and destruction release movement', () => {
   key('keydown', 'KeyD');
   assert.deepEqual(controls.getDirection(), { x: 0, y: 0 });
 });
+
+test('restarting controls leaves only the new instance responsive', () => {
+  const { controls, target, visibility, key } = setup();
+  controls.destroy();
+  const next = new GameControls(target, visibility);
+  key('keydown', 'KeyE');
+  key('keydown', 'KeyD');
+  assert.equal(controls.consumeAction(), false);
+  assert.deepEqual(controls.getDirection(), { x: 0, y: 0 });
+  assert.equal(next.consumeAction(), true);
+  assert.equal(next.consumeAction(), false);
+  assert.deepEqual(next.getDirection(), { x: 1, y: 0 });
+  next.destroy();
+});
