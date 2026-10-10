@@ -4,10 +4,11 @@ import GameScene from './scenes/GameScene.js';
 
 const config = {
   type: Phaser.AUTO,
-  width: 640,
-  height: 480,
+  width: window.innerWidth,
+  height: window.innerHeight,
   pixelArt: true,
-  zoom: 2,
+  scale: { mode: Phaser.Scale.RESIZE },
+  render: { roundPixels: true },
   backgroundColor: '#1a1a2e',
   physics: {
     default: 'arcade',
@@ -16,6 +17,7 @@ const config = {
       debug: false
     }
   },
+  input: { keyboard: false },
   scene: [BootScene, GameScene]
 };
 

@@ -4,6 +4,7 @@ import GameControls from '../input/GameControls.js';
 import GameUI from '../ui/GameUI.js';
 import InteractionSystem from '../systems/InteractionSystem.js';
 import { PORTFOLIO } from '../data/portfolio.js';
+import { computeView, computeBounds } from '../config/viewport.mjs';
 
 const TILESETS = [
   { tiledName: 'Sol',        key: 'Sol' },
@@ -30,6 +31,8 @@ export default class GameScene extends Phaser.Scene {
 
   create() {
     this.player = null;
+    this.mapSize = null;
+    this.interactions = null;
     this.dialogOpen = false;
     this.controls = new GameControls();
     this.ui = new GameUI({
@@ -42,12 +45,14 @@ export default class GameScene extends Phaser.Scene {
       },
     });
     this.events.once('shutdown', () => {
+      this.scale.off('resize', this.resizeViewport, this);
       this.interactions?.destroy();
       this.ui.destroy();
       this.controls.destroy();
     });
     // --- Tilemap ---
     const map = this.make.tilemap({ key: 'chambre' });
+    this.mapSize = { width: map.widthInPixels, height: map.heightInPixels };
     this.interactions = new InteractionSystem(this, map);
 
     // Ajoute chaque tileset (ignore silencieusement s'il n'existe pas dans la map)
@@ -66,6 +71,10 @@ export default class GameScene extends Phaser.Scene {
     const layerSol   = this._createLayer(map, LAYERS.sol,  tilesets);
     const layerMurs  = this._createLayer(map, LAYERS.murs, tilesets);
     const layerDeco  = this._createLayer(map, LAYERS.decorations, tilesets);
+    layerSol?.setDepth(-1000);
+    layerMurs?.setDepth(-900);
+    layerDeco?.setDepth(-800);
+    this._createLayer(map, 'premier_plan', tilesets)?.setDepth(10000);
 
     // Collision sur toutes les tiles non-vides du calque murs
     if (layerMurs) {
@@ -81,7 +90,7 @@ export default class GameScene extends Phaser.Scene {
     this.player = new Player(this, spawnX, spawnY);
     this.game.canvas.tabIndex = 0;
     this.game.canvas.setAttribute('aria-label', 'La Chambre du Dev : déplace-toi avec les flèches, ZQSD ou WASD et utilise E pour interagir.');
-    this.player.setDepth(10);
+    this.player.setDepth(this.player.getFeet().y);
 
     // Collisions joueur ↔ murs
     if (layerMurs) {
@@ -89,13 +98,27 @@ export default class GameScene extends Phaser.Scene {
     }
 
     // --- Caméra ---
-    this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
+    this.resizeViewport(this.scale.gameSize);
+    this.scale.on('resize', this.resizeViewport, this);
 
     // Monde physique limité à la taille de la map
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.player.setCollideWorldBounds(true);
 
+  }
+
+  resizeViewport(size) {
+    if (!this.mapSize) return;
+    const view = computeView(size.width, size.height);
+    const bounds = computeBounds(this.mapSize.width, this.mapSize.height, view);
+    const camera = this.cameras.main;
+    camera.setSize(size.width, size.height);
+    camera.setZoom(view.zoom);
+    camera.setBounds(bounds.x, bounds.y, bounds.width, bounds.height, true);
+    this.ui.cancelGesture();
+    this.controls.reset();
+    this.player?.setVelocity(0, 0);
   }
 
   _createLayer(map, layerName, tilesets) {

@@ -9,7 +9,10 @@ export default class GameUI {
     this.root = document.createElement('div');
     this.root.className = 'game-ui';
     this.root.innerHTML = `
-      <div class="game-help">Explore la chambre · Flèches / ZQSD / WASD · E pour interagir</div>
+      <div class="game-help">
+        <span class="desktop-help">Explore la chambre · Flèches / ZQSD / WASD · E pour interagir</span>
+        <span class="mobile-help">Explore la chambre · Joystick pour bouger · Interagir près d’un objet</span>
+      </div>
       <p class="interaction-hint" role="status" aria-live="polite"></p>
       <div class="touch-controls">
         <div class="joystick" aria-label="Joystick de déplacement">
@@ -46,6 +49,7 @@ export default class GameUI {
       if (!this.enabled || this.pointerId !== null || event.button > 0) return;
       event.preventDefault();
       this.pointerId = event.pointerId;
+      document.querySelector('canvas')?.focus({ preventScroll: true });
       this.stick.setPointerCapture(event.pointerId);
       this.moveJoystick(event);
     });
@@ -78,8 +82,10 @@ export default class GameUI {
   }
 
   setTarget(zone) {
-    this.target = zone;
-    this.hint.textContent = zone ? `${zone.label} · E / Interagir` : '';
+    if (this.target !== zone) {
+      this.target = zone;
+      this.hint.textContent = zone ? `${zone.label} · E / Interagir` : '';
+    }
     this.actionButton.disabled = !zone || !this.enabled;
   }
 
