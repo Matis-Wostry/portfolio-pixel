@@ -1,57 +1,78 @@
+import Phaser from 'phaser';
+import { PLAYER } from '../config/player.js';
+
+export const TILESETS = ['Sol', 'Mur', 'Mur-bas', 'Mur-haut', 'Mur-droit', 'Mur-gauche', 'Mur-coin'];
+const assetURL = (path) => `${import.meta.env.BASE_URL}${path}`;
+
 export default class BootScene extends Phaser.Scene {
   constructor() {
     super({ key: 'BootScene' });
   }
 
   preload() {
-    // --- MAP ---
-    this.load.tilemapTiledJSON('chambre', '/assets/tilemaps/chambre.json');
-
-    // --- Tilesets ---
-    this.load.image('Sol',        '/assets/tilesets/Sol.png');
-    this.load.image('Mur',        '/assets/tilesets/Mur.png');
-    this.load.image('Mur-bas',    '/assets/tilesets/Mur-bas.png');
-    this.load.image('Mur-haut',   '/assets/tilesets/Mur-haut.png');
-    this.load.image('Mur-droit',  '/assets/tilesets/Mur-droit.png');
-    this.load.image('Mur-gauche', '/assets/tilesets/Mur-gauche.png');
-    this.load.image('Mur-coin',   '/assets/tilesets/Mur-coin.png');
-    // Note : Mur.png fait 32×64px (tile plus haut que la grille — normal)
-
-    // --- Personnage ---
-    // Charge le vrai sprite s'il existe, sinon génère un placeholder
-    if (this.textures.exists('joueur')) return;
-    this.load.spritesheet('joueur', '/assets/sprites/joueur.png', {
-      frameWidth: 19,
-      frameHeight: 32
-    });
-    this.load.on('filecomplete-spritesheet-joueur', () => { /* sprite prêt */ });
-
-    // Barre de chargement simple
+    this.failedFiles = new Set();
+    const onError = (file) => this.failedFiles.add(file.key);
+    this.load.on('loaderror', onError);
+    this.load.tilemapTiledJSON('chambre', assetURL('assets/tilemaps/chambre.json'));
+    TILESETS.forEach((name) => this.load.image(name, assetURL(`assets/tilesets/${name}.png`)));
+    if (!this.textures.exists(PLAYER.texture)) {
+      this.load.spritesheet(PLAYER.texture, assetURL(PLAYER.path), {
+        frameWidth: PLAYER.frameWidth,
+        frameHeight: PLAYER.frameHeight,
+      });
+    }
     const { width, height } = this.scale;
     const bar = this.add.rectangle(width / 2, height / 2, 0, 8, 0xffffff);
-    this.load.on('progress', (p) => bar.setSize(width * p, 8));
-    this.load.on('complete', () => bar.destroy());
+    const progress = (value) => bar.setSize(width * value, 8);
+    this.load.on('progress', progress);
+    this.load.once('complete', () => {
+      this.load.off('progress', progress);
+      this.load.off('loaderror', onError);
+      bar.destroy();
+    });
   }
 
   create() {
-    if (!this.textures.exists('joueur')) this._createPlaceholder();
+    if (!this.cache.tilemap.exists('chambre') || TILESETS.some((key) => this.failedFiles.has(key))) {
+      this.showError();
+      return;
+    }
+    if (this.failedFiles.has(PLAYER.texture) || !this.textures.exists(PLAYER.texture)) {
+      this.createPlaceholder();
+    }
     this.scene.start('GameScene');
   }
 
-  _createPlaceholder() {
-    // Spritesheet 64×128 : 4 colonnes × 4 lignes, chaque frame 16×32
-    // Couleur différente par direction pour visualiser les anims
-    const gfx = this.make.graphics({ x: 0, y: 0, add: false });
-    const colors = [0xe74c3c, 0x3498db, 0x2ecc71, 0xf39c12]; // bas haut gauche droite
-    for (let row = 0; row < 4; row++) {
-      for (let col = 0; col < 4; col++) {
-        gfx.fillStyle(colors[row], 1);
-        gfx.fillRect(col * 17, row * 30, 15, 28);
-        gfx.fillStyle(0xffffff, 0.6);
-        gfx.fillRect(col * 17 + 5, row * 30 + 4, 5, 6);
+  showError() {
+    const error = document.createElement('p');
+    error.className = 'load-error';
+    error.setAttribute('role', 'alert');
+    error.textContent = 'La chambre ne peut pas ?tre charg?e. Recharge la page pour r?essayer.';
+    document.body.append(error);
+    this.events.once('shutdown', () => error.remove());
+  }
+
+  createPlaceholder() {
+    if (this.textures.exists(PLAYER.texture)) this.textures.remove(PLAYER.texture);
+    const { frameWidth: w, frameHeight: h, columns, rows } = PLAYER;
+    const canvas = document.createElement('canvas');
+    canvas.width = w * columns;
+    canvas.height = h * rows;
+    const context = canvas.getContext('2d');
+    const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12'];
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < columns; col++) {
+        context.fillStyle = colors[row % colors.length];
+        context.fillRect(col * w + 3, row * h + 2, w - 6, h - 4);
+        context.fillStyle = '#ffffff';
+        context.fillRect(col * w + 6, row * h + 5, 5, 5);
       }
     }
-    gfx.generateTexture('joueur', 68, 120);
-    gfx.destroy();
+    const texture = this.textures.addCanvas(PLAYER.texture, canvas);
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < columns; col++) {
+        texture.add(row * columns + col, 0, col * w, row * h, w, h);
+      }
+    }
   }
 }

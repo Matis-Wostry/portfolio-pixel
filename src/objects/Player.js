@@ -1,97 +1,47 @@
+import Phaser from 'phaser';
+import { PLAYER } from '../config/player.js';
+
 export default class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
-    super(scene, x, y, 'joueur');
-
+    super(scene, x, y, PLAYER.texture);
     scene.add.existing(this);
     scene.physics.add.existing(this);
-
-    // Hitbox plus petite que le sprite pour les collisions
-    this.body.setSize(13, 26);
-    this.body.setOffset(4, 4);
-
-    this.speed = 120;
-
-    this._createAnimations(scene);
-
-    // Contrôles clavier
-    this.keys = scene.input.keyboard.addKeys({
-      up:    Phaser.Input.Keyboard.KeyCodes.UP,
-      down:  Phaser.Input.Keyboard.KeyCodes.DOWN,
-      left:  Phaser.Input.Keyboard.KeyCodes.LEFT,
-      right: Phaser.Input.Keyboard.KeyCodes.RIGHT,
-      z:     Phaser.Input.Keyboard.KeyCodes.Z,
-      q:     Phaser.Input.Keyboard.KeyCodes.Q,
-      s:     Phaser.Input.Keyboard.KeyCodes.S,
-      d:     Phaser.Input.Keyboard.KeyCodes.D,
-    });
-
+    this.setOrigin(PLAYER.origin.x, PLAYER.origin.y);
+    this.body.setSize(PLAYER.hitbox.width, PLAYER.hitbox.height);
+    this.body.setOffset(PLAYER.hitbox.x, PLAYER.hitbox.y);
     this.lastDirection = 'down';
+    PLAYER.directions.forEach((direction, row) => {
+      const start = row * PLAYER.columns;
+      if (!scene.anims.exists(`walk-${direction}`)) {
+        scene.anims.create({
+          key: `walk-${direction}`,
+          frames: scene.anims.generateFrameNumbers(PLAYER.texture, {
+            start, end: start + PLAYER.columns - 1,
+          }),
+          frameRate: PLAYER.frameRate,
+          repeat: -1,
+        });
+      }
+      if (!scene.anims.exists(`idle-${direction}`)) {
+        scene.anims.create({
+          key: `idle-${direction}`,
+          frames: [{ key: PLAYER.texture, frame: start }],
+        });
+      }
+    });
   }
 
-  _createAnimations(scene) {
-    const anims = scene.anims;
-
-    // Bas — row 0 (frames 0–3)
-    anims.create({
-      key: 'walk-down',
-      frames: anims.generateFrameNumbers('joueur', { start: 0, end: 3 }),
-      frameRate: 8,
-      repeat: -1
-    });
-
-    // Haut — row 1 (frames 4–7)
-    anims.create({
-      key: 'walk-up',
-      frames: anims.generateFrameNumbers('joueur', { start: 4, end: 7 }),
-      frameRate: 8,
-      repeat: -1
-    });
-
-    // Gauche — row 2 (frames 8–11)
-    anims.create({
-      key: 'walk-left',
-      frames: anims.generateFrameNumbers('joueur', { start: 8, end: 11 }),
-      frameRate: 8,
-      repeat: -1
-    });
-
-    // Droite — row 3 (frames 12–15)
-    anims.create({
-      key: 'walk-right',
-      frames: anims.generateFrameNumbers('joueur', { start: 12, end: 15 }),
-      frameRate: 8,
-      repeat: -1
-    });
-
-    // Idle par direction (frame fixe début de chaque row)
-    anims.create({ key: 'idle-down',  frames: [{ key: 'joueur', frame: 0 }],  frameRate: 1 });
-    anims.create({ key: 'idle-up',    frames: [{ key: 'joueur', frame: 4 }],  frameRate: 1 });
-    anims.create({ key: 'idle-left',  frames: [{ key: 'joueur', frame: 8 }],  frameRate: 1 });
-    anims.create({ key: 'idle-right', frames: [{ key: 'joueur', frame: 12 }], frameRate: 1 });
+  getFeet() {
+    return { x: this.body.center.x, y: this.body.bottom };
   }
 
-  update() {
-    const { keys, speed } = this;
-    let vx = 0;
-    let vy = 0;
-
-    if (keys.left.isDown  || keys.q.isDown) vx = -speed;
-    if (keys.right.isDown || keys.d.isDown) vx =  speed;
-    if (keys.up.isDown    || keys.z.isDown) vy = -speed;
-    if (keys.down.isDown  || keys.s.isDown) vy =  speed;
-
-    // Normalise la diagonale
-    if (vx !== 0 && vy !== 0) {
-      vx *= 0.707;
-      vy *= 0.707;
-    }
-
-    this.setVelocity(vx, vy);
-
-    if (vx < 0)      { this.play('walk-left',  true); this.lastDirection = 'left'; }
-    else if (vx > 0) { this.play('walk-right', true); this.lastDirection = 'right'; }
-    else if (vy < 0) { this.play('walk-up',    true); this.lastDirection = 'up'; }
-    else if (vy > 0) { this.play('walk-down',  true); this.lastDirection = 'down'; }
-    else             { this.play(`idle-${this.lastDirection}`, true); }
+  update({ x = 0, y = 0 } = {}) {
+    this.setVelocity(x * PLAYER.speed, y * PLAYER.speed);
+    if (x < 0) this.lastDirection = 'left';
+    else if (x > 0) this.lastDirection = 'right';
+    else if (y < 0) this.lastDirection = 'up';
+    else if (y > 0) this.lastDirection = 'down';
+    this.play(`${x || y ? 'walk' : 'idle'}-${this.lastDirection}`, true);
+    this.setDepth(this.getFeet().y);
   }
 }
