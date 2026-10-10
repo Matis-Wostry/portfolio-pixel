@@ -1,0 +1,23 @@
+# Dependencies and build output
+/node_modules/
+/dist/
+
+# Local briefs and Superpowers documents
+/docs/
+
+# Local assistant configuration
+/.claude/
+/.codex/
+/.superpowers/
+
+# Environment variables (keep shareable examples)
+.env
+.env.*
+!.env.example
+
+# Logs and local editor / OS files
+*.log
+/.idea/
+/.vscode/
+.DS_Store
+Thumbs.db
