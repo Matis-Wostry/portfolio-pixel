@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { PLAYER } from '../config/player.js';
+import { buildPlaceholderFrames } from '../config/placeholder.mjs';
 
 export const TILESETS = ['Sol', 'Mur', 'Mur-bas', 'Mur-haut', 'Mur-droit', 'Mur-gauche', 'Mur-coin'];
 const assetURL = (path) => `${import.meta.env.BASE_URL}${path}`;
@@ -47,7 +48,7 @@ export default class BootScene extends Phaser.Scene {
     const error = document.createElement('p');
     error.className = 'load-error';
     error.setAttribute('role', 'alert');
-    error.textContent = 'La chambre ne peut pas ?tre charg?e. Recharge la page pour r?essayer.';
+    error.textContent = 'La chambre ne peut pas être chargée. Recharge la page pour réessayer.';
     document.body.append(error);
     this.events.once('shutdown', () => error.remove());
   }
@@ -59,20 +60,14 @@ export default class BootScene extends Phaser.Scene {
     canvas.width = w * columns;
     canvas.height = h * rows;
     const context = canvas.getContext('2d');
-    const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12'];
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < columns; col++) {
-        context.fillStyle = colors[row % colors.length];
-        context.fillRect(col * w + 3, row * h + 2, w - 6, h - 4);
-        context.fillStyle = '#ffffff';
-        context.fillRect(col * w + 6, row * h + 5, 5, 5);
-      }
-    }
+    const frames = buildPlaceholderFrames(PLAYER);
+    frames.forEach(({ x, y, rects }) => {
+      rects.forEach((rect) => {
+        context.fillStyle = rect.color;
+        context.fillRect(x + rect.x, y + rect.y, rect.width, rect.height);
+      });
+    });
     const texture = this.textures.addCanvas(PLAYER.texture, canvas);
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < columns; col++) {
-        texture.add(row * columns + col, 0, col * w, row * h, w, h);
-      }
-    }
+    frames.forEach(({ index, x, y }) => texture.add(index, 0, x, y, w, h));
   }
 }

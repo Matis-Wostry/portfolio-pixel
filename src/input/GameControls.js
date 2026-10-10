@@ -45,7 +45,7 @@ export default class GameControls {
     const values = [...this.pressed].filter((key) => !this.blocked.has(key)).map((key) => MOVEMENT[key]).filter(Boolean);
     direction.x = Number(values.some(([x]) => x > 0)) - Number(values.some(([x]) => x < 0));
     direction.y = Number(values.some(([, y]) => y > 0)) - Number(values.some(([, y]) => y < 0));
-    return resolveDirection(direction, this.joystick);
+    return values.length ? resolveDirection(direction) : resolveDirection({}, this.joystick);
   }
 
   setJoystick(direction) {

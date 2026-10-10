@@ -90,3 +90,16 @@ test('restarting controls leaves only the new instance responsive', () => {
   assert.deepEqual(next.getDirection(), { x: 1, y: 0 });
   next.destroy();
 });
+
+test('opposite keyboard directions retain ownership over the joystick', () => {
+  const { controls, key } = setup();
+  controls.setJoystick({ x: 0, y: 1 });
+  key('keydown', 'ArrowLeft');
+  key('keydown', 'ArrowRight');
+  assert.deepEqual(controls.getDirection(), { x: 0, y: 0 });
+  key('keyup', 'ArrowLeft');
+  assert.deepEqual(controls.getDirection(), { x: 1, y: 0 });
+  key('keyup', 'ArrowRight');
+  assert.deepEqual(controls.getDirection(), { x: 0, y: 1 });
+  controls.destroy();
+});
