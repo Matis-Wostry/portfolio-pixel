@@ -11,16 +11,19 @@ export default class GameUI {
     this.root.className = 'game-ui';
     this.root.innerHTML = `
       <div class="game-help">
-        <span class="desktop-help">Explore la chambre · Flèches / ZQSD / WASD · E pour interagir</span>
-        <span class="mobile-help">Explore la chambre · Joystick pour bouger · Interagir près d’un objet</span>
+        <span class="desktop-help">Flèches / ZQSD / WASD · Approche une bulle et appuie sur E pour ouvrir</span>
+        <span class="mobile-help">Joystick pour bouger · Approche une bulle puis touche Ouvrir</span>
       </div>
-      <p class="interaction-hint" role="status" aria-live="polite"></p>
+      <p class="interaction-hint sr-only" role="status" aria-live="polite"></p>
       <div class="touch-controls">
         <div class="joystick" aria-label="Joystick de déplacement">
           <span class="joystick-knob"></span>
           <span class="joystick-caption">Déplacer</span>
         </div>
-        <button class="action-button" type="button" disabled>Interagir</button>
+        <button class="action-button" type="button" disabled>
+          <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 9h18" stroke="currentColor" stroke-width="2"/></svg>
+          <span>Ouvrir</span>
+        </button>
       </div>`;
     document.body.append(this.root);
     this.hint = this.root.querySelector('.interaction-hint');
@@ -87,6 +90,7 @@ export default class GameUI {
     if (this.target !== zone) {
       this.target = zone;
       this.hint.textContent = zone ? `${zone.label} · E / Interagir` : '';
+      this.actionButton.setAttribute('aria-label', zone ? `Ouvrir ${zone.label}` : 'Approche un objet pour ouvrir son contenu');
     }
     this.actionButton.disabled = !zone || !this.enabled;
   }

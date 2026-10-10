@@ -50,7 +50,7 @@ export default class GameScene extends Phaser.Scene {
     // --- Tilemap ---
     const map = this.make.tilemap({ key: 'chambre' });
     this.mapSize = { width: map.widthInPixels, height: map.heightInPixels };
-    this.interactions = new InteractionSystem(this, map);
+    this.interactions = new InteractionSystem(this, map, () => this.controls.requestAction());
 
     // Ajoute chaque tileset (ignore silencieusement s'il n'existe pas dans la map)
     const tilesets = TILESETS.map(({ tiledName, key }) => {
@@ -123,6 +123,7 @@ export default class GameScene extends Phaser.Scene {
     if (this.paused === paused) return;
     this.paused = paused;
     this.controls.setEnabled(!paused);
+    this.interactions?.setEnabled(!paused);
     this.player?.update();
     this.ui.setTarget(null);
   }
