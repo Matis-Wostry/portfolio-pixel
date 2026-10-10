@@ -1,4 +1,5 @@
 import { joystickDirection } from '../input/direction.mjs';
+import { safeLink } from './content.mjs';
 import './game.css';
 
 export default class GameUI {
@@ -33,6 +34,7 @@ export default class GameUI {
     this.listen(document, 'visibilitychange', () => {
       if (document.hidden) this.cancelGesture();
     });
+    this.createDialog();
   }
 
   listen(target, type, listener) {
@@ -88,9 +90,62 @@ export default class GameUI {
     this.setTarget(enabled ? this.target : null);
   }
 
+  createDialog() {
+    this.dialog = document.createElement('dialog');
+    this.dialog.className = 'portfolio-dialog';
+    this.dialog.setAttribute('aria-labelledby', 'portfolio-title');
+    this.dialog.innerHTML = `
+      <header class="dialog-header">
+        <h1 id="portfolio-title"></h1>
+        <button class="close-button" type="button" aria-label="Fermer la fenêtre">Fermer ×</button>
+      </header>
+      <div class="dialog-content"></div>`;
+    document.body.append(this.dialog);
+    this.listen(this.dialog.querySelector('.close-button'), 'click', () => this.close());
+    this.listen(this.dialog, 'close', () => {
+      this.setEnabled(true);
+      this.setTarget(null);
+      this.callbacks.onClose();
+      document.querySelector('canvas')?.focus({ preventScroll: true });
+    });
+  }
+
+  open(content) {
+    if (this.dialog.open) return;
+    this.dialog.querySelector('h1').textContent = content.title;
+    const body = this.dialog.querySelector('.dialog-content');
+    body.replaceChildren();
+    content.paragraphs.forEach((text) => {
+      const paragraph = document.createElement('p');
+      paragraph.textContent = text;
+      body.append(paragraph);
+    });
+    content.links.forEach(({ label, href }) => {
+      const destination = safeLink(href);
+      if (!destination) return;
+      const link = document.createElement('a');
+      link.textContent = label;
+      link.href = destination;
+      if (/^https?:/i.test(destination)) {
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+      }
+      body.append(link);
+    });
+    this.setEnabled(false);
+    this.dialog.showModal();
+    body.scrollTop = 0;
+    this.dialog.querySelector('.close-button').focus();
+  }
+
+  close() {
+    if (this.dialog.open) this.dialog.close();
+  }
+
   destroy() {
     this.cancelGesture();
     this.abort.abort();
+    this.dialog.remove();
     this.root.remove();
   }
 }

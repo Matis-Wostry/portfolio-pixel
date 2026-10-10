@@ -3,6 +3,7 @@ import Player from '../objects/Player.js';
 import GameControls from '../input/GameControls.js';
 import GameUI from '../ui/GameUI.js';
 import InteractionSystem from '../systems/InteractionSystem.js';
+import { PORTFOLIO } from '../data/portfolio.js';
 
 const TILESETS = [
   { tiledName: 'Sol',        key: 'Sol' },
@@ -29,11 +30,16 @@ export default class GameScene extends Phaser.Scene {
 
   create() {
     this.player = null;
+    this.dialogOpen = false;
     this.controls = new GameControls();
     this.ui = new GameUI({
       onJoystick: (direction) => this.controls.setJoystick(direction),
       onAction: () => this.controls.requestAction(),
       onCancel: () => this.controls.reset(),
+      onClose: () => {
+        this.dialogOpen = false;
+        this.controls.setEnabled(true);
+      },
     });
     this.events.once('shutdown', () => {
       this.interactions?.destroy();
@@ -73,6 +79,8 @@ export default class GameScene extends Phaser.Scene {
     const spawnX = map.widthInPixels  / 2;
     const spawnY = map.heightInPixels / 2;
     this.player = new Player(this, spawnX, spawnY);
+    this.game.canvas.tabIndex = 0;
+    this.game.canvas.setAttribute('aria-label', 'La Chambre du Dev : déplace-toi avec les flèches, ZQSD ou WASD et utilise E pour interagir.');
     this.player.setDepth(10);
 
     // Collisions joueur ↔ murs
@@ -103,6 +111,15 @@ export default class GameScene extends Phaser.Scene {
   update() {
     if (!this.player) return;
     this.player.update(this.controls.getDirection());
+    if (this.dialogOpen) return;
     this.ui.setTarget(this.interactions.update(this.player.getFeet()));
+    if (this.controls.consumeAction()) {
+      const content = PORTFOLIO[this.interactions.activate()];
+      if (!content) return;
+      this.dialogOpen = true;
+      this.controls.setEnabled(false);
+      this.player.update();
+      this.ui.open(content);
+    }
   }
 }
