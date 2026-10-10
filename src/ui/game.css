@@ -28,6 +28,13 @@ canvas:focus-visible { outline: 3px solid #f8d68b; }
 .dialog-content { min-height: 0; padding: 16px 24px; overflow-y: auto; overscroll-behavior: contain; line-height: 1.7; overflow-wrap: anywhere; }
 .dialog-content p { margin: 0 0 16px; }
 .dialog-content a { display: block; color: #f8d68b; padding: 12px 0; min-height: 48px; }
+.orientation-dialog { width: min(440px, calc(100% - 32px)); overflow-y: auto; }
+.orientation-content { padding: 24px; text-align: center; line-height: 1.6; }
+.orientation-content h1 { font-size: 24px; margin: 8px 0; }
+.orientation-phone { width: 80px; height: 80px; color: #f8d68b; animation: turn-phone 2.4s ease-in-out infinite; }
+.orientation-note { font-size: 13px; color: #d8b889; }
+@keyframes turn-phone { 0%, 20% { transform: rotate(0); } 65%, 100% { transform: rotate(90deg); } }
+@media (prefers-reduced-motion: reduce) { .orientation-phone { animation: none; transform: rotate(90deg); } }
 @media (any-pointer: coarse), (max-width: 760px) {
   .touch-controls { display: block; }
   .desktop-help { display: none; }

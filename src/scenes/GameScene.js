@@ -33,16 +33,13 @@ export default class GameScene extends Phaser.Scene {
     this.player = null;
     this.mapSize = null;
     this.interactions = null;
-    this.dialogOpen = false;
+    this.paused = false;
     this.controls = new GameControls();
     this.ui = new GameUI({
       onJoystick: (direction) => this.controls.setJoystick(direction),
       onAction: () => this.controls.requestAction(),
       onCancel: () => this.controls.reset(),
-      onClose: () => {
-        this.dialogOpen = false;
-        this.controls.setEnabled(true);
-      },
+      onPauseChange: (paused) => this.setPaused(paused),
     });
     this.events.once('shutdown', () => {
       this.scale.off('resize', this.resizeViewport, this);
@@ -119,6 +116,15 @@ export default class GameScene extends Phaser.Scene {
     this.ui.cancelGesture();
     this.controls.reset();
     this.player?.setVelocity(0, 0);
+    this.ui.updateOrientation(size);
+  }
+
+  setPaused(paused) {
+    if (this.paused === paused) return;
+    this.paused = paused;
+    this.controls.setEnabled(!paused);
+    this.player?.update();
+    this.ui.setTarget(null);
   }
 
   _createLayer(map, layerName, tilesets) {
@@ -134,14 +140,11 @@ export default class GameScene extends Phaser.Scene {
   update() {
     if (!this.player) return;
     this.player.update(this.controls.getDirection());
-    if (this.dialogOpen) return;
+    if (this.paused) return;
     this.ui.setTarget(this.interactions.update(this.player.getFeet()));
     if (this.controls.consumeAction()) {
       const content = PORTFOLIO[this.interactions.activate()];
       if (!content) return;
-      this.dialogOpen = true;
-      this.controls.setEnabled(false);
-      this.player.update();
       this.ui.open(content);
     }
   }

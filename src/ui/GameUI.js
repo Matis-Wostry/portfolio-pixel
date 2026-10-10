@@ -1,10 +1,11 @@
 import { joystickDirection } from '../input/direction.mjs';
 import { safeLink } from './content.mjs';
+import { LandscapeSuggestion } from './orientation.mjs';
 import './game.css';
 
 export default class GameUI {
-  constructor({ onJoystick, onAction, onCancel, onClose = () => {} }) {
-    this.callbacks = { onJoystick, onAction, onCancel, onClose };
+  constructor({ onJoystick, onAction, onCancel, onPauseChange = () => {} }) {
+    this.callbacks = { onJoystick, onAction, onCancel, onPauseChange };
     this.abort = new AbortController();
     this.root = document.createElement('div');
     this.root.className = 'game-ui';
@@ -38,6 +39,7 @@ export default class GameUI {
       if (document.hidden) this.cancelGesture();
     });
     this.createDialog();
+    this.createOrientationDialog();
   }
 
   listen(target, type, listener) {
@@ -109,11 +111,70 @@ export default class GameUI {
     document.body.append(this.dialog);
     this.listen(this.dialog.querySelector('.close-button'), 'click', () => this.close());
     this.listen(this.dialog, 'close', () => {
-      this.setEnabled(true);
       this.setTarget(null);
-      this.callbacks.onClose();
-      document.querySelector('canvas')?.focus({ preventScroll: true });
+      this.syncPause();
+      this.restoreFocus();
     });
+  }
+
+  createOrientationDialog() {
+    this.landscapeSuggestion = new LandscapeSuggestion();
+    this.orientationDialog = document.createElement('dialog');
+    this.orientationDialog.className = 'portfolio-dialog orientation-dialog';
+    this.orientationDialog.setAttribute('aria-labelledby', 'orientation-title');
+    this.orientationDialog.setAttribute('aria-describedby', 'orientation-description');
+    this.orientationDialog.innerHTML = `
+      <div class="orientation-content">
+        <svg class="orientation-phone" viewBox="0 0 80 80" aria-hidden="true">
+          <rect x="24" y="10" width="32" height="58" rx="4" fill="none" stroke="currentColor" stroke-width="4"/>
+          <path d="M34 18h12M36 60h8" fill="none" stroke="currentColor" stroke-width="3"/>
+        </svg>
+        <h1 id="orientation-title">Tourne ton téléphone</h1>
+        <p id="orientation-description">La chambre se découvre mieux en paysage : plus de place pour explorer et utiliser les commandes.</p>
+        <p class="orientation-note">La fenêtre se fermera automatiquement après la rotation.</p>
+        <button class="close-button" type="button">Continuer en portrait</button>
+      </div>`;
+    document.body.append(this.orientationDialog);
+    this.listen(this.orientationDialog.querySelector('button'), 'click', () => this.dismissOrientation());
+    this.listen(this.orientationDialog, 'cancel', (event) => {
+      event.preventDefault();
+      this.dismissOrientation();
+    });
+    this.listen(this.orientationDialog, 'close', () => {
+      this.syncPause();
+      this.restoreFocus();
+    });
+  }
+
+  updateOrientation({ width, height }) {
+    const shouldOpen = this.landscapeSuggestion.shouldOpen({
+      width, height, coarsePointer: window.matchMedia('(any-pointer: coarse)').matches,
+    });
+    if (shouldOpen && !this.orientationDialog.open) {
+      this.orientationDialog.showModal();
+      this.orientationDialog.querySelector('button').focus();
+    } else if (!this.landscapeSuggestion.mobilePortrait && this.orientationDialog.open) {
+      this.orientationDialog.close();
+    }
+    this.syncPause();
+  }
+
+  dismissOrientation() {
+    this.landscapeSuggestion.dismiss();
+    this.orientationDialog.close();
+    this.syncPause();
+  }
+
+  syncPause() {
+    const paused = this.dialog.open || this.orientationDialog.open;
+    if (this.enabled === paused) this.setEnabled(!paused);
+    this.callbacks.onPauseChange(paused);
+  }
+
+  restoreFocus() {
+    const focusTarget = this.orientationDialog.open ? this.orientationDialog.querySelector('button')
+      : this.dialog.open ? this.dialog.querySelector('.close-button') : document.querySelector('canvas');
+    focusTarget?.focus({ preventScroll: true });
   }
 
   open(content) {
@@ -138,8 +199,8 @@ export default class GameUI {
       }
       body.append(link);
     });
-    this.setEnabled(false);
     this.dialog.showModal();
+    this.syncPause();
     body.scrollTop = 0;
     this.dialog.querySelector('.close-button').focus();
   }
@@ -152,6 +213,7 @@ export default class GameUI {
     this.cancelGesture();
     this.abort.abort();
     this.dialog.remove();
+    this.orientationDialog.remove();
     this.root.remove();
   }
 }
