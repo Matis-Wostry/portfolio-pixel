@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import Player from '../objects/Player.js';
-import { resolveDirection } from '../input/direction.mjs';
+import GameControls from '../input/GameControls.js';
+import GameUI from '../ui/GameUI.js';
 
 const TILESETS = [
   { tiledName: 'Sol',        key: 'Sol' },
@@ -27,7 +28,16 @@ export default class GameScene extends Phaser.Scene {
 
   create() {
     this.player = null;
-    this.keys = this.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,Z,Q,S,D,W,A');
+    this.controls = new GameControls();
+    this.ui = new GameUI({
+      onJoystick: (direction) => this.controls.setJoystick(direction),
+      onAction: () => this.controls.requestAction(),
+      onCancel: () => this.controls.reset(),
+    });
+    this.events.once('shutdown', () => {
+      this.ui.destroy();
+      this.controls.destroy();
+    });
     // --- Tilemap ---
     const map = this.make.tilemap({ key: 'chambre' });
 
@@ -88,10 +98,6 @@ export default class GameScene extends Phaser.Scene {
 
   update() {
     if (!this.player) return;
-    const k = this.keys;
-    this.player.update(resolveDirection({
-      x: Number(k.RIGHT.isDown || k.D.isDown) - Number(k.LEFT.isDown || k.Q.isDown || k.A.isDown),
-      y: Number(k.DOWN.isDown || k.S.isDown) - Number(k.UP.isDown || k.Z.isDown || k.W.isDown),
-    }));
+    this.player.update(this.controls.getDirection());
   }
 }
