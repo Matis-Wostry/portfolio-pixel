@@ -89,7 +89,7 @@ export default class GameUI {
   setTarget(zone) {
     if (this.target !== zone) {
       this.target = zone;
-      this.hint.textContent = zone ? `${zone.label} · E / Interagir` : '';
+      this.hint.textContent = zone ? `${zone.label} · Appuie sur E ou utilise Ouvrir.` : '';
       this.actionButton.setAttribute('aria-label', zone ? `Ouvrir ${zone.label}` : 'Approche un objet pour ouvrir son contenu');
     }
     this.actionButton.disabled = !zone || !this.enabled;
@@ -171,7 +171,8 @@ export default class GameUI {
 
   syncPause() {
     const paused = this.dialog.open || this.orientationDialog.open;
-    if (this.enabled === paused) this.setEnabled(!paused);
+    const enabled = !paused;
+    if (this.enabled !== enabled) this.setEnabled(enabled);
     this.callbacks.onPauseChange(paused);
   }
 
@@ -191,7 +192,46 @@ export default class GameUI {
       paragraph.textContent = text;
       body.append(paragraph);
     });
-    content.links.forEach(({ label, href }) => {
+    if (content.cards?.length) {
+      const cards = document.createElement('div');
+      cards.className = 'portfolio-cards';
+      content.cards.forEach((card) => {
+        const article = document.createElement('article');
+        article.className = 'portfolio-card';
+        const title = document.createElement('h2');
+        title.textContent = card.title;
+        article.append(title);
+        if (card.description) {
+          const description = document.createElement('p');
+          description.textContent = card.description;
+          article.append(description);
+        }
+        if (card.tags?.length) {
+          const tags = document.createElement('ul');
+          tags.className = 'portfolio-tags';
+          card.tags.forEach((tag) => {
+            const item = document.createElement('li');
+            item.textContent = tag;
+            tags.append(item);
+          });
+          article.append(tags);
+        }
+        this.appendLinks(article, card.links ?? []);
+        cards.append(article);
+      });
+      body.append(cards);
+    }
+    this.appendLinks(body, content.links);
+    this.dialog.showModal();
+    this.syncPause();
+    body.scrollTop = 0;
+    this.dialog.querySelector('.close-button').focus();
+  }
+
+  appendLinks(parent, links) {
+    const group = document.createElement('div');
+    group.className = 'portfolio-links';
+    links.forEach(({ label, href }) => {
       const destination = safeLink(href);
       if (!destination) return;
       const link = document.createElement('a');
@@ -201,12 +241,9 @@ export default class GameUI {
         link.target = '_blank';
         link.rel = 'noopener noreferrer';
       }
-      body.append(link);
+      group.append(link);
     });
-    this.dialog.showModal();
-    this.syncPause();
-    body.scrollTop = 0;
-    this.dialog.querySelector('.close-button').focus();
+    if (group.childElementCount) parent.append(group);
   }
 
   close() {

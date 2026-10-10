@@ -28,6 +28,16 @@ canvas:focus-visible { outline: 3px solid #f8d68b; }
 .dialog-content { min-height: 0; padding: 16px 24px; overflow-y: auto; overscroll-behavior: contain; line-height: 1.7; overflow-wrap: anywhere; }
 .dialog-content p { margin: 0 0 16px; }
 .dialog-content a { display: block; color: #f8d68b; padding: 12px 0; min-height: 48px; }
+.portfolio-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 16px 0; }
+.portfolio-card { display: flex; flex-direction: column; padding: 16px; border: 2px solid #9d7859; background: #201b2d; }
+.portfolio-card h2 { margin: 0 0 8px; font-size: 17px; line-height: 1.4; }
+.portfolio-card p { font-size: 14px; margin-bottom: 12px; }
+.portfolio-tags { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; margin: 0 0 12px; }
+.portfolio-tags li { padding: 2px 6px; font-size: 12px; color: #e9c992; background: #4e392d; border: 1px solid #9d7859; }
+.portfolio-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
+.portfolio-links a { display: inline-flex; align-items: center; justify-content: center; padding: 8px 12px; min-height: 48px; border: 2px solid #9d7859; text-decoration: none; font-size: 14px; }
+.portfolio-links a:hover { background: #4e392d; }
+@media (max-width: 540px) { .portfolio-cards { grid-template-columns: 1fr; } .dialog-content { padding: 16px; } }
 .orientation-dialog { width: min(440px, calc(100% - 32px)); overflow-y: auto; }
 .orientation-content { padding: 24px; text-align: center; line-height: 1.6; }
 .orientation-content h1 { font-size: 24px; margin: 8px 0; }

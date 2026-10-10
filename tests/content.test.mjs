@@ -15,11 +15,29 @@ test('invalid and executable links are omitted', () => {
   }
 });
 
-test('every interaction opens explicitly temporary portfolio content', () => {
+test('every interaction has real portfolio content and safe links', () => {
   assert.deepEqual(Object.keys(PORTFOLIO).sort(), ['about', 'contact', 'projets', 'skills']);
   for (const content of Object.values(PORTFOLIO)) {
     assert.ok(content.title);
-    assert.match(content.paragraphs[0], /Contenu provisoire/);
-    assert.deepEqual(content.links, []);
+    assert.ok(content.paragraphs.every((text) => !text.includes('Contenu provisoire')));
+    for (const link of [...content.links, ...(content.cards ?? []).flatMap((card) => card.links ?? [])]) {
+      assert.ok(link.label);
+      assert.equal(safeLink(link.href), link.href);
+    }
   }
+});
+
+test('project cards preserve the six projects and their published destinations', () => {
+  assert.equal(PORTFOLIO.projets.cards.length, 6);
+  const weather = PORTFOLIO.projets.cards.find((card) => card.id === 'weather');
+  assert.ok(weather.tags.includes('Laravel'));
+  assert.ok(weather.links.some(({ href }) => href === 'https://github.com/Matis-Wostry/iut-weather'));
+  const pokedex = PORTFOLIO.projets.cards.find((card) => card.id === 'pokedex');
+  assert.ok(pokedex.links.some(({ href }) => href === 'https://pokedex.matis-wostry.com/'));
+});
+
+test('contact and profile use the published identity and contact destinations', () => {
+  assert.ok(PORTFOLIO.about.paragraphs.some((text) => text.includes('Matis Wostry')));
+  assert.ok(PORTFOLIO.contact.links.some(({ href }) => href === 'mailto:matis.wostry@crea-inseec.com'));
+  assert.ok(PORTFOLIO.contact.links.some(({ href }) => href === 'https://matis-wostry.com/assets/cv/CV_Matis_Wostry.pdf'));
 });

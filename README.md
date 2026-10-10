@@ -20,12 +20,14 @@ Les tests des déplacements, commandes, interactions et calculs de caméra s'ex�
 ## Commandes
 
 - Ordinateur : flèches, ZQSD ou WASD pour bouger ; E ou Espace pour interagir.
-- Mobile : joystick à gauche et bouton Interagir à droite, utilisables avec deux doigts.
+- Mobile : joystick à gauche et bouton Ouvrir à droite, utilisables avec deux doigts.
 - Une fenêtre se ferme avec Échap ou son bouton Fermer. Le personnage s'arrête pendant la consultation.
 
-L'affichage s'adapte au portrait et au paysage. Une rotation ou une perte de focus remet les commandes à zéro.
+L'affichage s'adapte au portrait et au paysage. En portrait mobile, une invitation à tourner le téléphone met le jeu en pause ; elle se ferme après rotation ou avec Continuer en portrait. Une invitation fermée ne revient pas pendant les redimensionnements en portrait, mais peut revenir après un passage en paysage. Une rotation ou une perte de focus remet les commandes à zéro.
 
-La chambre actuelle contient quatre repères temporaires : projets, compétences, présentation et contact. Leurs contenus sont provisoires.
+La chambre actuelle contient quatre repères temporaires : projets, compétences, présentation et contact. Des bulles animées signalent les objets interactifs : le symbole de fenêtre annonce leur contenu, puis E (ou ! sur tactile) apparaît à portée. La bulle active est cliquable ; le bouton Ouvrir et E/Espace déclenchent la même action. L'animation respecte la préférence de réduction des mouvements.
+
+Les premiers contenus sont adaptés de [matis-wostry.com](https://matis-wostry.com/) et de son [CV public](https://matis-wostry.com/assets/cv/CV_Matis_Wostry.pdf), consultés le 11 octobre 2026 : six projets, compétences, présentation, formation et contact. Ces données sont une copie locale modifiable dans `src/data/portfolio.js` ; elles ne se synchronisent pas automatiquement.
 
 ## Arborescence
 
@@ -74,7 +76,7 @@ Dans Tiled, ajouter un calque d'objets `objets_interaction`. Chaque objet est un
 
 Les repères temporaires de `src/data/interactables.js` disparaissent dès que ce calque existe, même s'il est vide. Les zones invalides sont ignorées avec un avertissement. La distance est mesurée entre les pieds du joueur et le bord du rectangle ; seul l'objet à portée le plus proche est actif.
 
-Les textes et liens se configurent dans `src/data/portfolio.js`. Les liens acceptent HTTP, HTTPS ou mailto. Aucun formulaire ni serveur de contact n'est inclus.
+Les textes et liens se configurent dans `src/data/portfolio.js`. Chaque rubrique accepte `paragraphs`, `links` et des `cards` facultatives (titre, description, tags et liens). Les liens acceptent HTTP, HTTPS ou mailto. Aucun formulaire ni serveur de contact n'est inclus.
 
 Les calques `sol`, `murs` et `decorations` restent derrière les entités. Toutes les cases non vides de `murs` sont bloquantes. Le calque facultatif `premier_plan` passe au-dessus. Les meubles qui doivent alterner devant/derrière le personnage devront devenir des objets avec une profondeur fondée sur leur position aux pieds, ou être découpés entre décoration et premier plan. La nouvelle chambre doit être exportée depuis Tiled et ses zones repositionnées.
 
