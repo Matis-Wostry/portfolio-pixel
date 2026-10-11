@@ -9,6 +9,14 @@ npm ci
 npm run dev
 ```
 
+Pour tester sur un téléphone connecté au même Wi-Fi que l'ordinateur :
+
+```sh
+npm run dev:mobile
+```
+
+Vite affiche alors une adresse `Network` (par exemple `http://192.168.1.20:5173/`) à ouvrir dans le navigateur du téléphone. Si la page ne charge pas, autoriser Node.js sur les réseaux privés dans le pare-feu Windows.
+
 Pour générer la version de production :
 
 ```sh
