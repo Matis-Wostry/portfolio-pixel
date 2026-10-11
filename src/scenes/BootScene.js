@@ -51,7 +51,7 @@ export default class BootScene extends Phaser.Scene {
     if (this.failedFiles.has(PLAYER.texture) || !this.textures.exists(PLAYER.texture)) {
       this.createPlaceholder();
     }
-    this.scene.start('GameScene');
+    this.scene.start('TitleScene');
   }
 
   configuredFiles(prefix, entries, type) {
