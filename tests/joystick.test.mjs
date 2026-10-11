@@ -103,3 +103,23 @@ test('opposite keyboard directions retain ownership over the joystick', () => {
   assert.deepEqual(controls.getDirection(), { x: 0, y: 1 });
   controls.destroy();
 });
+
+test('a HUD button keeps movement keys but not the action key', () => {
+  const { target, controls } = setup();
+  const element = (selector) => ({ closest: (query) => (query.split(',').some((part) => part.trim() === selector) ? {} : null) });
+  const press = (code, from) => {
+    const event = new Event('keydown', { cancelable: true });
+    Object.assign(event, { code, repeat: false });
+    Object.defineProperty(event, 'target', { value: element(from) });
+    target.dispatchEvent(event);
+    return event;
+  };
+  press('ArrowRight', 'button');
+  assert.deepEqual(controls.getDirection(), { x: 1, y: 0 });
+  assert.equal(press('Space', 'button').defaultPrevented, false);
+  assert.equal(controls.consumeAction(), false);
+  press('KeyW', 'input');
+  press('KeyS', 'dialog');
+  assert.deepEqual(controls.getDirection(), { x: 1, y: 0 });
+  controls.destroy();
+});

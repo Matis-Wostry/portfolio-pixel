@@ -4,15 +4,17 @@ const ICONS = {
 };
 
 export default class SoundButton {
-  constructor(audio, parent) {
+  constructor(audio, parent, { onPointerToggle = () => {} } = {}) {
     this.audio = audio;
     this.button = document.createElement('button');
     this.button.type = 'button';
     this.button.className = 'sound-button';
     this.button.hidden = !audio.available;
-    this.onClick = () => {
+    this.onClick = (event) => {
       audio.toggle();
       if (!audio.muted) audio.play('click');
+      // Après un clic souris ou tactile, rendre le clavier au jeu ; au clavier, garder le focus ici.
+      if (event.detail > 0) onPointerToggle();
     };
     this.button.addEventListener('click', this.onClick);
     this.unsubscribe = audio.onChange((muted) => this.render(muted));

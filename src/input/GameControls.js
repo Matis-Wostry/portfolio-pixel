@@ -19,7 +19,9 @@ export default class GameControls {
     this.action = false;
     this.onKeyDown = (event) => {
       if (!MOVEMENT[event.code] && !ACTION.has(event.code)) return;
-      if (!this.enabled || event.target?.closest?.('input, textarea, select, button, dialog, [contenteditable]')) return;
+      if (!this.enabled || event.target?.closest?.('input, textarea, select, dialog, [contenteditable]')) return;
+      // Un bouton de l'interface (son, Ouvrir) garde Espace/Entrée ; les déplacements restent au jeu.
+      if (ACTION.has(event.code) && event.target?.closest?.('button')) return;
       event.preventDefault();
       if (event.repeat || this.pressed.has(event.code)) return;
       this.blocked.delete(event.code);

@@ -2,7 +2,7 @@ import SoundButton from './SoundButton.js';
 import { renderContent } from './renderContent.js';
 import { TITLE_CONTENT } from '../data/title.js';
 import { UI_ART } from '../config/assets.js';
-import { isSafeAssetPath } from '../systems/assetManifest.mjs';
+import { isSafeAssetPath, listConfigured } from '../systems/assetManifest.mjs';
 import './game.css';
 import './title.css';
 
@@ -56,6 +56,8 @@ export default class TitleUI {
   }
 
   applyArt() {
+    listConfigured('ui-', UI_ART).invalid
+      .forEach((name) => console.warn(`Chemin ignoré pour ui-${name} : indiquer un chemin relatif au dossier public/.`));
     if (isSafeAssetPath(UI_ART.logo)) {
       const sign = this.root.querySelector('.title-sign');
       const image = document.createElement('img');
@@ -70,8 +72,15 @@ export default class TitleUI {
       sign.prepend(image);
     }
     if (isSafeAssetPath(UI_ART.button)) {
-      this.root.style.setProperty('--wood-image', `url("${assetURL(UI_ART.button)}")`);
-      this.root.classList.add('has-wood-image');
+      // Précharger la planche : les boutons générés restent en place si elle est inutilisable.
+      const url = assetURL(UI_ART.button);
+      const image = new Image();
+      this.listen(image, 'load', () => {
+        this.root.style.setProperty('--wood-image', `url("${url}")`);
+        this.root.classList.add('has-wood-image');
+      });
+      this.listen(image, 'error', () => console.warn(`Planche de bouton introuvable : ${UI_ART.button}. Boutons générés conservés.`));
+      image.src = url;
     }
   }
 

@@ -28,7 +28,7 @@ export default class GameUI {
         </button>
       </div>`;
     document.body.append(this.root);
-    this.soundButton = audio ? new SoundButton(audio, this.root) : null;
+    this.soundButton = audio ? new SoundButton(audio, this.root, { onPointerToggle: () => this.restoreFocus() }) : null;
     this.hint = this.root.querySelector('.interaction-hint');
     this.stick = this.root.querySelector('.joystick');
     this.knob = this.root.querySelector('.joystick-knob');
