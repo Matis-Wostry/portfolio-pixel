@@ -46,8 +46,10 @@ export default class BootScene extends Phaser.Scene {
       this.showError();
       return;
     }
-    this.optionalFiles.filter(({ key }) => this.failedFiles.has(key))
-      .forEach(({ key, path }) => console.warn(`Fichier ${path} introuvable pour ${key} : version générée utilisée.`));
+    // Un fichier absent peut revenir en 200 (page HTML du serveur) et échouer au décodage
+    // sans loaderror : on vérifie donc ce qui a réellement été chargé.
+    this.optionalFiles.filter(({ key, type }) => !(type === 'image' ? this.textures.exists(key) : this.cache.audio.exists(key)))
+      .forEach(({ key, path }) => console.warn(`Fichier ${path} inutilisable pour ${key} : version générée utilisée.`));
     if (this.failedFiles.has(PLAYER.texture) || !this.textures.exists(PLAYER.texture)) {
       this.createPlaceholder();
     }

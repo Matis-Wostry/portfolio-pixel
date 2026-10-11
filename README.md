@@ -37,6 +37,16 @@ La chambre actuelle contient quatre repères temporaires : projets, compétences
 
 Les premiers contenus sont adaptés de [matis-wostry.com](https://matis-wostry.com/) et de son [CV public](https://matis-wostry.com/assets/cv/CV_Matis_Wostry.pdf), consultés le 11 octobre 2026 : six projets, compétences, présentation, formation et contact. Ces données sont une copie locale modifiable dans `src/data/portfolio.js` ; elles ne se synchronisent pas automatiquement.
 
+## Écran titre et son
+
+Le jeu s'ouvre sur un écran titre en pixel art dessiné par le code (`src/title/`).
+Les bruitages sont synthétisés dans le navigateur ; aucune musique n'est jouée sans fichier.
+Le bouton son, en haut à droite, est mémorisé dans le navigateur.
+
+Les fichiers du designer remplacent ces versions générées : déposer le fichier dans `public/`
+et renseigner son chemin dans `src/config/assets.js` (décor en 480 × 300 pixels, sons en MP3).
+Un fichier absent ou invalide est ignoré avec un avertissement.
+
 ## Arborescence
 
 ```text
