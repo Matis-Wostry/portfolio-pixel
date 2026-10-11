@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { safeLink } from '../src/ui/content.mjs';
 import { PORTFOLIO } from '../src/data/portfolio.js';
+import { TITLE_CONTENT } from '../src/data/title.js';
 
 test('portfolio links support web and email destinations', () => {
   for (const href of ['https://example.com/work', 'http://example.com', 'mailto:dev@example.com']) {
@@ -40,4 +41,16 @@ test('contact and profile use the published identity and contact destinations', 
   assert.ok(PORTFOLIO.about.paragraphs.some((text) => text.includes('Matis Wostry')));
   assert.ok(PORTFOLIO.contact.links.some(({ href }) => href === 'mailto:matis.wostry@crea-inseec.com'));
   assert.ok(PORTFOLIO.contact.links.some(({ href }) => href === 'https://matis-wostry.com/assets/cv/CV_Matis_Wostry.pdf'));
+});
+
+test('title windows explain the controls and credit the project', () => {
+  assert.deepEqual(Object.keys(TITLE_CONTENT).sort(), ['controls', 'credits']);
+  for (const content of Object.values(TITLE_CONTENT)) {
+    assert.ok(content.title && content.paragraphs.length && content.cards.length);
+    for (const link of [...content.links, ...content.cards.flatMap((card) => card.links ?? [])]) {
+      assert.equal(safeLink(link.href), link.href);
+    }
+  }
+  const credits = JSON.stringify(TITLE_CONTENT.credits);
+  assert.ok(credits.includes('Matis Wostry') && credits.includes('Pixelify Sans'));
 });
