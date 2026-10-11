@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { PLAYER } from '../config/player.js';
 import { buildPlaceholderFrames } from '../config/placeholder.mjs';
+import { TITLE_ART, AUDIO_FILES } from '../config/assets.js';
+import { listConfigured } from '../systems/assetManifest.mjs';
 
 export const TILESETS = ['Sol', 'Mur', 'Mur-bas', 'Mur-haut', 'Mur-droit', 'Mur-gauche', 'Mur-coin'];
 const assetURL = (path) => `${import.meta.env.BASE_URL}${path}`;
@@ -22,6 +24,12 @@ export default class BootScene extends Phaser.Scene {
         frameHeight: PLAYER.frameHeight,
       });
     }
+    this.optionalFiles = [
+      ...this.configuredFiles('title-', TITLE_ART, 'image'),
+      ...this.configuredFiles('music-', AUDIO_FILES.music, 'audio'),
+      ...this.configuredFiles('sfx-', AUDIO_FILES.sfx, 'audio'),
+    ];
+    this.optionalFiles.forEach(({ key, path, type }) => this.load[type](key, assetURL(path)));
     const { width, height } = this.scale;
     const bar = this.add.rectangle(width / 2, height / 2, 0, 8, 0xffffff);
     const progress = (value) => bar.setSize(width * value, 8);
@@ -38,10 +46,18 @@ export default class BootScene extends Phaser.Scene {
       this.showError();
       return;
     }
+    this.optionalFiles.filter(({ key }) => this.failedFiles.has(key))
+      .forEach(({ key, path }) => console.warn(`Fichier ${path} introuvable pour ${key} : version générée utilisée.`));
     if (this.failedFiles.has(PLAYER.texture) || !this.textures.exists(PLAYER.texture)) {
       this.createPlaceholder();
     }
     this.scene.start('GameScene');
+  }
+
+  configuredFiles(prefix, entries, type) {
+    const { files, invalid } = listConfigured(prefix, entries);
+    invalid.forEach((name) => console.warn(`Chemin ignoré pour ${prefix}${name} : indiquer un chemin relatif au dossier public/.`));
+    return files.map((file) => ({ ...file, type }));
   }
 
   showError() {
