@@ -5,6 +5,7 @@ import GameUI from '../ui/GameUI.js';
 import InteractionSystem from '../systems/InteractionSystem.js';
 import { PORTFOLIO } from '../data/portfolio.js';
 import { computeView, computeBounds } from '../config/viewport.mjs';
+import AudioManager from '../audio/AudioManager.js';
 
 const TILESETS = [
   { tiledName: 'Sol',        key: 'Sol' },
@@ -34,12 +35,14 @@ export default class GameScene extends Phaser.Scene {
     this.mapSize = null;
     this.interactions = null;
     this.paused = false;
+    this.audio = AudioManager.get(this.game);
     this.controls = new GameControls();
     this.ui = new GameUI({
       onJoystick: (direction) => this.controls.setJoystick(direction),
       onAction: () => this.controls.requestAction(),
       onCancel: () => this.controls.reset(),
       onPauseChange: (paused) => this.setPaused(paused),
+      audio: this.audio,
     });
     this.events.once('shutdown', () => {
       this.scale.off('resize', this.resizeViewport, this);
@@ -98,6 +101,8 @@ export default class GameScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
     this.resizeViewport(this.scale.gameSize);
     this.scale.on('resize', this.resizeViewport, this);
+    this.audio.playMusic('room');
+    this.cameras.main.fadeIn(300, 0, 0, 0);
 
     // Monde physique limité à la taille de la map
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);

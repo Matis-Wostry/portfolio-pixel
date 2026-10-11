@@ -1,11 +1,13 @@
 import { joystickDirection } from '../input/direction.mjs';
 import { safeLink } from './content.mjs';
 import { LandscapeSuggestion } from './orientation.mjs';
+import SoundButton from './SoundButton.js';
 import './game.css';
 
 export default class GameUI {
-  constructor({ onJoystick, onAction, onCancel, onPauseChange = () => {} }) {
+  constructor({ onJoystick, onAction, onCancel, onPauseChange = () => {}, audio = null }) {
     this.callbacks = { onJoystick, onAction, onCancel, onPauseChange };
+    this.audio = audio;
     this.abort = new AbortController();
     this.root = document.createElement('div');
     this.root.className = 'game-ui';
@@ -26,6 +28,7 @@ export default class GameUI {
         </button>
       </div>`;
     document.body.append(this.root);
+    this.soundButton = audio ? new SoundButton(audio, this.root) : null;
     this.hint = this.root.querySelector('.interaction-hint');
     this.stick = this.root.querySelector('.joystick');
     this.knob = this.root.querySelector('.joystick-knob');
@@ -115,6 +118,7 @@ export default class GameUI {
     document.body.append(this.dialog);
     this.listen(this.dialog.querySelector('.close-button'), 'click', () => this.close());
     this.listen(this.dialog, 'close', () => {
+      this.audio?.play('close');
       this.setTarget(null);
       this.syncPause();
       this.restoreFocus();
@@ -222,6 +226,7 @@ export default class GameUI {
       body.append(cards);
     }
     this.appendLinks(body, content.links);
+    this.audio?.play('open');
     this.dialog.showModal();
     this.syncPause();
     body.scrollTop = 0;
@@ -251,6 +256,7 @@ export default class GameUI {
   }
 
   destroy() {
+    this.soundButton?.destroy();
     this.cancelGesture();
     this.abort.abort();
     this.dialog.remove();
