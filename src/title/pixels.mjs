@@ -31,7 +31,7 @@ export function dither(x, y, w, rows, color) {
   for (let row = 0; row < rows; row++) {
     const threshold = ((row + 1) * 16) / (rows + 1);
     for (let dx = 0; dx < w; dx++) {
-      if (BAYER[(y + row) % 4][(x + dx) % 4] < threshold) rects.push(rect(x + dx, y + row, 1, 1, color));
+      if (BAYER[(((y + row) % 4) + 4) % 4][(((x + dx) % 4) + 4) % 4] < threshold) rects.push(rect(x + dx, y + row, 1, 1, color));
     }
   }
   return rects;

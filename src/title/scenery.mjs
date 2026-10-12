@@ -13,8 +13,13 @@ export { fromPattern, disc } from './pixels.mjs';
 export const TITLE_LAYERS = ['sky', 'city', 'building', 'street', 'foreground'];
 export const GROUND_Y = 250;
 
-// Positions en pixels du monde (480 × 300). Les calques du designer doivent les respecter.
-export const ANCHORS = {
+// Le décor d'origine (480 px) est dessiné en « coordonnées de scène » puis centré dans le monde
+// (720 × 300) avec STAGE_X pixels de marge à gauche ; ciel, ville, rue et haie couvrent toute la SPAN.
+export const STAGE_X = 120;
+const SPAN = { left: -STAGE_X, right: TITLE_WORLD.width - STAGE_X };
+
+// Positions en coordonnées de scène ; ANCHORS (exporté) les donne en pixels du monde.
+const STAGE = {
   focus: { x: 245, y: 200 },
   window: { x: 223, y: 136, w: 16, h: 20 },
   door: { x: 222, y: 222, w: 18, h: 28 },
@@ -32,7 +37,7 @@ export const ANCHORS = {
     { x: 196, color: 'warm', light: 'column', column: 188 },
     { x: 266, color: 'warm', light: 'column', column: 258 },
   ],
-  lake: { x: 280, y: 238, w: 200, h: 12 },
+  lake: { x: 280, y: 238, w: 320, h: 12 },
   jet: { x: 400, y: 241, h: 80 },
   neon: { x: 134, y: 205 },
   moon: { x: 404, y: 42, r: 12 },
@@ -124,11 +129,12 @@ export const SPRITES = {
 function sky() {
   const stops = [0, 30, 60, 92, 124, 156, 188, 220, GROUND_Y];
   const colors = PALETTE.sky;
-  const rects = colors.map((color, i) => rect(0, stops[i], TITLE_WORLD.width, stops[i + 1] - stops[i], color));
+  const width = SPAN.right - SPAN.left;
+  const rects = colors.map((color, i) => rect(SPAN.left, stops[i], width, stops[i + 1] - stops[i], color));
   for (let i = 1; i < colors.length; i++) {
-    rects.push(...dither(0, stops[i] - 6, TITLE_WORLD.width, 6, colors[i]));
+    rects.push(...dither(SPAN.left, stops[i] - 6, width, 6, colors[i]));
   }
-  const { x, y, r } = ANCHORS.moon;
+  const { x, y, r } = STAGE.moon;
   rects.push(...disc(x, y, r + 9, PALETTE.moonHalo), ...disc(x, y, r + 4, PALETTE.moonHaloInner));
   rects.push(...disc(x, y, r, PALETTE.moon), ...disc(x + 2, y + 1, r - 1, PALETTE.moonShade), ...disc(x - 1, y - 1, r - 2, PALETTE.moon),
     rect(x + 2, y - 5, 4, 3, PALETTE.moonShade), rect(x - 6, y + 3, 3, 3, PALETTE.moonShade), rect(x + 4, y + 5, 2, 2, PALETTE.moonShade));
@@ -146,7 +152,7 @@ function spire(x, base, height, color) {
 
 function skyline(random, { color, roof, minH, maxH, minW, maxW, lights, lightChance, landmarks = [], collect = null }) {
   const rects = [];
-  for (let x = -4; x < TITLE_WORLD.width;) {
+  for (let x = SPAN.left - 4; x < SPAN.right;) {
     const w = minW + Math.floor(random() * (maxW - minW));
     const h = minH + Math.floor(random() * (maxH - minH));
     const top = GROUND_Y - h;
@@ -186,37 +192,49 @@ function city(random, cityLights) {
     }),
   ];
   // Lac Léman à droite, reflets des lumières et du Jet d'eau.
-  const { x, y, w, h } = ANCHORS.lake;
+  const { x, y, w, h } = STAGE.lake;
   rects.push(rect(x, y, w, h, PALETTE.lake), rect(x, y, w, 1, PALETTE.lakeLight), rect(x, y + 8, w, h - 8, PALETTE.lakeDeep));
   for (let dx = 3; dx < w - 4; dx += 7) rects.push(rect(x + dx, y + 2 + (dx % 3) * 2, 3 + (dx % 2), 1, PALETTE.lakeLight));
   for (let dx = 12; dx < w - 2; dx += 23) rects.push(rect(x + dx, y + 3, 1, 2, PALETTE.lakeGlow), rect(x + dx, y + 6, 1, 1, PALETTE.lakeGlow));
-  const { x: jetX } = ANCHORS.jet;
+  const { x: jetX } = STAGE.jet;
   rects.push(rect(jetX - 2, y + 1, 5, 1, PALETTE.jetSide), rect(jetX, y + 3, 1, 2, PALETTE.jet), rect(jetX, y + 7, 1, 2, PALETTE.jetSide));
   return rects;
 }
 
+const shiftRects = (rects) => rects.map((item) => ({ ...item, x: item.x + STAGE_X }));
+function shiftAnchors(value) {
+  if (Array.isArray(value)) return value.map(shiftAnchors);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, key === 'x' ? item + STAGE_X : shiftAnchors(item)]));
+  }
+  return value;
+}
+
+export const ANCHORS = shiftAnchors(STAGE);
+
 export function buildScenery(seed = 7) {
-  const { moon } = ANCHORS;
   const { width, height } = TITLE_WORLD;
   const cityLights = [];
   const layers = {
     sky: sky(),
     city: city(createRandom(seed), cityLights),
-    building: building(createRandom(seed + 2), ANCHORS),
-    street: street(createRandom(seed + 3), ANCHORS, width),
-    foreground: foreground(createRandom(seed + 4), width),
+    building: building(createRandom(seed + 2), STAGE),
+    street: street(createRandom(seed + 3), STAGE, SPAN),
+    foreground: foreground(createRandom(seed + 4), SPAN),
   };
-  Object.keys(layers).forEach((name) => { layers[name] = clip(layers[name], width, height); });
+  Object.keys(layers).forEach((name) => { layers[name] = clip(shiftRects(layers[name]), width, height); });
+  const visibleLights = cityLights.filter(({ x, y }) => {
+    const hidden = (x + 2 > 117 && x < 286 && y + 2 > 188) || (x + 2 > 176 && x < 286) || y + 2 > STAGE.lake.y;
+    return x >= SPAN.left && x + 2 <= SPAN.right && !hidden;
+  });
+  const { moon } = ANCHORS;
   return {
     layers,
-    stars: generateStars(seed + 1, { width, height: 140, count: 70, avoid: [{ x: moon.x, y: moon.y, r: moon.r + 10 }] }),
-    clouds: [{ x: 30, y: 26, speed: 3 }, { x: 190, y: 56, speed: 2 }, { x: 340, y: 18, speed: 4 }],
+    stars: generateStars(seed + 1, { width, height: 140, count: 105, avoid: [{ x: moon.x, y: moon.y, r: moon.r + 10 }] }),
+    clouds: [{ x: 40, y: 30, speed: 3 }, { x: 150, y: 26, speed: 3 }, { x: 310, y: 56, speed: 2 }, { x: 460, y: 18, speed: 4 }, { x: 620, y: 44, speed: 2 }],
     anchors: ANCHORS,
-    windows: facadeWindows(ANCHORS),
+    windows: shiftAnchors(facadeWindows(STAGE)),
     // Lumières du plan proche visibles dans le décor, que la scène peut éteindre une à une.
-    cityLights: cityLights.filter(({ x, y }) => {
-      const hidden = (x + 2 > 117 && x < 286 && y + 2 > 188) || (x + 2 > 176 && x < 286) || y + 2 > ANCHORS.lake.y;
-      return x >= 0 && x + 2 <= width && !hidden;
-    }),
+    cityLights: shiftRects(visibleLights),
   };
 }

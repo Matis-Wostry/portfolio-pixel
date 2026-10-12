@@ -44,7 +44,7 @@ Les bruitages sont synthétisés dans le navigateur ; aucune musique n'est joué
 Le bouton son, en haut à droite, est mémorisé dans le navigateur.
 
 Les fichiers du designer remplacent ces versions générées : déposer le fichier dans `public/`
-et renseigner son chemin dans `src/config/assets.js` (décor en 480 × 300 pixels, sons en MP3).
+et renseigner son chemin dans `src/config/assets.js` (décor en 720 × 300 pixels, sons en MP3).
 Un fichier absent ou invalide est ignoré avec un avertissement.
 
 ## Arborescence

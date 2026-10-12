@@ -82,12 +82,13 @@ function bicycle(x) {
   return rects;
 }
 
-function sidewalk(random, anchors, width) {
+function sidewalk(random, anchors, { left, right }) {
   const { top, bottom } = SIDEWALK;
-  const rects = [rect(0, top, width, bottom - top, PALETTE.sidewalk)];
+  const width = right - left;
+  const rects = [rect(left, top, width, bottom - top, PALETTE.sidewalk)];
   // Dalles de teintes variées en deux rangées décalées.
   [[top + 1, 0], [top + 7, 6]].forEach(([y, offset]) => {
-    for (let x = -offset; x < width; x += 12) {
+    for (let x = left - offset; x < right; x += 12) {
       const roll = random();
       if (roll < 0.5) rects.push(rect(x + 1, y, 11, 5, roll < 0.25 ? PALETTE.sidewalkAlt : PALETTE.sidewalkDark));
       rects.push(rect(x, y, 1, 5, PALETTE.sidewalkLine));
@@ -98,7 +99,7 @@ function sidewalk(random, anchors, width) {
     const half = Math.round(36 * Math.sqrt(Math.max(0, 1 - ((y - bottom) / 14) ** 2)));
     if (half > 0) rects.push(rect(anchors.lamp.x - half, y, half * 2, 1, PALETTE.sidewalkLit));
   }
-  rects.push(rect(0, top, width, 1, PALETTE.sidewalkLight), rect(0, top + 6, width, 1, PALETTE.sidewalkLine));
+  rects.push(rect(left, top, width, 1, PALETTE.sidewalkLight), rect(left, top + 6, width, 1, PALETTE.sidewalkLine));
   // Fissures avec un brin d'herbe.
   [52, 168, 262, 420].forEach((x) => {
     rects.push(rect(x, top + 2, 1, 1, PALETTE.crack), rect(x + 1, top + 3, 1, 2, PALETTE.crack), rect(x + 2, top + 5, 1, 1, PALETTE.crack),
@@ -114,15 +115,16 @@ function sidewalk(random, anchors, width) {
   return rects;
 }
 
-function road(random, anchors, width) {
+function road(random, anchors, { left, right }) {
+  const width = right - left;
   const rects = [
-    rect(0, 262, width, 1, PALETTE.curbTop), rect(0, 263, width, 2, PALETTE.curbFace),
-    rect(0, ROAD.top, width, ROAD.bottom - ROAD.top, PALETTE.road), rect(0, ROAD.top, width, 1, PALETTE.gutter),
+    rect(left, 262, width, 1, PALETTE.curbTop), rect(left, 263, width, 2, PALETTE.curbFace),
+    rect(left, ROAD.top, width, ROAD.bottom - ROAD.top, PALETTE.road), rect(left, ROAD.top, width, 1, PALETTE.gutter),
   ];
-  for (let x = 0; x < width; x += 5 + Math.floor(random() * 6)) rects.push(rect(x, 262, 1, 1, PALETTE.curbSpeck));
+  for (let x = left; x < right; x += 5 + Math.floor(random() * 6)) rects.push(rect(x, 262, 1, 1, PALETTE.curbSpeck));
   const lit = (x, y) => ((x - anchors.lamp.x) / 36) ** 2 + ((y - 262) / 14) ** 2 < 1;
   for (let row = 0, y = ROAD.top + 1; y < ROAD.bottom; row++, y += 4) {
-    for (let x = -(row % 2) * 3; x < width; x += 6) {
+    for (let x = left - (row % 2) * 3; x < right; x += 6) {
       const roll = random();
       const base = lit(x + 2, y) ? PALETTE.cobbleLit : roll < 0.3 ? PALETTE.cobbleDark : PALETTE.cobble;
       rects.push(rect(x, y, 5, 3, base));
@@ -134,7 +136,7 @@ function road(random, anchors, width) {
   for (let x = 187; x < 196; x += 2) rects.push(rect(x, ROAD.top, 1, 2, PALETTE.railTop));
   rects.push(...ellipse(60, 276, 6, 2, PALETTE.gutter), ...ellipse(60, 276, 4, 1, PALETTE.cobbleDark));
   // Rails de tram encastrés.
-  RAILS.forEach((y) => rects.push(rect(0, y, width, 1, PALETTE.railTop), rect(0, y + 1, width, 1, PALETTE.railGroove)));
+  RAILS.forEach((y) => rects.push(rect(left, y, width, 1, PALETTE.railTop), rect(left, y + 1, width, 1, PALETTE.railGroove)));
   // Flaques : la lune dans l'une, la porte éclairée dans l'autre.
   rects.push(...ellipse(404, 277, 13, 2, PALETTE.puddle), ...ellipse(404, 277, 10, 1, PALETTE.puddleLight),
     ...ellipse(400, 277, 3, 1, PALETTE.puddleMoon));
@@ -142,43 +144,46 @@ function road(random, anchors, width) {
   return rects;
 }
 
-export function street(random, anchors, width) {
+export function street(random, anchors, span) {
   // Garde-corps du quai, du coin de l'immeuble jusqu'au bord droit.
   const quay = 287;
-  const rects = [rect(quay, 244, width - quay, 1, PALETTE.railingLight), rect(quay, 245, width - quay, 1, PALETTE.railing)];
-  for (let x = quay + 3; x < width; x += 10) rects.push(rect(x, 245, 2, 5, PALETTE.railing));
-  rects.push(...sidewalk(random, anchors, width), ...road(random, anchors, width));
+  const rects = [rect(quay, 244, span.right - quay, 1, PALETTE.railingLight), rect(quay, 245, span.right - quay, 1, PALETTE.railing)];
+  for (let x = quay + 3; x < span.right; x += 10) rects.push(rect(x, 245, 2, 5, PALETTE.railing));
+  rects.push(...sidewalk(random, anchors, span), ...road(random, anchors, span));
   // Mobilier : fontaine, poubelle, bancs, pots, arbre et son vélo, lampadaire.
   rects.push(...fromPattern(30, 241, FOUNTAIN, FOUNTAIN_COLORS), ...bin(106));
   rects.push(...pot(207), ...pot(247), ...bench(78), ...bench(440));
   rects.push(...tree(anchors.tree.x, 196, 256, random), ...bicycle(325), ...lamp(anchors.lamp));
+  // Prolongements : bancs et arbres sur les bords élargis.
+  rects.push(...bench(-60), ...tree(-92, 196, 256, random), ...bench(548), ...tree(578, 196, 256, random));
   return rects;
 }
 
-export function foreground(random, width) {
-  const rects = [rect(0, 290, width, 10, PALETTE.hedge)];
+export function foreground(random, { left, right }) {
+  const width = right - left;
+  const rects = [rect(left, 290, width, 10, PALETTE.hedge)];
   // Buissons arrondis de hauteurs variées.
-  for (let x = 0; x < width + 8;) {
+  for (let x = left; x < right + 8;) {
     const r = 5 + Math.floor(random() * 4);
     rects.push(...disc(x, 292, r, PALETTE.hedge), ...disc(x - 1, 291, r - 2, PALETTE.hedgeLight), ...disc(x + 1, 293, r - 3, PALETTE.hedge));
     x += r + 4 + Math.floor(random() * 6);
   }
   for (let i = 0; i < 260; i++) {
-    const x = Math.floor(random() * width);
+    const x = left + Math.floor(random() * width);
     const y = 287 + Math.floor(random() * 13);
     rects.push(rect(x, y, 1, 1, random() < 0.5 ? PALETTE.hedgeLight : PALETTE.hedgeDark));
   }
   // Massifs d'hortensias bleus et roses.
-  for (let x = 22; x < width; x += 48 + Math.floor(random() * 30)) {
+  for (let x = left + 22; x < right; x += 48 + Math.floor(random() * 30)) {
     const [main, deep] = random() < 0.5 ? [PALETTE.hydrangeaBlue, PALETTE.hydrangeaDeep] : [PALETTE.hydrangeaPink, PALETTE.flowerPink];
     rects.push(...disc(x, 289, 3, deep), ...disc(x - 1, 288, 2, main), ...disc(x + 4, 291, 2, deep), ...disc(x + 4, 290, 1, main));
   }
   const flowers = [PALETTE.flowerPink, PALETTE.flowerYellow, PALETTE.awningLight];
-  for (let x = 3; x < width; x += 7 + Math.floor(random() * 6)) {
+  for (let x = left + 3; x < right; x += 7 + Math.floor(random() * 6)) {
     rects.push(rect(x, 288 + Math.floor(random() * 4), 1, 1, flowers[Math.floor(random() * flowers.length)]));
   }
   // Clôture en bois basse devant la haie.
-  rects.push(rect(0, 292, width, 2, PALETTE.fence), rect(0, 294, width, 1, PALETTE.fenceDark));
-  for (let x = 10; x < width; x += 40) rects.push(rect(x, 287, 3, 13, PALETTE.fence), rect(x, 287, 3, 1, PALETTE.fenceDark), rect(x + 2, 288, 1, 12, PALETTE.fenceDark));
+  rects.push(rect(left, 292, width, 2, PALETTE.fence), rect(left, 294, width, 1, PALETTE.fenceDark));
+  for (let x = left + 10; x < right; x += 40) rects.push(rect(x, 287, 3, 13, PALETTE.fence), rect(x, 287, 3, 1, PALETTE.fenceDark), rect(x + 2, 288, 1, 12, PALETTE.fenceDark));
   return rects;
 }

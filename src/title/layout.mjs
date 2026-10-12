@@ -1,13 +1,12 @@
-export const TITLE_WORLD = { width: 480, height: 300 };
+export const TITLE_WORLD = { width: 720, height: 300 };
 
-// Zoom entier le plus proche de la hauteur, augmenté jusqu'à ce que la vue tienne dans le monde,
-// puis vue centrée sur le point focal et bornée au décor.
+// Plus petit zoom qui couvre l'écran : en paysage jusqu'à 2,4:1, toute la hauteur du décor est visible.
+// Vue centrée sur le point focal et bornée au décor.
 export function computeTitleView(screenWidth, screenHeight, focus, world = TITLE_WORLD) {
   const valid = [screenWidth, screenHeight].every((value) => Number.isFinite(value) && value > 0);
   const width = valid ? screenWidth : world.width;
   const height = valid ? screenHeight : world.height;
-  let zoom = Math.max(1, Math.round(height / world.height));
-  while (width / zoom > world.width || height / zoom > world.height) zoom += 1;
+  const zoom = Math.max(width / world.width, height / world.height);
   const viewWidth = width / zoom;
   const viewHeight = height / zoom;
   const clamp = (value, max) => Math.min(Math.max(value, 0), max);
