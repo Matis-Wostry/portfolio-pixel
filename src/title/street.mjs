@@ -6,7 +6,6 @@ const SIDEWALK = { top: 250, bottom: 262 };
 const ROAD = { top: 265, bottom: 284 };
 export const RAILS = [272, 280];
 
-const RING = [[-3, 0], [3, 0], [0, -3], [0, 3], [-2, -2], [2, -2], [-2, 2], [2, 2], [-1, -3], [1, -3], [-1, 3], [1, 3]];
 
 function tree(cx, top, ground, random) {
   const rects = [
@@ -86,18 +85,6 @@ function bin(x) {
   ];
 }
 
-// Vélo appuyé contre l'arbre, roues centrées sur (x, 256) et (x + 10, 256).
-function bicycle(x) {
-  const rects = [];
-  [x, x + 10].forEach((cx) => RING.forEach(([dx, dy]) => rects.push(rect(cx + dx, 256 + dy, 1, 1, PALETTE.iron))));
-  rects.push(
-    rect(x + 1, 256, 4, 1, PALETTE.bike), rect(x + 4, 252, 1, 4, PALETTE.bike), rect(x + 4, 252, 6, 1, PALETTE.bike),
-    rect(x + 6, 255, 1, 1, PALETTE.bike), rect(x + 7, 254, 1, 1, PALETTE.bike), rect(x + 8, 253, 1, 1, PALETTE.bike),
-    rect(x + 10, 251, 1, 5, PALETTE.bike), rect(x + 9, 250, 3, 1, PALETTE.iron), rect(x + 3, 251, 3, 1, PALETTE.iron),
-  );
-  return rects;
-}
-
 function sidewalk(random, anchors, { left, right }) {
   const { top, bottom } = SIDEWALK;
   const width = right - left;
@@ -168,14 +155,14 @@ export function street(random, anchors, span) {
   const rects = [rect(quay, 244, span.right - quay, 1, PALETTE.railingLight), rect(quay, 245, span.right - quay, 1, PALETTE.railing)];
   for (let x = quay + 3; x < span.right; x += 10) rects.push(rect(x, 245, 2, 5, PALETTE.railing));
   rects.push(...sidewalk(random, anchors, span), ...road(random, anchors, span));
-  // Mobilier : fontaine, poubelle, bancs, pots, arbre et son vélo, lampadaire.
+  // Mobilier : poubelle, bancs, pots, arbres et lampadaires.
   // Végétation : bacs fleuris, touffes au pied de l'immeuble, de la boutique et du garde-corps.
   rects.push(...planter(-30, 24, random), ...planter(22, 26, random));
   rects.push(...planter(372, 22, random), ...planter(480, 24, random));
   [-110, -4, 74, 114, 178, 200, 262, 360, 446, 512, 590].forEach((x) => rects.push(...tuft(x, 248, random)));
   rects.push(...bin(106));
   rects.push(...pot(207), ...pot(247), ...bench(78), ...bench(420));
-  rects.push(...anchors.trees.flatMap(({ x }) => tree(x, 196, 256, random)), ...bicycle(325), ...anchors.lamps.flatMap(lamp));
+  rects.push(...anchors.trees.flatMap(({ x }) => tree(x, 196, 256, random)), ...anchors.lamps.flatMap(lamp));
   // Prolongements : bancs sur les bords élargis.
   rects.push(...bench(-60), ...bench(548));
   return rects;
