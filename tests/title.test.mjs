@@ -96,3 +96,15 @@ test('the title scene no longer has a basketball hoop', () => {
   ['hoop', 'rim', 'ball'].forEach((name) => assert.equal(ANCHORS[name], undefined, name));
   assert.equal(SPRITES.ball, undefined);
 });
+
+test('the street has animated passers, a dog and wet reflections to draw', () => {
+  ['dogStand', 'dogWag', 'dogSit', 'dogSniff', 'pedestrian0', 'pedestrian1', 'cyclist0', 'cyclist1', 'tram', 'leaf'].forEach((name) => assert.ok(SPRITES[name], name));
+  ['dogStand', 'dogWag', 'dogSit', 'dogSniff'].forEach((name) => assert.deepEqual([SPRITES[name].width, SPRITES[name].height], [19, 13], name));
+  const { dog, reflections } = ANCHORS;
+  assert.ok(dog.y + 13 <= 262 && dog.y + 13 >= GROUND_Y, 'dog stands on the sidewalk');
+  assert.ok(reflections.length >= 4);
+  for (const { x, color } of reflections) {
+    assert.ok(Number.isInteger(x) && x >= 0 && x < TITLE_WORLD.width);
+    assert.ok(SPRITES[`reflection-${color}`], color);
+  }
+});

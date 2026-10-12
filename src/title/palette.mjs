@@ -31,4 +31,14 @@ export const PALETTE = {
   pot: '#a0573a', potDark: '#7a3f2a',
   dog: '#d39a48', dogDark: '#a26a2c', dogLight: '#efc477',
   hedge: '#1d3326', hedgeDark: '#142419', hedgeLight: '#2b4a36', fence: '#6a4a33', fenceDark: '#4a3122',
+  hydrangeaBlue: '#7d8fe0', hydrangeaDeep: '#5d6cc0', hydrangeaPink: '#e88bc0',
+
+  sidewalkAlt: '#615a74', sidewalkDark: '#565068', sidewalkShadow: '#48425a', curbSpeck: '#a19ab0', crack: '#3e384e', grass: '#4c7a3a',
+  cobbleDark: '#302b3d', wetShine: '#514c68', gutter: '#1c1a26', railTop: '#8b88a0', railGroove: '#1c1a26',
+  puddle: '#262a4e', puddleLight: '#3a4278', puddleMoon: '#c9c3b0',
+  fountain: '#2e4a3e', fountainLight: '#4a6e5c', fountainDark: '#1f332a', water: '#a9cdf2', basin: '#3d5a94',
+  bin: '#34463c', binDark: '#24312a', bike: '#b8483c', leafOrange: '#c8742e', leafRed: '#a8502a', leafGold: '#d9a04a',
+  signBlue: '#2f5fa8', signWhite: '#e8ebe6',
+  tram: '#e8ebe6', tramShade: '#c3c8c2', tramGreen: '#3f8f5a', tramGreenDark: '#2e6a43', tramSkirt: '#2f3a35',
+  skin: '#e0b08a', hair: '#3a2a24', coat: '#3d7a8a', coatDark: '#2c5a66', jacket: '#c84a4a', pants: '#2a2a3a', shoes: '#16161e',
 };

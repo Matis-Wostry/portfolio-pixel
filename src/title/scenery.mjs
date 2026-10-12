@@ -3,6 +3,8 @@ import { TITLE_WORLD } from './layout.mjs';
 import { PALETTE } from './palette.mjs';
 import { rect, fromPattern, disc, ellipse, dither, clip } from './pixels.mjs';
 import { building, facadeWindows, litWindowRects } from './building.mjs';
+import { street, foreground } from './street.mjs';
+import { DOG_FRAMES, PEDESTRIAN_FRAMES, CYCLIST_FRAMES, TRAM, LEAF, REFLECTIONS } from './actors.mjs';
 import { outline } from './lights.mjs';
 
 export { PALETTE } from './palette.mjs';
@@ -20,6 +22,16 @@ export const ANCHORS = {
   doorLamp: { x: 249, y: 225 },
   screens: [{ x: 128, y: 231, w: 4, h: 3 }, { x: 139, y: 231, w: 4, h: 3 }],
   tree: { x: 318, y: 210 },
+  dog: { x: 287, y: 246 },
+  // Reflets sur les pavés mouillés, centrés sous leur lumière (light : source qui les fait varier).
+  reflections: [
+    { x: 140, color: 'pink', light: 'neon' },
+    { x: 346, color: 'yellow', light: 'lamp' },
+    { x: 249, color: 'warm', light: 'door' },
+    { x: 231, color: 'blue', light: 'matis' },
+    { x: 196, color: 'warm', light: 'column', column: 188 },
+    { x: 266, color: 'warm', light: 'column', column: 258 },
+  ],
   lake: { x: 280, y: 238, w: 200, h: 12 },
   jet: { x: 400, y: 241, h: 80 },
   neon: { x: 134, y: 205 },
@@ -62,21 +74,6 @@ const JET_FOAM = [
   '.mmssssssssssssssssssmm..',
   '...mm.mmmmmmmmmmmmm.mm...',
 ];
-const DOG = [
-  '..ggg..............',
-  '.ggggg.............',
-  '.ggegGG............',
-  'nggggGG............',
-  '.gggGGG..........l.',
-  '..ggGGgllllllllgll.',
-  '...gggggggggggggGl.',
-  '...ggggggggggggg.l.',
-  '...GgggggggggggG..l',
-  '...gG.gG....gG.gG..',
-  '...gG.gG....gG.gG..',
-  '...gG.gG....gG.gG..',
-  '...GG.GG....GG.GG..',
-];
 
 // Jet d'eau de Genève : colonne fine, plumet rabattu par le vent vers la droite, rideau d'embruns et écume.
 export const JET_CENTER = 11;
@@ -110,6 +107,14 @@ export const SPRITES = {
   litWindow: { width: 18, height: 25, rects: litWindowRects(false) },
   litWindowFlowers: { width: 18, height: 25, rects: litWindowRects(true) },
   lampPool: { width: 73, height: 29, rects: ellipse(36, 14, 36, 14, PALETTE.lampLight) },
+  ...DOG_FRAMES,
+  pedestrian0: PEDESTRIAN_FRAMES[0],
+  pedestrian1: PEDESTRIAN_FRAMES[1],
+  cyclist0: CYCLIST_FRAMES[0],
+  cyclist1: CYCLIST_FRAMES[1],
+  tram: TRAM,
+  leaf: LEAF,
+  ...REFLECTIONS,
   jet: { width: 25, height: 80, rects: jetRects() },
   haloOuter: { width: 57, height: 57, rects: disc(28, 28, 28, PALETTE.lampLight) },
   haloInner: { width: 33, height: 33, rects: disc(16, 16, 16, PALETTE.lampLight) },
@@ -190,103 +195,6 @@ function city(random, cityLights) {
   return rects;
 }
 
-function tree(cx, top, ground, random) {
-  const rects = [
-    rect(cx - 2, top + 24, 5, ground - top - 24, PALETTE.trunk), rect(cx + 1, top + 24, 2, ground - top - 24, PALETTE.trunkDark),
-    rect(cx - 4, ground - 2, 9, 2, PALETTE.trunkDark), rect(cx - 7, ground, 15, 2, PALETTE.trunkDark),
-    ...disc(cx, top + 14, 16, PALETTE.treeDark),
-    ...disc(cx - 7, top + 10, 10, PALETTE.tree), ...disc(cx + 7, top + 12, 10, PALETTE.tree), ...disc(cx, top + 4, 9, PALETTE.tree),
-    ...disc(cx + 3, top + 4, 5, PALETTE.treeLight), ...disc(cx - 8, top + 8, 4, PALETTE.treeLight),
-    ...disc(cx + 12, top + 12, 4, PALETTE.treeLit),
-  ];
-  for (let i = 0; i < 40; i++) {
-    const dx = Math.floor(random() * 28) - 14;
-    const dy = Math.floor(random() * 24) - 6;
-    if (dx * dx + (dy - 8) * (dy - 8) < 180) rects.push(rect(cx + dx, top + dy, 1, 1, random() < 0.5 ? PALETTE.treeLight : PALETTE.treeDark));
-  }
-  return rects;
-}
-
-function lamp({ x, y }) {
-  const left = x - 5;
-  return [
-    rect(x - 2, y + 8, 4, 52, PALETTE.lampPole), rect(x - 2, y + 8, 1, 52, PALETTE.lampPoleLight),
-    rect(x - 4, y + 56, 8, 4, PALETTE.lampPole), rect(x - 5, y + 60, 10, 2, PALETTE.lampPole),
-    rect(x - 1, y - 10, 2, 2, PALETTE.lampPole), rect(left + 1, y - 8, 9, 2, PALETTE.lampPole), rect(left - 1, y - 6, 13, 2, PALETTE.lampPole),
-    rect(left, y - 4, 11, 9, PALETTE.lampGlass), rect(left + 2, y - 2, 7, 5, PALETTE.lampLight),
-    rect(left, y - 4, 1, 9, PALETTE.lampPole), rect(left + 10, y - 4, 1, 9, PALETTE.lampPole),
-    rect(left - 1, y + 5, 13, 2, PALETTE.lampPole), rect(x - 3, y + 7, 6, 1, PALETTE.lampPole),
-  ];
-}
-
-function bench(x) {
-  return [
-    rect(x, 244, 20, 2, PALETTE.bench), rect(x, 246, 20, 1, PALETTE.benchDark),
-    rect(x, 249, 20, 2, PALETTE.bench), rect(x, 251, 20, 1, PALETTE.benchDark),
-    rect(x + 1, 244, 1, 12, PALETTE.iron), rect(x + 18, 244, 1, 12, PALETTE.iron),
-  ];
-}
-
-function pot(x) {
-  return [
-    ...disc(x + 4, 240, 5, PALETTE.leafDark), ...disc(x + 3, 239, 3, PALETTE.leaf),
-    rect(x + 6, 237, 1, 1, PALETTE.flowerPink), rect(x + 1, 241, 1, 1, PALETTE.flowerYellow),
-    rect(x, 244, 9, 2, PALETTE.potDark), rect(x + 1, 246, 7, 5, PALETTE.pot), rect(x + 1, 246, 1, 5, PALETTE.potDark),
-  ];
-}
-
-function street(random) {
-  const width = TITLE_WORLD.width;
-  // Garde-corps du quai, du coin de l'immeuble jusqu'au bord droit.
-  const quay = 287;
-  const rects = [rect(quay, 244, width - quay, 1, PALETTE.railingLight), rect(quay, 245, width - quay, 1, PALETTE.railing)];
-  for (let x = quay + 3; x < width; x += 10) rects.push(rect(x, 245, 2, 5, PALETTE.railing));
-  // Trottoir dallé, bordure et chaussée pavée, réchauffés par la flaque de lumière du lampadaire.
-  const lit = (x, y) => ((x - ANCHORS.lamp.x) / 36) ** 2 + ((y - 262) / 14) ** 2 < 1;
-  rects.push(rect(0, GROUND_Y, width, 12, PALETTE.sidewalk), rect(0, GROUND_Y, width, 1, PALETTE.sidewalkLight));
-  for (let y = GROUND_Y + 1; y < 262; y++) {
-    const half = Math.round(36 * Math.sqrt(Math.max(0, 1 - ((y - 262) / 14) ** 2)));
-    if (half > 0) rects.push(rect(ANCHORS.lamp.x - half, y, half * 2, 1, PALETTE.sidewalkLit));
-  }
-  rects.push(rect(0, 256, width, 1, PALETTE.sidewalkLine));
-  for (let x = 0; x < width; x += 12) rects.push(rect(x, 251, 1, 5, PALETTE.sidewalkLine), rect(x + 6, 257, 1, 5, PALETTE.sidewalkLine));
-  rects.push(rect(0, 262, width, 1, PALETTE.curbTop), rect(0, 263, width, 2, PALETTE.curbFace), rect(0, 265, width, 19, PALETTE.road));
-  for (let row = 0, y = 266; y < 284; row++, y += 4) {
-    for (let x = -(row % 2) * 3; x < width; x += 6) {
-      const warm = lit(x + 2, y);
-      rects.push(rect(x, y, 5, 3, warm ? PALETTE.cobbleLit : PALETTE.cobble));
-      if (random() < 0.6) rects.push(rect(x, y, 2, 1, warm ? PALETTE.cobbleLitLight : PALETTE.cobbleLight));
-    }
-  }
-  // Mobilier : pots de part et d'autre de la porte, golden retriever sur le trottoir, arbre, lampadaire et bancs.
-  rects.push(...pot(207), ...pot(247), ...bench(78), ...bench(440));
-  rects.push(...tree(318, 196, 256, random), ...lamp(ANCHORS.lamp));
-  rects.push(...fromPattern(287, 246, DOG, { g: PALETTE.dog, G: PALETTE.dogDark, l: PALETTE.dogLight, e: PALETTE.silhouette, n: PALETTE.silhouette }));
-  return rects;
-}
-
-function foreground(random) {
-  const width = TITLE_WORLD.width;
-  const rects = [rect(0, 290, width, 10, PALETTE.hedge)];
-  for (let x = 0; x < width; x += 4) {
-    const top = 284 + Math.floor(random() * 4);
-    rects.push(rect(x, top, 4, 290 - top, PALETTE.hedge), rect(x + 1, top, 2, 1, PALETTE.hedgeLight));
-  }
-  for (let i = 0; i < 260; i++) {
-    const x = Math.floor(random() * width);
-    const y = 287 + Math.floor(random() * 13);
-    rects.push(rect(x, y, 1, 1, random() < 0.5 ? PALETTE.hedgeLight : PALETTE.hedgeDark));
-  }
-  const flowers = [PALETTE.flowerPink, PALETTE.flowerYellow, PALETTE.awningLight];
-  for (let x = 3; x < width; x += 7 + Math.floor(random() * 6)) {
-    rects.push(rect(x, 288 + Math.floor(random() * 4), 1, 1, flowers[Math.floor(random() * flowers.length)]));
-  }
-  // Clôture en bois basse devant la haie.
-  rects.push(rect(0, 292, width, 2, PALETTE.fence), rect(0, 294, width, 1, PALETTE.fenceDark));
-  for (let x = 10; x < width; x += 40) rects.push(rect(x, 287, 3, 13, PALETTE.fence), rect(x, 287, 3, 1, PALETTE.fenceDark), rect(x + 2, 288, 1, 12, PALETTE.fenceDark));
-  return rects;
-}
-
 export function buildScenery(seed = 7) {
   const { moon } = ANCHORS;
   const { width, height } = TITLE_WORLD;
@@ -295,8 +203,8 @@ export function buildScenery(seed = 7) {
     sky: sky(),
     city: city(createRandom(seed), cityLights),
     building: building(createRandom(seed + 2), ANCHORS),
-    street: street(createRandom(seed + 3)),
-    foreground: foreground(createRandom(seed + 4)),
+    street: street(createRandom(seed + 3), ANCHORS, width),
+    foreground: foreground(createRandom(seed + 4), width),
   };
   Object.keys(layers).forEach((name) => { layers[name] = clip(layers[name], width, height); });
   return {

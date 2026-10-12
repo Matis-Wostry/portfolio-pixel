@@ -7,9 +7,16 @@ import { buildScenery, TITLE_LAYERS, SPRITES, JET_CENTER } from '../title/scener
 import { computeTitleView, TITLE_WORLD } from '../title/layout.mjs';
 import { paintRects } from '../title/paint.js';
 import { flickerSequence, nextToggle } from '../title/lights.mjs';
+import { nextPassage, crossing, nextDogAction } from '../title/life.mjs';
 
 const DEPTH = {
-  sky: 0, stars: 1, clouds: 2, city: 3, cityLights: 3.5, jet: 4, building: 5, windows: 5.5, glow: 6, street: 7, halo: 8, fireflies: 8.5, foreground: 9,
+  sky: 0, stars: 1, clouds: 2, city: 3, cityLights: 3.5, jet: 4, building: 5, windows: 5.5, glow: 6,
+  street: 7, reflections: 7.05, dog: 7.2, pedestrian: 7.3, cyclist: 7.4, tram: 7.5, leaves: 7.6, halo: 8, fireflies: 8.5, foreground: 9,
+};
+const PASSER_LAYOUT = {
+  pedestrian: { frames: ['pedestrian0', 'pedestrian1'], bottom: 261, frameDelay: 220 },
+  cyclist: { frames: ['cyclist0', 'cyclist1'], bottom: 283, frameDelay: 150 },
+  tram: { frames: ['tram'], bottom: 283, frameDelay: 0 },
 };
 const SCREEN_COLORS = [0x4ff0ff, 0xff4fd8, 0xf6d26a, 0x7cff8a, 0xb18cff];
 const ENTER_DURATION = 900;
@@ -26,6 +33,7 @@ export default class TitleScene extends Phaser.Scene {
     this.entering = false;
     this.generated = {};
     TITLE_LAYERS.forEach((name) => { this.generated[name] = this.addLayer(name); });
+    this.addReflections();
     this.addStars();
     this.addClouds();
     this.addJet();
@@ -39,6 +47,9 @@ export default class TitleScene extends Phaser.Scene {
       this.addArcadeScreens();
     }
     this.addFireflies();
+    this.addDog();
+    this.addLeaves();
+    this.addPassers();
     this.ui = new TitleUI({ audio: this.audio, onEnter: () => this.enter() });
     this.audio.playMusic('title');
     this.resize(this.scale.gameSize);
@@ -149,7 +160,10 @@ export default class TitleScene extends Phaser.Scene {
     const glow = this.add.rectangle(x, y, w, h, 0x6fb7ff).setOrigin(0).setAlpha(0.3)
       .setBlendMode(Phaser.BlendModes.ADD).setDepth(DEPTH.glow);
     // Lumière d'écran : varie sans cesse, sans jamais s'éteindre.
-    this.flicker((level) => glow.setAlpha(0.14 + 0.3 * level), { hum: 0.7, stutterChance: 0.03, outageChance: 0 });
+    this.flicker((level) => {
+      glow.setAlpha(0.14 + 0.3 * level);
+      this.reflect('matis', level);
+    }, { hum: 0.7, stutterChance: 0.03, outageChance: 0 });
   }
 
   addNeon() {
@@ -165,6 +179,7 @@ export default class TitleScene extends Phaser.Scene {
       wide.setAlpha(0.08 * level);
       middle.setAlpha(0.08 * level);
       close.setAlpha(0.16 * level);
+      this.reflect('neon', level);
     }, { hum: 0.15, stutterChance: 0.06, outageChance: 0.015 });
   }
 
@@ -179,10 +194,14 @@ export default class TitleScene extends Phaser.Scene {
       inner.setAlpha(0.1 * level);
       pool.setAlpha(0.045 * level);
       bulb.setAlpha(0.35 * level);
+      this.reflect('lamp', level);
     }, { hum: 0.25, stutterChance: 0.03, outageChance: 0.005 });
     const door = this.scenery.anchors.doorLamp;
     const doorGlow = this.glowImage(door.x, door.y, 'title-halo-small', SPRITES.haloSmall, 0.1);
-    this.flicker((level) => doorGlow.setAlpha(0.1 * level), { hum: 0.3, stutterChance: 0.01, outageChance: 0 });
+    this.flicker((level) => {
+      doorGlow.setAlpha(0.1 * level);
+      this.reflect('door', level);
+    }, { hum: 0.3, stutterChance: 0.01, outageChance: 0 });
   }
 
   addWindows() {
@@ -194,11 +213,19 @@ export default class TitleScene extends Phaser.Scene {
       [image, halo].forEach((item) => item.setVisible(lit));
       return { image, halo };
     });
+    // Le reflet d'une colonne de fenêtres grandit avec le nombre de voisins allumés.
+    const updateColumns = () => {
+      const lit = {};
+      this.scenery.windows.forEach(({ x }, index) => { lit[x] = (lit[x] ?? 0) + (states[index] ? 1 : 0); });
+      Object.entries(lit).forEach(([column, count]) => this.reflect('column', Math.min(count / 2, 1), Number(column)));
+    };
+    updateColumns();
     this.toggleLoop(states, { minLit: 1, maxLit: 4 }, (index, lit) => {
       const { image, halo } = lights[index];
       [image, halo].forEach((item) => item.setVisible(lit));
       // Un interrupteur : bref sursaut à l'allumage, extinction franche.
       if (lit) this.tweens.add({ targets: image, alpha: { from: 0.4, to: 1 }, duration: 90 });
+      updateColumns();
     });
   }
 
@@ -243,6 +270,119 @@ export default class TitleScene extends Phaser.Scene {
         targets: fly, alpha: 1, duration: 700 + i * 120, delay: i * 400, hold: 300, repeatDelay: 900 + i * 200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
       });
     }
+  }
+
+  // Reflets des lumières sur les pavés mouillés : seulement sur la chaussée générée.
+  addReflections() {
+    this.reflections = [];
+    if (!this.generated.street) return;
+    this.reflections = this.scenery.anchors.reflections.map(({ x, color, light, column }) => {
+      const key = `reflection-${color}`;
+      const image = this.add.image(x - 3, 266, this.texture(`title-${key}`, SPRITES[key])).setOrigin(0)
+        .setBlendMode(Phaser.BlendModes.ADD).setDepth(DEPTH.reflections).setAlpha(0);
+      return { image, light, column };
+    });
+  }
+
+  reflect(light, level, column) {
+    this.reflections.forEach((reflection) => {
+      if (reflection.light === light && (column === undefined || reflection.column === column)) reflection.image.setAlpha(0.4 * level);
+    });
+  }
+
+  frameTexture(name) {
+    return this.texture(`title-${name}`, SPRITES[name]);
+  }
+
+  addDog() {
+    const { x, y } = this.scenery.anchors.dog;
+    const dog = this.add.image(x, y, this.frameTexture('dogStand')).setOrigin(0).setDepth(DEPTH.dog);
+    if (this.reducedMotion) return;
+    const frames = { idle: ['dogStand'], wag: ['dogStand', 'dogWag'], sit: ['dogSit'], sniff: ['dogSniff', 'dogStand', 'dogSniff'] };
+    const act = () => {
+      const { action, duration } = nextDogAction(Math.random);
+      const sequence = frames[action];
+      const step = action === 'wag' ? 160 : duration / sequence.length;
+      let index = 0;
+      dog.setTexture(this.frameTexture(sequence[0]));
+      const timer = this.time.addEvent({
+        delay: step,
+        loop: true,
+        callback: () => {
+          index += 1;
+          dog.setTexture(this.frameTexture(sequence[index % sequence.length]));
+        },
+      });
+      this.time.delayedCall(duration, () => {
+        timer.remove();
+        act();
+      });
+    };
+    act();
+  }
+
+  addLeaves() {
+    if (this.reducedMotion) return;
+    const { x, y } = this.scenery.anchors.tree;
+    const key = this.frameTexture('leaf');
+    const drop = () => {
+      const startX = x - 14 + Math.random() * 28;
+      const startY = y - 8 + Math.random() * 14;
+      const leaf = this.add.image(startX, startY, key).setDepth(DEPTH.leaves);
+      const progress = { t: 0 };
+      const drift = -6 + Math.random() * 12;
+      this.tweens.add({
+        targets: progress,
+        t: 1,
+        duration: 4000 + Math.random() * 2500,
+        onUpdate: () => {
+          const { t } = progress;
+          leaf.setPosition(startX + drift * t + Math.sin(t * Math.PI * 4) * 3, startY + (257 - startY) * t);
+          leaf.setAngle(Math.sin(t * Math.PI * 6) * 60);
+          leaf.setAlpha(t > 0.85 ? (1 - t) / 0.15 : 1);
+        },
+        onComplete: () => leaf.destroy(),
+      });
+      this.time.delayedCall(2000 + Math.random() * 3500, drop);
+    };
+    this.time.delayedCall(1200, drop);
+  }
+
+  // Un passage à la fois : passant sur le trottoir, cycliste ou tram sur la chaussée.
+  addPassers() {
+    if (this.reducedMotion) return;
+    const next = () => {
+      const passage = nextPassage(Math.random);
+      this.time.delayedCall(passage.delay, () => this.pass(passage, next));
+    };
+    next();
+  }
+
+  pass(passage, done) {
+    const layout = PASSER_LAYOUT[passage.kind];
+    const sprite = SPRITES[layout.frames[0]];
+    const { fromX, toX, duration } = crossing(passage, TITLE_WORLD.width, sprite.width);
+    const passer = this.add.image(fromX, layout.bottom - sprite.height + 1, this.frameTexture(layout.frames[0]))
+      .setOrigin(0).setDepth(DEPTH[passage.kind]).setFlipX(passage.direction === -1);
+    let frame = 0;
+    const timer = layout.frames.length > 1 ? this.time.addEvent({
+      delay: layout.frameDelay,
+      loop: true,
+      callback: () => {
+        frame += 1;
+        passer.setTexture(this.frameTexture(layout.frames[frame % layout.frames.length]));
+      },
+    }) : null;
+    this.tweens.add({
+      targets: passer,
+      x: toX,
+      duration,
+      onComplete: () => {
+        timer?.remove();
+        passer.destroy();
+        done();
+      },
+    });
   }
 
   enter() {

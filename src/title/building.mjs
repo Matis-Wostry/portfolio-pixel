@@ -172,6 +172,14 @@ function entrance({ x, y, w, h }) {
   ];
 }
 
+// Plaque de rue bleue à liseré blanc, à l'angle de la façade.
+function streetSign() {
+  return [
+    rect(178, 225, 10, 6, PALETTE.signWhite), rect(179, 226, 8, 4, PALETTE.signBlue),
+    rect(180, 227, 2, 1, PALETTE.signWhite), rect(183, 227, 3, 1, PALETTE.signWhite), rect(181, 228, 4, 1, PALETTE.signWhite),
+  ];
+}
+
 function drainpipe() {
   const { right, top, bottom } = BUILDING;
   const rects = [rect(right - 6, top - 2, 6, 3, PALETTE.pipe), rect(right - 4, top, 3, bottom - top, PALETTE.pipe), rect(right - 4, top, 1, bottom - top, PALETTE.pipeLight)];
@@ -216,5 +224,6 @@ export function building(random, anchors) {
     ...plinth(),
     ...entrance(anchors.door),
     ...drainpipe(),
+    ...streetSign(),
   ];
 }
