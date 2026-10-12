@@ -1,11 +1,10 @@
-// Vie de la rue : qui passe, dans quel sens, quand, et ce que fait le chien. Sans Phaser.
+// Vie de la rue : qui passe sur la chaussée, dans quel sens, quand, et ce que fait le chien. Sans Phaser.
 const between = (random, min, max) => min + random() * (max - min);
 
 // Vitesses en pixels du monde par seconde ; poids = fréquence relative des passages.
 export const PASSERS = {
-  pedestrian: { weight: 0.45, speed: [10, 14] },
-  cyclist: { weight: 0.3, speed: [30, 42] },
-  tram: { weight: 0.25, speed: [45, 60] },
+  cyclist: { weight: 0.55, speed: [30, 42] },
+  tram: { weight: 0.45, speed: [45, 60] },
 };
 
 export function nextPassage(random) {

@@ -11,10 +11,9 @@ import { nextPassage, crossing, nextDogAction } from '../title/life.mjs';
 
 const DEPTH = {
   sky: 0, stars: 1, clouds: 2, city: 3, cityLights: 3.5, jet: 4, building: 5, windows: 5.5, glow: 6,
-  street: 7, reflections: 7.05, dog: 7.2, pedestrian: 7.3, cyclist: 7.4, tram: 7.5, leaves: 7.6, halo: 8, fireflies: 8.5, foreground: 9,
+  street: 7, reflections: 7.05, dog: 7.2, cyclist: 7.4, tram: 7.5, leaves: 7.6, halo: 8, fireflies: 8.5, foreground: 9,
 };
 const PASSER_LAYOUT = {
-  pedestrian: { frames: ['pedestrian0', 'pedestrian1'], bottom: 261, frameDelay: 220 },
   cyclist: { frames: ['cyclist0', 'cyclist1'], bottom: 283, frameDelay: 150 },
   tram: { frames: ['tram'], bottom: 283, frameDelay: 0 },
 };
@@ -348,7 +347,7 @@ export default class TitleScene extends Phaser.Scene {
     this.time.delayedCall(1200, drop);
   }
 
-  // Un passage à la fois : passant sur le trottoir, cycliste ou tram sur la chaussée.
+  // Un passage à la fois sur la chaussée : cycliste ou tram.
   addPassers() {
     if (this.reducedMotion) return;
     const next = () => {

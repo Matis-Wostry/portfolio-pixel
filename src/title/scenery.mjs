@@ -4,7 +4,7 @@ import { PALETTE } from './palette.mjs';
 import { rect, fromPattern, disc, ellipse, dither, clip } from './pixels.mjs';
 import { building, facadeWindows, litWindowRects } from './building.mjs';
 import { street, foreground } from './street.mjs';
-import { DOG_FRAMES, PEDESTRIAN_FRAMES, CYCLIST_FRAMES, TRAM, LEAF, REFLECTIONS } from './actors.mjs';
+import { DOG_FRAMES, CYCLIST_FRAMES, TRAM, LEAF, REFLECTIONS } from './actors.mjs';
 import { outline } from './lights.mjs';
 
 export { PALETTE } from './palette.mjs';
@@ -113,8 +113,6 @@ export const SPRITES = {
   litWindowFlowers: { width: 18, height: 25, rects: litWindowRects(true) },
   lampPool: { width: 73, height: 29, rects: ellipse(36, 14, 36, 14, PALETTE.lampLight) },
   ...DOG_FRAMES,
-  pedestrian0: PEDESTRIAN_FRAMES[0],
-  pedestrian1: PEDESTRIAN_FRAMES[1],
   cyclist0: CYCLIST_FRAMES[0],
   cyclist1: CYCLIST_FRAMES[1],
   tram: TRAM,

@@ -1,16 +1,11 @@
 import { PALETTE } from './palette.mjs';
-import { rect, fromPattern, disc, ellipse } from './pixels.mjs';
+import { rect, disc, ellipse } from './pixels.mjs';
 
 // Rue de nuit après une averse : quai, trottoir dallé, chaussée pavée mouillée et rails de tram.
 const SIDEWALK = { top: 250, bottom: 262 };
 const ROAD = { top: 265, bottom: 284 };
 export const RAILS = [272, 280];
 
-const FOUNTAIN = [
-  '...ii....', '..iiii...', '...ii....', '...iiI...', '...ii.w..', '...ii.w..', '...ii.w..', '...ii.w..',
-  '...ii.w..', '...ii.w..', '...ii.w..', 'kiiiiiiik', '.kbbbbbk.', '..kkkkk..', '...ii....', '...ii....', '..iiii...', '.iiiiii..',
-];
-const FOUNTAIN_COLORS = { i: PALETTE.fountain, I: PALETTE.fountainLight, w: PALETTE.water, b: PALETTE.basin, k: PALETTE.fountainDark };
 const RING = [[-3, 0], [3, 0], [0, -3], [0, 3], [-2, -2], [2, -2], [-2, 2], [2, 2], [-1, -3], [1, -3], [-1, 3], [1, 3]];
 
 function tree(cx, top, ground, random) {
@@ -61,6 +56,27 @@ function pot(x) {
     rect(x + 6, 237, 1, 1, PALETTE.flowerPink), rect(x + 1, 241, 1, 1, PALETTE.flowerYellow),
     rect(x, 244, 9, 2, PALETTE.potDark), rect(x + 1, 246, 7, 5, PALETTE.pot), rect(x + 1, 246, 1, 5, PALETTE.potDark),
   ];
+}
+
+// Bac en bois planté de buissons ronds et de fleurs, posé sur le trottoir (bas à y 258).
+function planter(x, w, random) {
+  const rects = [];
+  for (let cx = x + 4; cx < x + w - 2; cx += 7) {
+    const r = 5 + Math.floor(random() * 2);
+    rects.push(...disc(cx, 247, r, PALETTE.leafDark), ...disc(cx - 1, 246, r - 2, PALETTE.leaf), rect(cx + 1, 243, 1, 1, PALETTE.treeLit));
+  }
+  const flowers = [PALETTE.flowerPink, PALETTE.flowerYellow, PALETTE.flowerRed, PALETTE.hydrangeaBlue];
+  for (let i = 0; i < w / 3; i++) rects.push(rect(x + 1 + Math.floor(random() * (w - 2)), 242 + Math.floor(random() * 8), 1, 1, flowers[i % flowers.length]));
+  rects.push(rect(x, 252, w, 6, PALETTE.box), rect(x, 252, w, 1, PALETTE.fence), rect(x, 257, w, 1, PALETTE.boxDark));
+  for (let px = x + 4; px < x + w - 1; px += 5) rects.push(rect(px, 253, 1, 4, PALETTE.boxDark));
+  return rects;
+}
+
+// Touffe d'herbe et petites fleurs au pied d'un mur ou d'un garde-corps.
+function tuft(x, y, random) {
+  const rects = [rect(x, y, 1, 2, PALETTE.leafDark), rect(x + 1, y - 1, 1, 3, PALETTE.leaf), rect(x + 2, y, 1, 2, PALETTE.leafDark)];
+  if (random() < 0.5) rects.push(rect(x + 1, y - 2, 1, 1, random() < 0.5 ? PALETTE.flowerYellow : PALETTE.awningLight));
+  return rects;
 }
 
 function bin(x) {
@@ -151,7 +167,11 @@ export function street(random, anchors, span) {
   for (let x = quay + 3; x < span.right; x += 10) rects.push(rect(x, 245, 2, 5, PALETTE.railing));
   rects.push(...sidewalk(random, anchors, span), ...road(random, anchors, span));
   // Mobilier : fontaine, poubelle, bancs, pots, arbre et son vélo, lampadaire.
-  rects.push(...fromPattern(30, 241, FOUNTAIN, FOUNTAIN_COLORS), ...bin(106));
+  // Végétation : bacs fleuris, touffes au pied de l'immeuble, de la boutique et du garde-corps.
+  rects.push(...planter(-30, 24, random), ...planter(18, 30, random));
+  rects.push(...planter(372, 22, random), ...planter(470, 24, random), ...planter(506, 28, random));
+  [-110, -4, 60, 114, 178, 200, 262, 360, 430, 540, 590].forEach((x) => rects.push(...tuft(x, 248, random)));
+  rects.push(...bin(106));
   rects.push(...pot(207), ...pot(247), ...bench(78), ...bench(440));
   rects.push(...tree(anchors.tree.x, 196, 256, random), ...bicycle(325), ...lamp(anchors.lamp));
   // Prolongements : bancs et arbres sur les bords élargis.

@@ -38,3 +38,9 @@ test('the dog mostly wags and sometimes sits or sniffs', () => {
   assert.ok(count('wag') > count('sit') && count('wag') > count('sniff'));
   DOG_ACTIONS.forEach((name) => assert.ok(count(name) > 0, name));
 });
+
+test('only cyclists and trams pass, nobody walks on the sidewalk', () => {
+  assert.deepEqual(Object.keys(PASSERS).sort(), ['cyclist', 'tram']);
+  const total = Object.values(PASSERS).reduce((sum, { weight }) => sum + weight, 0);
+  assert.ok(Math.abs(total - 1) < 1e-9);
+});

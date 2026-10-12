@@ -23,15 +23,6 @@ export const DOG_FRAMES = {
   ]),
 };
 
-const PERSON_TOP = ['..hhh', '.hhhhh', '..sss', '..sss', '.ccccc', 'ccccccc', 'c.cCc.c', 'c.cCc.c', 's.cCc.s', '..ccc', '..ccc'];
-const PERSON_COLORS = { h: PALETTE.hair, s: PALETTE.skin, c: PALETTE.coat, C: PALETTE.coatDark, p: PALETTE.pants, b: PALETTE.shoes };
-const person = (legs) => ({ width: 7, height: 16, rects: fromPattern(0, 0, pad([...PERSON_TOP, ...legs], 7), PERSON_COLORS) });
-
-export const PEDESTRIAN_FRAMES = [
-  person(['..p.p', '..p.p', '.p...p', '.p...p', 'bb...bb']),
-  person(['..ppp', '..ppp', '..p.p', '..p.p', '.bb.bb']),
-];
-
 const RING = [[-3, 0], [3, 0], [0, -3], [0, 3], [-2, -2], [2, -2], [-2, 2], [2, 2], [-1, -3], [1, -3], [-1, 3], [1, 3]];
 
 function cyclist(frame) {
