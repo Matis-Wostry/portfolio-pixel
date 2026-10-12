@@ -1,8 +1,9 @@
 import { createRandom, generateStars } from './random.mjs';
 import { TITLE_WORLD } from './layout.mjs';
 import { PALETTE } from './palette.mjs';
-import { rect, fromPattern, disc, dither, clip } from './pixels.mjs';
-import { building } from './building.mjs';
+import { rect, fromPattern, disc, ellipse, dither, clip } from './pixels.mjs';
+import { building, facadeWindows, litWindowRects } from './building.mjs';
+import { outline } from './lights.mjs';
 
 export { PALETTE } from './palette.mjs';
 export { fromPattern, disc } from './pixels.mjs';
@@ -16,7 +17,9 @@ export const ANCHORS = {
   window: { x: 223, y: 136, w: 16, h: 20 },
   door: { x: 222, y: 222, w: 18, h: 28 },
   lamp: { x: 346, y: 196 },
-  warmLights: [{ x: 249, y: 225 }, { x: 266, y: 114 }, { x: 196, y: 178 }],
+  doorLamp: { x: 249, y: 225 },
+  screens: [{ x: 128, y: 231, w: 4, h: 3 }, { x: 139, y: 231, w: 4, h: 3 }],
+  tree: { x: 318, y: 210 },
   lake: { x: 280, y: 238, w: 200, h: 12 },
   jet: { x: 400, y: 241, h: 80 },
   neon: { x: 134, y: 205 },
@@ -97,7 +100,16 @@ function jetRects() {
 
 export const SPRITES = {
   cloud: { width: 24, height: 7, rects: fromPattern(0, 0, CLOUD, { c: PALETTE.cloud, d: PALETTE.cloudShade, l: PALETTE.cloudLight }) },
-  neon: { width: 13, height: 7, rects: fromPattern(0, 0, GAMEPAD, { n: PALETTE.neon }) },
+  // Tube allumé : cœur pâle cerné d'un liseré rose, posé un pixel au-dessus et à gauche de l'ancre.
+  neon: {
+    width: 15,
+    height: 9,
+    rects: [...outline(GAMEPAD).map(({ x, y }) => rect(x + 1, y + 1, 1, 1, PALETTE.neon)), ...fromPattern(1, 1, GAMEPAD, { n: PALETTE.neonCore })],
+  },
+  neonGlow: { width: 25, height: 25, rects: disc(12, 12, 12, PALETTE.neon) },
+  litWindow: { width: 18, height: 25, rects: litWindowRects(false) },
+  litWindowFlowers: { width: 18, height: 25, rects: litWindowRects(true) },
+  lampPool: { width: 73, height: 29, rects: ellipse(36, 14, 36, 14, PALETTE.lampLight) },
   jet: { width: 25, height: 80, rects: jetRects() },
   haloOuter: { width: 57, height: 57, rects: disc(28, 28, 28, PALETTE.lampLight) },
   haloInner: { width: 33, height: 33, rects: disc(16, 16, 16, PALETTE.lampLight) },
@@ -127,7 +139,7 @@ function spire(x, base, height, color) {
   return rects;
 }
 
-function skyline(random, { color, roof, minH, maxH, minW, maxW, lights, lightChance, landmarks = [] }) {
+function skyline(random, { color, roof, minH, maxH, minW, maxW, lights, lightChance, landmarks = [], collect = null }) {
   const rects = [];
   for (let x = -4; x < TITLE_WORLD.width;) {
     const w = minW + Math.floor(random() * (maxW - minW));
@@ -140,7 +152,10 @@ function skyline(random, { color, roof, minH, maxH, minW, maxW, lights, lightCha
     } else if (shape < 0.45) rects.push(rect(x + 2 + Math.floor(random() * (w - 5)), top - 4, 2, 4, color));
     for (let wy = top + 4; wy < GROUND_Y - 6; wy += 6) {
       for (let wx = x + 3; wx + 2 <= x + w - 3; wx += 5) {
-        if (random() < lightChance) rects.push(rect(wx, wy, lights.size, lights.size, random() < 0.7 ? lights.colors[0] : lights.colors[1]));
+        if (random() < lightChance) {
+          rects.push(rect(wx, wy, lights.size, lights.size, random() < 0.7 ? lights.colors[0] : lights.colors[1]));
+          collect?.push({ x: wx, y: wy, w: lights.size, h: lights.size });
+        }
       }
     }
     x += w + Math.floor(random() * 3);
@@ -151,7 +166,7 @@ function skyline(random, { color, roof, minH, maxH, minW, maxW, lights, lightCha
   return rects;
 }
 
-function city(random) {
+function city(random, cityLights) {
   const rects = [
     // Plan lointain dans la brume : la vieille ville et les flèches de la cathédrale.
     ...skyline(random, {
@@ -162,7 +177,7 @@ function city(random) {
     // Plan proche, plus sombre, avec des fenêtres chaudes.
     ...skyline(random, {
       color: PALETTE.cityNear, roof: PALETTE.cityNearRoof, minH: 22, maxH: 62, minW: 14, maxW: 34,
-      lights: { size: 2, colors: [PALETTE.cityLight, PALETTE.cityLightWarm] }, lightChance: 0.2,
+      lights: { size: 2, colors: [PALETTE.cityLight, PALETTE.cityLightWarm] }, lightChance: 0.2, collect: cityLights,
     }),
   ];
   // Lac Léman à droite, reflets des lumières et du Jet d'eau.
@@ -275,9 +290,10 @@ function foreground(random) {
 export function buildScenery(seed = 7) {
   const { moon } = ANCHORS;
   const { width, height } = TITLE_WORLD;
+  const cityLights = [];
   const layers = {
     sky: sky(),
-    city: city(createRandom(seed)),
+    city: city(createRandom(seed), cityLights),
     building: building(createRandom(seed + 2), ANCHORS),
     street: street(createRandom(seed + 3)),
     foreground: foreground(createRandom(seed + 4)),
@@ -288,5 +304,11 @@ export function buildScenery(seed = 7) {
     stars: generateStars(seed + 1, { width, height: 140, count: 70, avoid: [{ x: moon.x, y: moon.y, r: moon.r + 10 }] }),
     clouds: [{ x: 30, y: 26, speed: 3 }, { x: 190, y: 56, speed: 2 }, { x: 340, y: 18, speed: 4 }],
     anchors: ANCHORS,
+    windows: facadeWindows(ANCHORS),
+    // Lumières du plan proche visibles dans le décor, que la scène peut éteindre une à une.
+    cityLights: cityLights.filter(({ x, y }) => {
+      const hidden = (x + 2 > 117 && x < 286 && y + 2 > 188) || (x + 2 > 176 && x < 286) || y + 2 > ANCHORS.lake.y;
+      return x >= 0 && x + 2 <= width && !hidden;
+    }),
   };
 }

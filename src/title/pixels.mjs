@@ -37,6 +37,15 @@ export function dither(x, y, w, rows, color) {
   return rects;
 }
 
+export function ellipse(cx, cy, rx, ry, color) {
+  const rects = [];
+  for (let dy = -ry; dy <= ry; dy++) {
+    const half = Math.round(rx * Math.sqrt(1 - (dy / ry) ** 2));
+    rects.push(rect(cx - half, cy + dy, half * 2 + 1, 1, color));
+  }
+  return rects;
+}
+
 // Coupe les rectangles au cadre du calque pour que tout dessin débordant reste valide.
 export function clip(rects, width, height) {
   return rects.flatMap(({ x, y, w, h, color }) => {

@@ -20,7 +20,7 @@ export const PALETTE = {
   shopWood: '#4a3150', shopWoodDark: '#38243e', shopWoodLight: '#5c3e63', shopWindow: '#2a1f45', shopGlow: '#3c2c5c',
   cabinetBodyPink: '#5a2a6a', cabinetBodyBlue: '#2a4a6a',
   awning: '#e2607a', awningLight: '#f3e3cc', awningShade: '#b4465e', sign: '#1f1830',
-  cabinetPink: '#ff4fd8', cabinetCyan: '#4ff0ff', neonDim: '#4a2a50', neon: '#ff4fd8',
+  cabinetPink: '#ff4fd8', cabinetCyan: '#4ff0ff', neonDim: '#4a2a50', neon: '#ff4fd8', neonCore: '#ffe3f7',
 
   sidewalk: '#5d5670', sidewalkLine: '#4a4459', sidewalkLight: '#6d6682', curbTop: '#8a8399', curbFace: '#3a3548',
   road: '#2a2637', cobble: '#363144', cobbleLight: '#423c52', cobbleLit: '#433b4d', cobbleLitLight: '#544a5a', sidewalkLit: '#6a6176',

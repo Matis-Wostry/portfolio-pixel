@@ -113,20 +113,33 @@ function matisWindow({ x, y, w, h }) {
   ];
 }
 
-function facadeWindows(anchors) {
-  const rects = [];
+// Fenêtres des voisins, dessinées éteintes : la scène pose par-dessus leur version allumée.
+export function facadeWindows(anchors) {
+  const windows = [];
   FLOORS.forEach((y) => COLUMNS.forEach((x) => {
-    if (x === 223 && y === 200) return;
+    if ((x === 223 && y === 200) || (x === anchors.window.x && y === anchors.window.y)) return;
     const id = `${x},${y}`;
-    const isMatis = x === anchors.window.x && y === anchors.window.y;
-    if (y < 200) rects.push(...shutters(x, y));
-    rects.push(...windowFrame(x, y));
-    if (isMatis) rects.push(...matisWindow(anchors.window));
-    else rects.push(...(LIT.includes(id) ? litGlass(x, y) : darkGlass(x, y)));
-    rects.push(...sill(x, y));
-    if (LIT.includes(id)) rects.push(rect(x - 1, y + 23, 18, 1, PALETTE.brickLit), rect(x + 1, y + 24, 14, 1, PALETTE.brickLit));
-    if (FLOWERS.includes(id)) rects.push(...fromPattern(x - 1, y + 13, FLOWER_BOX, FLOWER_COLORS));
+    windows.push({ x, y, lit: LIT.includes(id), flowers: FLOWERS.includes(id) });
   }));
+  return windows;
+}
+
+// Fenêtre allumée vue depuis son coin (x - 1, y) : vitre, rideaux, jardinière éventuelle et lumière sur les briques.
+export function litWindowRects(flowers) {
+  const rects = [...litGlass(1, 0), rect(0, 23, 18, 1, PALETTE.brickLit), rect(2, 24, 14, 1, PALETTE.brickLit)];
+  if (flowers) rects.push(...fromPattern(0, 13, FLOWER_BOX, FLOWER_COLORS));
+  return rects;
+}
+
+function windows(anchors) {
+  const rects = [];
+  const draw = (x, y, glass, flowers) => {
+    if (y < 200) rects.push(...shutters(x, y));
+    rects.push(...windowFrame(x, y), ...glass, ...sill(x, y));
+    if (flowers) rects.push(...fromPattern(x - 1, y + 13, FLOWER_BOX, FLOWER_COLORS));
+  };
+  facadeWindows(anchors).forEach(({ x, y, flowers }) => draw(x, y, darkGlass(x, y), flowers));
+  draw(anchors.window.x, anchors.window.y, matisWindow(anchors.window), false);
   return rects;
 }
 
@@ -199,7 +212,7 @@ export function building(random, anchors) {
     ...bricks(random),
     ...cornice(),
     ...roofline(),
-    ...facadeWindows(anchors),
+    ...windows(anchors),
     ...plinth(),
     ...entrance(anchors.door),
     ...drainpipe(),

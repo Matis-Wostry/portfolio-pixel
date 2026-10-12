@@ -6,8 +6,12 @@ import { isUsableArtSize } from '../systems/assetManifest.mjs';
 import { buildScenery, TITLE_LAYERS, SPRITES, JET_CENTER } from '../title/scenery.mjs';
 import { computeTitleView, TITLE_WORLD } from '../title/layout.mjs';
 import { paintRects } from '../title/paint.js';
+import { flickerSequence, nextToggle } from '../title/lights.mjs';
 
-const DEPTH = { sky: 0, stars: 1, clouds: 2, city: 3, jet: 4, building: 5, glow: 6, street: 7, halo: 8, foreground: 9 };
+const DEPTH = {
+  sky: 0, stars: 1, clouds: 2, city: 3, cityLights: 3.5, jet: 4, building: 5, windows: 5.5, glow: 6, street: 7, halo: 8, fireflies: 8.5, foreground: 9,
+};
+const SCREEN_COLORS = [0x4ff0ff, 0xff4fd8, 0xf6d26a, 0x7cff8a, 0xb18cff];
 const ENTER_DURATION = 900;
 
 export default class TitleScene extends Phaser.Scene {
@@ -20,13 +24,21 @@ export default class TitleScene extends Phaser.Scene {
     this.scenery = buildScenery();
     this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.entering = false;
-    TITLE_LAYERS.forEach((name) => this.addLayer(name));
+    this.generated = {};
+    TITLE_LAYERS.forEach((name) => { this.generated[name] = this.addLayer(name); });
     this.addStars();
     this.addClouds();
     this.addJet();
     this.addWindowGlow();
     this.addNeon();
-    this.addHalo();
+    this.addLamp();
+    // Les lumières calées sur le dessin exact ne s'appliquent qu'au décor généré.
+    if (this.generated.city) this.addCityLights();
+    if (this.generated.building) {
+      this.addWindows();
+      this.addArcadeScreens();
+    }
+    this.addFireflies();
     this.ui = new TitleUI({ audio: this.audio, onEnter: () => this.enter() });
     this.audio.playMusic('title');
     this.resize(this.scale.gameSize);
@@ -42,17 +54,55 @@ export default class TitleScene extends Phaser.Scene {
     return key;
   }
 
+  // Renvoie true quand le calque vient du décor généré par le code.
   addLayer(name) {
     const fileKey = `title-${name}`;
     if (TITLE_ART[name] && this.textures.exists(fileKey)) {
       if (isUsableArtSize(this.textures.get(fileKey).getSourceImage(), TITLE_WORLD)) {
         this.add.image(0, 0, fileKey).setOrigin(0).setDepth(DEPTH[name]);
-        return;
+        return false;
       }
       console.warn(`Calque ${name} ignoré : ${TITLE_WORLD.width} × ${TITLE_WORLD.height} pixels attendus.`);
     }
     const key = this.texture(`title-generated-${name}`, { ...TITLE_WORLD, rects: this.scenery.layers[name] });
     this.add.image(0, 0, key).setOrigin(0).setDepth(DEPTH[name]);
+    return true;
+  }
+
+  // Rejoue sans fin des séquences d'intensité ; lumière fixe si le visiteur réduit les animations.
+  flicker(apply, options) {
+    if (this.reducedMotion) {
+      apply(1);
+      return;
+    }
+    const play = () => {
+      let at = 0;
+      flickerSequence(Math.random, options).forEach(({ level, duration }) => {
+        this.time.delayedCall(at, () => apply(level));
+        at += duration;
+      });
+      this.time.delayedCall(at, play);
+    };
+    play();
+  }
+
+  // Allume ou éteint une lumière à la fois, à intervalles irréguliers.
+  toggleLoop(states, options, apply, speed = 1) {
+    if (this.reducedMotion) return;
+    const tick = () => {
+      const toggle = nextToggle(Math.random, states, options);
+      if (!toggle) return;
+      this.time.delayedCall(toggle.delay / speed, () => {
+        states[toggle.index] = toggle.lit;
+        apply(toggle.index, toggle.lit);
+        tick();
+      });
+    };
+    tick();
+  }
+
+  glowImage(x, y, key, sprite, alpha, depth = DEPTH.glow) {
+    return this.add.image(x, y, this.texture(key, sprite)).setAlpha(alpha).setBlendMode(Phaser.BlendModes.ADD).setDepth(depth);
   }
 
   addStars() {
@@ -96,28 +146,103 @@ export default class TitleScene extends Phaser.Scene {
 
   addWindowGlow() {
     const { x, y, w, h } = this.scenery.anchors.window;
-    const glow = this.add.rectangle(x, y, w, h, 0x6fb7ff).setOrigin(0).setAlpha(0.18)
+    const glow = this.add.rectangle(x, y, w, h, 0x6fb7ff).setOrigin(0).setAlpha(0.3)
       .setBlendMode(Phaser.BlendModes.ADD).setDepth(DEPTH.glow);
-    if (!this.reducedMotion) this.tweens.add({ targets: glow, alpha: 0.4, duration: 1500, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    // Lumière d'écran : varie sans cesse, sans jamais s'éteindre.
+    this.flicker((level) => glow.setAlpha(0.14 + 0.3 * level), { hum: 0.7, stutterChance: 0.03, outageChance: 0 });
   }
 
   addNeon() {
     const { x, y } = this.scenery.anchors.neon;
-    const neon = this.add.image(x, y, this.texture('title-neon', SPRITES.neon)).setOrigin(0).setDepth(DEPTH.glow);
-    if (this.reducedMotion) return;
-    this.time.addEvent({ delay: 140, loop: true, callback: () => neon.setAlpha(Math.random() < 0.06 ? 0.3 : 1) });
+    const centerX = x + 6.5;
+    const centerY = y + 3.5;
+    const wide = this.glowImage(centerX, centerY, 'title-neon-glow', SPRITES.neonGlow, 0.08).setScale(1.9, 1.1);
+    const middle = this.glowImage(centerX, centerY, 'title-neon-glow', SPRITES.neonGlow, 0.08).setScale(1.35, 0.8);
+    const close = this.glowImage(centerX, centerY, 'title-neon-glow', SPRITES.neonGlow, 0.16).setScale(0.9, 0.55);
+    const tube = this.add.image(x - 1, y - 1, this.texture('title-neon', SPRITES.neon)).setOrigin(0).setDepth(DEPTH.glow);
+    this.flicker((level) => {
+      tube.setAlpha(level);
+      wide.setAlpha(0.08 * level);
+      middle.setAlpha(0.08 * level);
+      close.setAlpha(0.16 * level);
+    }, { hum: 0.15, stutterChance: 0.06, outageChance: 0.015 });
   }
 
-  addHalo() {
+  addLamp() {
     const { x, y } = this.scenery.anchors.lamp;
-    [['title-halo-outer', SPRITES.haloOuter, 0.07], ['title-halo-inner', SPRITES.haloInner, 0.1]].forEach(([key, sprite, alpha]) => {
-      this.add.image(x, y, this.texture(key, sprite)).setAlpha(alpha).setBlendMode(Phaser.BlendModes.ADD).setDepth(DEPTH.halo);
+    const outer = this.glowImage(x, y, 'title-halo-outer', SPRITES.haloOuter, 0.07, DEPTH.halo);
+    const inner = this.glowImage(x, y, 'title-halo-inner', SPRITES.haloInner, 0.1, DEPTH.halo);
+    const pool = this.glowImage(x, 262, 'title-lamp-pool', SPRITES.lampPool, 0.045, DEPTH.halo);
+    const bulb = this.add.rectangle(x - 3, y - 2, 7, 5, 0xffffff).setOrigin(0).setBlendMode(Phaser.BlendModes.ADD).setDepth(DEPTH.halo);
+    this.flicker((level) => {
+      outer.setAlpha(0.07 * level);
+      inner.setAlpha(0.1 * level);
+      pool.setAlpha(0.045 * level);
+      bulb.setAlpha(0.35 * level);
+    }, { hum: 0.25, stutterChance: 0.03, outageChance: 0.005 });
+    const door = this.scenery.anchors.doorLamp;
+    const doorGlow = this.glowImage(door.x, door.y, 'title-halo-small', SPRITES.haloSmall, 0.1);
+    this.flicker((level) => doorGlow.setAlpha(0.1 * level), { hum: 0.3, stutterChance: 0.01, outageChance: 0 });
+  }
+
+  addWindows() {
+    const states = this.scenery.windows.map(({ lit }) => lit);
+    const lights = this.scenery.windows.map(({ x, y, lit, flowers }) => {
+      const sprite = flowers ? SPRITES.litWindowFlowers : SPRITES.litWindow;
+      const image = this.add.image(x - 1, y, this.texture(`title-lit-window${flowers ? '-flowers' : ''}`, sprite)).setOrigin(0).setDepth(DEPTH.windows);
+      const halo = this.glowImage(x + 8, y + 10, 'title-halo-small', SPRITES.haloSmall, 0.09);
+      [image, halo].forEach((item) => item.setVisible(lit));
+      return { image, halo };
     });
-    // Lueurs chaudes plus discrètes : applique de la porte et fenêtres éclairées des voisins.
-    const small = this.texture('title-halo-small', SPRITES.haloSmall);
-    this.scenery.anchors.warmLights.forEach(({ x: lightX, y: lightY }) => {
-      this.add.image(lightX, lightY, small).setAlpha(0.08).setBlendMode(Phaser.BlendModes.ADD).setDepth(DEPTH.glow);
+    this.toggleLoop(states, { minLit: 1, maxLit: 4 }, (index, lit) => {
+      const { image, halo } = lights[index];
+      [image, halo].forEach((item) => item.setVisible(lit));
+      // Un interrupteur : bref sursaut à l'allumage, extinction franche.
+      if (lit) this.tweens.add({ targets: image, alpha: { from: 0.4, to: 1 }, duration: 90 });
     });
+  }
+
+  addCityLights() {
+    const lights = this.scenery.cityLights;
+    const states = lights.map(() => true);
+    // Un cache de la couleur des immeubles éteint la fenêtre peinte dessous.
+    const covers = lights.map(({ x, y, w, h }) => this.add.rectangle(x, y, w, h, 0x1a1633).setOrigin(0).setDepth(DEPTH.cityLights).setVisible(false));
+    this.toggleLoop(states, { minLit: lights.length - 6 }, (index, lit) => covers[index].setVisible(!lit), 3);
+  }
+
+  addArcadeScreens() {
+    const screens = this.scenery.anchors.screens.map(({ x, y, w, h }, index) => (
+      this.add.rectangle(x, y, w, h, SCREEN_COLORS[index]).setOrigin(0).setDepth(DEPTH.glow)
+    ));
+    if (this.reducedMotion) return;
+    screens.forEach((screen) => {
+      const change = () => {
+        screen.setFillStyle(SCREEN_COLORS[Math.floor(Math.random() * SCREEN_COLORS.length)]);
+        this.time.delayedCall(300 + Math.random() * 900, change);
+      };
+      change();
+    });
+  }
+
+  addFireflies() {
+    if (this.reducedMotion) return;
+    const { x, y } = this.scenery.anchors.tree;
+    for (let i = 0; i < 6; i++) {
+      const fly = this.add.rectangle(x - 18 + i * 7, y - 6 + (i % 3) * 10, 1, 1, 0xe4f58a).setOrigin(0)
+        .setBlendMode(Phaser.BlendModes.ADD).setDepth(DEPTH.fireflies).setAlpha(0);
+      const wander = () => this.tweens.add({
+        targets: fly,
+        x: x - 24 + Math.random() * 48,
+        y: y - 14 + Math.random() * 40,
+        duration: 2500 + Math.random() * 2500,
+        ease: 'Sine.easeInOut',
+        onComplete: wander,
+      });
+      wander();
+      this.tweens.add({
+        targets: fly, alpha: 1, duration: 700 + i * 120, delay: i * 400, hold: 300, repeatDelay: 900 + i * 200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+      });
+    }
   }
 
   enter() {
