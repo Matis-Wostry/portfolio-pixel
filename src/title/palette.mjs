@@ -29,5 +29,6 @@ export const PALETTE = {
   trunk: '#4a3026', trunkDark: '#35211b', tree: '#24402f', treeDark: '#1a3024', treeLight: '#33583f', treeLit: '#4c7448',
   bench: '#7a4e2e', benchDark: '#553420', iron: '#22222e',
   pot: '#a0573a', potDark: '#7a3f2a',
+  dog: '#d39a48', dogDark: '#a26a2c', dogLight: '#efc477',
   hedge: '#1d3326', hedgeDark: '#142419', hedgeLight: '#2b4a36', fence: '#6a4a33', fenceDark: '#4a3122',
 };

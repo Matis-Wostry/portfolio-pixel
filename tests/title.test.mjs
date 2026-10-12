@@ -48,6 +48,16 @@ test('keeps the lit window and the front door visible on common screens', () => 
   }
 });
 
+test("shows the Jet d'eau rising from the lake on landscape screens", () => {
+  const { jet, lake } = ANCHORS;
+  assert.ok(jet.x - 2 >= lake.x && jet.x + 3 <= lake.x + lake.w && jet.y >= lake.y && jet.y <= lake.y + lake.h);
+  assert.ok(lake.x > TITLE_WORLD.width / 2, 'lake on the right');
+  for (const [width, height] of SCREENS.filter(([w, h]) => w > h)) {
+    const view = computeTitleView(width, height, ANCHORS.focus);
+    assert.ok(inside(view, { x: jet.x - 2, y: jet.y - jet.h, w: 5, h: jet.h }), `jet ${width}x${height}`);
+  }
+});
+
 test('invalid screen sizes fall back to the whole world', () => {
   for (const [width, height] of [[0, 800], [Number.NaN, 600], [-5, -5]]) {
     const view = computeTitleView(width, height, ANCHORS.focus);

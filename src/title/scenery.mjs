@@ -17,7 +17,8 @@ export const ANCHORS = {
   door: { x: 222, y: 222, w: 18, h: 28 },
   lamp: { x: 346, y: 196 },
   warmLights: [{ x: 249, y: 225 }, { x: 266, y: 114 }, { x: 196, y: 178 }],
-  jet: { x: 70, y: 240, h: 72 },
+  lake: { x: 292, y: 238, w: 188, h: 12 },
+  jet: { x: 400, y: 240, h: 72 },
   neon: { x: 134, y: 205 },
   moon: { x: 404, y: 42, r: 12 },
 };
@@ -32,7 +33,21 @@ const CLOUD = [
   '.dddddddddddddddddddddd.',
   '...dddddd.....ddddd.....',
 ];
-const CAT = ['k...k...', 'kkkkk...', 'kekek...', 'kkkkk..k', '.kkk...k', 'kkkkk.k.', 'kkkkkkk.'];
+const DOG = [
+  '..ggg..............',
+  '.ggggg.............',
+  '.ggegGG............',
+  'nggggGG............',
+  '.gggGGG..........l.',
+  '..ggGGgllllllllgll.',
+  '...gggggggggggggGl.',
+  '...ggggggggggggg.l.',
+  '...GgggggggggggG..l',
+  '...gG.gG....gG.gG..',
+  '...gG.gG....gG.gG..',
+  '...gG.gG....gG.gG..',
+  '...GG.GG....GG.GG..',
+];
 
 export const SPRITES = {
   cloud: { width: 24, height: 7, rects: fromPattern(0, 0, CLOUD, { c: PALETTE.cloud, d: PALETTE.cloudShade, l: PALETTE.cloudLight }) },
@@ -109,17 +124,20 @@ function city(random) {
       lights: { size: 2, colors: [PALETTE.cityLight, PALETTE.cityLightWarm] }, lightChance: 0.2,
     }),
   ];
-  // Lac Léman et reflets des lumières.
-  rects.push(rect(0, 238, 166, 12, PALETTE.lake), rect(0, 238, 166, 1, PALETTE.lakeLight), rect(0, 246, 166, 4, PALETTE.lakeDeep));
-  for (let x = 3; x < 164; x += 7) rects.push(rect(x, 240 + (x % 3) * 2, 3 + (x % 2), 1, PALETTE.lakeLight));
-  for (let x = 12; x < 160; x += 23) rects.push(rect(x, 241, 1, 2, PALETTE.lakeGlow), rect(x, 244, 1, 1, PALETTE.lakeGlow));
+  // Lac Léman à droite, reflets des lumières et du Jet d'eau.
+  const { x, y, w, h } = ANCHORS.lake;
+  rects.push(rect(x, y, w, h, PALETTE.lake), rect(x, y, w, 1, PALETTE.lakeLight), rect(x, y + 8, w, h - 8, PALETTE.lakeDeep));
+  for (let dx = 3; dx < w - 4; dx += 7) rects.push(rect(x + dx, y + 2 + (dx % 3) * 2, 3 + (dx % 2), 1, PALETTE.lakeLight));
+  for (let dx = 12; dx < w - 2; dx += 23) rects.push(rect(x + dx, y + 3, 1, 2, PALETTE.lakeGlow), rect(x + dx, y + 6, 1, 1, PALETTE.lakeGlow));
+  const { x: jetX } = ANCHORS.jet;
+  rects.push(rect(jetX - 2, y + 1, 5, 1, PALETTE.jetSide), rect(jetX, y + 3, 1, 2, PALETTE.jet), rect(jetX, y + 7, 1, 2, PALETTE.jetSide));
   return rects;
 }
 
-function tree(cx, top, random) {
+function tree(cx, top, ground, random) {
   const rects = [
-    rect(cx - 2, top + 24, 5, 34, PALETTE.trunk), rect(cx + 1, top + 24, 2, 34, PALETTE.trunkDark),
-    rect(cx - 4, top + 56, 9, 2, PALETTE.trunkDark),
+    rect(cx - 2, top + 24, 5, ground - top - 24, PALETTE.trunk), rect(cx + 1, top + 24, 2, ground - top - 24, PALETTE.trunkDark),
+    rect(cx - 4, ground - 2, 9, 2, PALETTE.trunkDark), rect(cx - 7, ground, 15, 2, PALETTE.trunkDark),
     ...disc(cx, top + 14, 16, PALETTE.treeDark),
     ...disc(cx - 7, top + 10, 10, PALETTE.tree), ...disc(cx + 7, top + 12, 10, PALETTE.tree), ...disc(cx, top + 4, 9, PALETTE.tree),
     ...disc(cx + 3, top + 4, 5, PALETTE.treeLight), ...disc(cx - 8, top + 8, 4, PALETTE.treeLight),
@@ -163,11 +181,12 @@ function pot(x) {
 
 function street(random) {
   const width = TITLE_WORLD.width;
+  const { x: lakeX, w: lakeW } = ANCHORS.lake;
   const rects = [
     // Garde-corps du quai, devant le lac.
-    rect(0, 244, 117, 1, PALETTE.railingLight), rect(0, 245, 117, 1, PALETTE.railing),
+    rect(lakeX, 244, lakeW, 1, PALETTE.railingLight), rect(lakeX, 245, lakeW, 1, PALETTE.railing),
   ];
-  for (let x = 2; x < 117; x += 10) rects.push(rect(x, 245, 2, 5, PALETTE.railing));
+  for (let x = lakeX + 2; x < lakeX + lakeW; x += 10) rects.push(rect(x, 245, 2, 5, PALETTE.railing));
   // Trottoir dallé, bordure et chaussée pavée, réchauffés par la flaque de lumière du lampadaire.
   const lit = (x, y) => ((x - ANCHORS.lamp.x) / 36) ** 2 + ((y - 262) / 14) ** 2 < 1;
   rects.push(rect(0, GROUND_Y, width, 12, PALETTE.sidewalk), rect(0, GROUND_Y, width, 1, PALETTE.sidewalkLight));
@@ -185,9 +204,10 @@ function street(random) {
       if (random() < 0.6) rects.push(rect(x, y, 2, 1, warm ? PALETTE.cobbleLitLight : PALETTE.cobbleLight));
     }
   }
-  // Mobilier : pots de part et d'autre de la porte, banc et chat face au lac, arbre et lampadaire.
-  rects.push(...pot(207), ...pot(247), ...bench(78), ...fromPattern(88, 243, CAT, { k: PALETTE.silhouette, e: PALETTE.flowerYellow }));
-  rects.push(...tree(318, 186, random), ...lamp(ANCHORS.lamp), ...bench(392));
+  // Mobilier : pots de part et d'autre de la porte, golden retriever sur le trottoir, arbre, lampadaire et bancs.
+  rects.push(...pot(207), ...pot(247), ...bench(78), ...bench(440));
+  rects.push(...tree(318, 196, 256, random), ...lamp(ANCHORS.lamp));
+  rects.push(...fromPattern(287, 246, DOG, { g: PALETTE.dog, G: PALETTE.dogDark, l: PALETTE.dogLight, e: PALETTE.silhouette, n: PALETTE.silhouette }));
   return rects;
 }
 
