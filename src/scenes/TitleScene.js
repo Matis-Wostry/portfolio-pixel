@@ -183,18 +183,20 @@ export default class TitleScene extends Phaser.Scene {
   }
 
   addLamp() {
-    const { x, y } = this.scenery.anchors.lamp;
-    const outer = this.glowImage(x, y, 'title-halo-outer', SPRITES.haloOuter, 0.07, DEPTH.halo);
-    const inner = this.glowImage(x, y, 'title-halo-inner', SPRITES.haloInner, 0.1, DEPTH.halo);
-    const pool = this.glowImage(x, 262, 'title-lamp-pool', SPRITES.lampPool, 0.045, DEPTH.halo);
-    const bulb = this.add.rectangle(x - 3, y - 2, 7, 5, 0xffffff).setOrigin(0).setBlendMode(Phaser.BlendModes.ADD).setDepth(DEPTH.halo);
-    this.flicker((level) => {
-      outer.setAlpha(0.07 * level);
-      inner.setAlpha(0.1 * level);
-      pool.setAlpha(0.045 * level);
-      bulb.setAlpha(0.35 * level);
-      this.reflect('lamp', level);
-    }, { hum: 0.25, stutterChance: 0.03, outageChance: 0.005 });
+    // Chaque lampadaire grésille à son propre rythme.
+    this.scenery.anchors.lamps.forEach(({ x, y }, index) => {
+      const outer = this.glowImage(x, y, 'title-halo-outer', SPRITES.haloOuter, 0.07, DEPTH.halo);
+      const inner = this.glowImage(x, y, 'title-halo-inner', SPRITES.haloInner, 0.1, DEPTH.halo);
+      const pool = this.glowImage(x, 262, 'title-lamp-pool', SPRITES.lampPool, 0.045, DEPTH.halo);
+      const bulb = this.add.rectangle(x - 3, y - 2, 7, 5, 0xffffff).setOrigin(0).setBlendMode(Phaser.BlendModes.ADD).setDepth(DEPTH.halo);
+      this.flicker((level) => {
+        outer.setAlpha(0.07 * level);
+        inner.setAlpha(0.1 * level);
+        pool.setAlpha(0.045 * level);
+        bulb.setAlpha(0.35 * level);
+        this.reflect('lamp', level, index);
+      }, { hum: 0.25, stutterChance: 0.03, outageChance: 0.005 });
+    });
     const door = this.scenery.anchors.doorLamp;
     const doorGlow = this.glowImage(door.x, door.y, 'title-halo-small', SPRITES.haloSmall, 0.1);
     this.flicker((level) => {

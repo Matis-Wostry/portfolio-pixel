@@ -110,11 +110,13 @@ function sidewalk(random, anchors, { left, right }) {
       rects.push(rect(x, y, 1, 5, PALETTE.sidewalkLine));
     }
   });
-  // Flaque de lumière du lampadaire.
-  for (let y = top + 1; y < bottom; y++) {
-    const half = Math.round(36 * Math.sqrt(Math.max(0, 1 - ((y - bottom) / 14) ** 2)));
-    if (half > 0) rects.push(rect(anchors.lamp.x - half, y, half * 2, 1, PALETTE.sidewalkLit));
-  }
+  // Flaques de lumière des lampadaires.
+  anchors.lamps.forEach((lamp) => {
+    for (let y = top + 1; y < bottom; y++) {
+      const half = Math.round(36 * Math.sqrt(Math.max(0, 1 - ((y - bottom) / 14) ** 2)));
+      if (half > 0) rects.push(rect(lamp.x - half, y, half * 2, 1, PALETTE.sidewalkLit));
+    }
+  });
   rects.push(rect(left, top, width, 1, PALETTE.sidewalkLight), rect(left, top + 6, width, 1, PALETTE.sidewalkLine));
   // Fissures avec un brin d'herbe.
   [52, 168, 262, 420].forEach((x) => {
@@ -138,7 +140,7 @@ function road(random, anchors, { left, right }) {
     rect(left, ROAD.top, width, ROAD.bottom - ROAD.top, PALETTE.road), rect(left, ROAD.top, width, 1, PALETTE.gutter),
   ];
   for (let x = left; x < right; x += 5 + Math.floor(random() * 6)) rects.push(rect(x, 262, 1, 1, PALETTE.curbSpeck));
-  const lit = (x, y) => ((x - anchors.lamp.x) / 36) ** 2 + ((y - 262) / 14) ** 2 < 1;
+  const lit = (x, y) => anchors.lamps.some((lamp) => ((x - lamp.x) / 36) ** 2 + ((y - 262) / 14) ** 2 < 1);
   for (let row = 0, y = ROAD.top + 1; y < ROAD.bottom; row++, y += 4) {
     for (let x = left - (row % 2) * 3; x < right; x += 6) {
       const roll = random();
@@ -168,14 +170,14 @@ export function street(random, anchors, span) {
   rects.push(...sidewalk(random, anchors, span), ...road(random, anchors, span));
   // Mobilier : fontaine, poubelle, bancs, pots, arbre et son vélo, lampadaire.
   // Végétation : bacs fleuris, touffes au pied de l'immeuble, de la boutique et du garde-corps.
-  rects.push(...planter(-30, 24, random), ...planter(18, 30, random));
-  rects.push(...planter(372, 22, random), ...planter(470, 24, random), ...planter(506, 28, random));
-  [-110, -4, 60, 114, 178, 200, 262, 360, 430, 540, 590].forEach((x) => rects.push(...tuft(x, 248, random)));
+  rects.push(...planter(-30, 24, random), ...planter(22, 26, random));
+  rects.push(...planter(372, 22, random), ...planter(480, 24, random));
+  [-110, -4, 74, 114, 178, 200, 262, 360, 446, 512, 590].forEach((x) => rects.push(...tuft(x, 248, random)));
   rects.push(...bin(106));
-  rects.push(...pot(207), ...pot(247), ...bench(78), ...bench(440));
-  rects.push(...tree(anchors.tree.x, 196, 256, random), ...bicycle(325), ...lamp(anchors.lamp));
-  // Prolongements : bancs et arbres sur les bords élargis.
-  rects.push(...bench(-60), ...tree(-92, 196, 256, random), ...bench(548), ...tree(578, 196, 256, random));
+  rects.push(...pot(207), ...pot(247), ...bench(78), ...bench(420));
+  rects.push(...anchors.trees.flatMap(({ x }) => tree(x, 196, 256, random)), ...bicycle(325), ...anchors.lamps.flatMap(lamp));
+  // Prolongements : bancs sur les bords élargis.
+  rects.push(...bench(-60), ...bench(548));
   return rects;
 }
 

@@ -120,3 +120,12 @@ test('the street has animated passers, a dog and wet reflections to draw', () =>
     assert.ok(SPRITES[`reflection-${color}`], color);
   }
 });
+
+test('the street has at least two lit lamps and six trees that never hide the Jet d\'eau', () => {
+  const { lamps, trees, jet, reflections } = ANCHORS;
+  assert.ok(lamps.length >= 2 && trees.length >= 6);
+  for (const tree of trees) assert.ok(tree.x + 16 < jet.x - 12 || tree.x - 16 > jet.x + 13, `tree ${tree.x}`);
+  lamps.forEach((lamp, index) => {
+    assert.ok(reflections.some((reflection) => reflection.light === 'lamp' && reflection.column === index && reflection.x === lamp.x), `lamp ${index}`);
+  });
+});
