@@ -11,14 +11,14 @@ test('accepts only relative paths inside public', () => {
 });
 
 test('lists only configured files with prefixed keys', () => {
-  const result = listConfigured('sfx-', { click: 'assets/audio/sfx/click.mp3', open: null, close: '', rim: '   ', swish: undefined });
+  const result = listConfigured('sfx-', { click: 'assets/audio/sfx/click.mp3', open: null, close: '', enter: '   ', extra: undefined });
   assert.deepEqual(result, { files: [{ key: 'sfx-click', path: 'assets/audio/sfx/click.mp3' }], invalid: [] });
 });
 
 test('reports unsafe or malformed entries without loading them', () => {
-  const result = listConfigured('title-', { sky: 'https://example.com/sky.png', city: '../city.png', building: 42, court: '/court.png' });
+  const result = listConfigured('title-', { sky: 'https://example.com/sky.png', city: '../city.png', building: 42, street: '/street.png' });
   assert.deepEqual(result.files, []);
-  assert.deepEqual(result.invalid, ['sky', 'city', 'building', 'court']);
+  assert.deepEqual(result.invalid, ['sky', 'city', 'building', 'street']);
   assert.deepEqual(listConfigured('music-', null), { files: [], invalid: [] });
 });
 

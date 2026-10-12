@@ -5,10 +5,9 @@ import { TITLE_ART } from '../config/assets.js';
 import { isUsableArtSize } from '../systems/assetManifest.mjs';
 import { buildScenery, TITLE_LAYERS, SPRITES } from '../title/scenery.mjs';
 import { computeTitleView, TITLE_WORLD } from '../title/layout.mjs';
-import { planShot, shotArc, SHOT_DURATION } from '../title/shot.mjs';
 import { paintRects } from '../title/paint.js';
 
-const DEPTH = { sky: 0, stars: 1, clouds: 2, city: 3, jet: 4, building: 5, glow: 6, court: 7, ball: 8, halo: 9, foreground: 10 };
+const DEPTH = { sky: 0, stars: 1, clouds: 2, city: 3, jet: 4, building: 5, glow: 6, street: 7, halo: 8, foreground: 9 };
 const ENTER_DURATION = 900;
 
 export default class TitleScene extends Phaser.Scene {
@@ -21,8 +20,6 @@ export default class TitleScene extends Phaser.Scene {
     this.scenery = buildScenery();
     this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.entering = false;
-    this.shooting = false;
-    this.made = 0;
     TITLE_LAYERS.forEach((name) => this.addLayer(name));
     this.addStars();
     this.addClouds();
@@ -30,8 +27,7 @@ export default class TitleScene extends Phaser.Scene {
     this.addWindowGlow();
     this.addNeon();
     this.addHalo();
-    this.addBall();
-    this.ui = new TitleUI({ audio: this.audio, onEnter: () => this.enter(), onShoot: () => this.shoot() });
+    this.ui = new TitleUI({ audio: this.audio, onEnter: () => this.enter() });
     this.audio.playMusic('title');
     this.resize(this.scale.gameSize);
     this.scale.on('resize', this.resize, this);
@@ -100,52 +96,10 @@ export default class TitleScene extends Phaser.Scene {
     [['title-halo-outer', SPRITES.haloOuter, 0.07], ['title-halo-inner', SPRITES.haloInner, 0.1]].forEach(([key, sprite, alpha]) => {
       this.add.image(x, y, this.texture(key, sprite)).setAlpha(alpha).setBlendMode(Phaser.BlendModes.ADD).setDepth(DEPTH.halo);
     });
-  }
-
-  addBall() {
-    const { x, y } = this.scenery.anchors.ball;
-    this.ball = this.add.image(x, y, this.texture('title-ball', SPRITES.ball)).setDepth(DEPTH.ball);
-    // Zone de toucher de 19 pixels du monde, soit au moins 48 pixels CSS dès le zoom 3.
-    this.ball.setInteractive(new Phaser.Geom.Rectangle(-6, -6, 19, 19), Phaser.Geom.Rectangle.Contains);
-    this.ball.input.cursor = 'pointer';
-    this.ball.on('pointerdown', () => this.shoot());
-  }
-
-  shoot() {
-    if (this.shooting || this.entering) return;
-    this.shooting = true;
-    this.audio.play('bounce');
-    const shot = planShot(Math.random(), this.scenery.anchors);
-    const progress = { t: 0 };
-    this.tweens.add({
-      targets: progress,
-      t: 1,
-      duration: this.reducedMotion ? 450 : SHOT_DURATION,
-      onUpdate: () => {
-        const point = shotArc(shot, progress.t);
-        this.ball.setPosition(point.x, point.y);
-      },
-      onComplete: () => this.finishShot(shot),
-    });
-  }
-
-  finishShot(shot) {
-    this.audio.play(shot.made ? 'swish' : 'rim');
-    if (shot.made) {
-      this.made += 1;
-      this.ui.setScore(this.made);
-    }
-    const { x, y } = this.scenery.anchors.ball;
-    this.tweens.add({
-      targets: this.ball,
-      x,
-      y,
-      duration: this.reducedMotion ? 250 : 650,
-      ease: 'Bounce.easeOut',
-      onComplete: () => {
-        this.audio.play('bounce');
-        this.shooting = false;
-      },
+    // Lueurs chaudes plus discrètes : applique de la porte et fenêtres éclairées des voisins.
+    const small = this.texture('title-halo-small', SPRITES.haloSmall);
+    this.scenery.anchors.warmLights.forEach(({ x: lightX, y: lightY }) => {
+      this.add.image(lightX, lightY, small).setAlpha(0.08).setBlendMode(Phaser.BlendModes.ADD).setDepth(DEPTH.glow);
     });
   }
 

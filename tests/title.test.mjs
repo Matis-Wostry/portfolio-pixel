@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import { createRandom, generateStars } from '../src/title/random.mjs';
 import { computeTitleView, TITLE_WORLD } from '../src/title/layout.mjs';
 import { buildScenery, ANCHORS, SPRITES, TITLE_LAYERS, GROUND_Y } from '../src/title/scenery.mjs';
-import { planShot, shotArc, MAKE_CHANCE } from '../src/title/shot.mjs';
 import { TITLE_ART } from '../src/config/assets.js';
 
 const SCREENS = [[1920, 1080], [1366, 768], [2560, 1080], [390, 844], [412, 915], [360, 800], [320, 568], [768, 1024], [844, 390], [667, 375]];
@@ -41,13 +40,11 @@ test('uses an integer zoom that covers the screen inside the world', () => {
   assert.equal(computeTitleView(390, 844, ANCHORS.focus).zoom, 3);
 });
 
-test('keeps the lit window, the hoop and the ball visible on common screens', () => {
-  const { x, y, r } = ANCHORS.ball;
+test('keeps the lit window and the front door visible on common screens', () => {
   for (const [width, height] of SCREENS) {
     const view = computeTitleView(width, height, ANCHORS.focus);
     assert.ok(inside(view, ANCHORS.window), `window ${width}x${height}`);
-    assert.ok(inside(view, ANCHORS.hoop), `hoop ${width}x${height}`);
-    assert.ok(inside(view, { x: x - r, y: y - r, w: r * 2, h: r * 2 }), `ball ${width}x${height}`);
+    assert.ok(inside(view, ANCHORS.door), `door ${width}x${height}`);
   }
 });
 
@@ -78,32 +75,14 @@ test('draws only integer pixels inside the world and the sprites', () => {
   Object.entries(SPRITES).forEach(([name, sprite]) => check(sprite.rects, sprite.width, sprite.height, name));
 });
 
-test('places the lit window in the building and the ball on the court', () => {
-  const { window: win, ball } = ANCHORS;
+test('places the lit window in the building and the door on the street', () => {
+  const { window: win, door } = ANCHORS;
   assert.ok(win.x >= 176 && win.x + win.w <= 286 && win.y >= 90 && win.y + win.h <= GROUND_Y);
-  assert.ok(ball.y - ball.r >= GROUND_Y && ball.y + ball.r < 280);
+  assert.ok(door.x >= 176 && door.x + door.w <= 286 && door.y + door.h === GROUND_Y);
 });
 
-test('a low roll scores in the middle of the rim', () => {
-  const shot = planShot(0.1, ANCHORS);
-  assert.equal(shot.made, true);
-  assert.deepEqual(shotArc(shot, 0), { x: 268, y: 262 });
-  assert.deepEqual(shotArc(shot, 1), { x: 298, y: 197 });
-  assert.equal(planShot(MAKE_CHANCE - 0.01, ANCHORS).made, true);
-});
-
-test('a high or invalid roll misses on the rim edge', () => {
-  for (const roll of [MAKE_CHANCE, 0.99, 1.5, -1, Number.NaN, undefined]) {
-    const shot = planShot(roll, ANCHORS);
-    assert.equal(shot.made, false, String(roll));
-    assert.deepEqual(shotArc(shot, 1), { x: 305, y: 196 });
-  }
-});
-
-test('the arc rises above both ends and clamps time', () => {
-  const shot = planShot(0.1, ANCHORS);
-  assert.ok(shotArc(shot, 0.5).y < Math.min(shot.from.y, shot.to.y) - 10);
-  assert.deepEqual(shotArc(shot, -1), shotArc(shot, 0));
-  assert.deepEqual(shotArc(shot, 2), shotArc(shot, 1));
-  assert.deepEqual(shotArc(shot, Number.NaN), shotArc(shot, 0));
+test('the title scene no longer has a basketball hoop', () => {
+  assert.deepEqual(TITLE_LAYERS, ['sky', 'city', 'building', 'street', 'foreground']);
+  ['hoop', 'rim', 'ball'].forEach((name) => assert.equal(ANCHORS[name], undefined, name));
+  assert.equal(SPRITES.ball, undefined);
 });

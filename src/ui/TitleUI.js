@@ -9,9 +9,9 @@ import './title.css';
 const assetURL = (path) => `${import.meta.env.BASE_URL}${path}`;
 
 export default class TitleUI {
-  constructor({ audio, onEnter, onShoot }) {
+  constructor({ audio, onEnter }) {
     this.audio = audio;
-    this.callbacks = { onEnter, onShoot };
+    this.callbacks = { onEnter };
     this.abort = new AbortController();
     this.returnFocus = null;
     this.root = document.createElement('div');
@@ -22,8 +22,6 @@ export default class TitleUI {
           <span class="title-sign-main">La Chambre du Dev</span>
           <span class="title-sign-sub">Matis Wostry · développeur full-stack</span>
         </h1>
-        <p class="title-score" aria-live="polite"></p>
-        <button class="wood-button ball-button" type="button">Tirer au panier</button>
       </header>
       <nav class="title-menu" aria-label="Menu principal">
         <button class="wood-button" type="button" data-action="enter">Entrer</button>
@@ -31,12 +29,10 @@ export default class TitleUI {
         <button class="wood-button" type="button" data-action="credits">Crédits</button>
       </nav>`;
     document.body.append(this.root);
-    this.score = this.root.querySelector('.title-score');
     this.buttons = [...this.root.querySelectorAll('.wood-button')];
     this.applyArt();
     this.soundButton = new SoundButton(audio, this.root);
     this.createDialog();
-    this.listen(this.root.querySelector('.ball-button'), 'click', () => this.callbacks.onShoot());
     this.listen(this.root.querySelector('.title-menu'), 'click', (event) => {
       const button = event.target.closest('button[data-action]');
       if (!button || button.disabled) return;
@@ -112,10 +108,6 @@ export default class TitleUI {
     this.dialog.showModal();
     body.scrollTop = 0;
     this.dialog.querySelector('.close-button').focus();
-  }
-
-  setScore(made) {
-    this.score.textContent = made > 0 ? `Paniers marqués : ${made}` : '';
   }
 
   setEnabled(enabled) {

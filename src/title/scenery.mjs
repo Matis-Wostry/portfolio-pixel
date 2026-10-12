@@ -1,73 +1,41 @@
 import { createRandom, generateStars } from './random.mjs';
 import { TITLE_WORLD } from './layout.mjs';
+import { PALETTE } from './palette.mjs';
+import { rect, fromPattern, disc, dither, clip } from './pixels.mjs';
+import { building } from './building.mjs';
 
-export const TITLE_LAYERS = ['sky', 'city', 'building', 'court', 'foreground'];
+export { PALETTE } from './palette.mjs';
+export { fromPattern, disc } from './pixels.mjs';
+
+export const TITLE_LAYERS = ['sky', 'city', 'building', 'street', 'foreground'];
 export const GROUND_Y = 250;
-
-export const PALETTE = {
-  skyTop: '#141029', skyMid: '#1f1840', skyLow: '#2c2153', skyHorizon: '#43306a',
-  moon: '#f4e7c3', moonShade: '#d9c99b',
-  city: '#1d1838', cityLight: '#f8d68b', lake: '#22305a', lakeLight: '#4a6aa8',
-  roof: '#2e1a14', brick: '#5a2a1c', brickLine: '#41190f', windowOff: '#1c1a2e', frame: '#3a2a24', windowWarm: '#5a4a3a',
-  glowDark: '#1b2d55', glowLight: '#6fb7ff', silhouette: '#0f0d1c', posterRed: '#e8505b', posterGold: '#f8d68b', knight: '#6a5f8f',
-  shop: '#2b2540', shopWindow: '#16132a', cabinetPink: '#ff4fd8', cabinetCyan: '#4ff0ff', neonDim: '#4a2a50', neon: '#ff4fd8',
-  asphalt: '#24212f', curb: '#3a3548', line: '#d8b889', board: '#e9e3d6', boardMark: '#c0392b', rim: '#e8742a', net: '#fff2d5',
-  pole: '#5c5f6e', lampPole: '#3a3a4a', lampLight: '#fff2a8', fence: '#15121f', fenceLight: '#2a2540',
-  ball: '#e8742a', ballSeam: '#7a3818', cloud: '#3b3466', cloudShade: '#2c2650', jet: '#dfefff', jetSide: '#9fc7ef',
-};
 
 // Positions en pixels du monde (480 × 300). Les calques du designer doivent les respecter.
 export const ANCHORS = {
-  focus: { x: 265, y: 200 },
+  focus: { x: 245, y: 200 },
   window: { x: 223, y: 136, w: 16, h: 20 },
-  hoop: { x: 290, y: 184, w: 16, h: 24 },
-  rim: { x: 292, y: 199, w: 12, h: 2 },
-  ball: { x: 268, y: 262, r: 3 },
-  lamp: { x: 345, y: 199 },
+  door: { x: 222, y: 222, w: 18, h: 28 },
+  lamp: { x: 346, y: 196 },
+  warmLights: [{ x: 249, y: 225 }, { x: 266, y: 114 }, { x: 196, y: 178 }],
   jet: { x: 70, y: 240, h: 72 },
   neon: { x: 134, y: 205 },
   moon: { x: 404, y: 42, r: 12 },
 };
 
-const rect = (x, y, w, h, color) => ({ x, y, w, h, color });
-
-export function fromPattern(x, y, rows, colors) {
-  const rects = [];
-  rows.forEach((row, dy) => {
-    for (let start = 0; start < row.length;) {
-      let end = start + 1;
-      while (end < row.length && row[end] === row[start]) end += 1;
-      if (colors[row[start]]) rects.push(rect(x + start, y + dy, end - start, 1, colors[row[start]]));
-      start = end;
-    }
-  });
-  return rects;
-}
-
-export function disc(cx, cy, r, color) {
-  const rects = [];
-  for (let dy = -r; dy <= r; dy++) {
-    const half = Math.round(Math.sqrt(r * r - dy * dy));
-    rects.push(rect(cx - half, cy + dy, half * 2 + 1, 1, color));
-  }
-  return rects;
-}
-
-const KNIGHT = ['..kkk..', '.kkkkk.', 'kk.kkkk', 'kkkkkkk', '...kkkk', '..kkkk.', '..kkkk.', '.kkkkkk', 'kkkkkkk'];
 const GAMEPAD = ['..nnnnnnnnn..', '.n.........n.', 'n..n.....n..n', 'n.nnn...n.n.n', 'n..n.....n..n', '.n...nnn...n.', '..nnn...nnn..'];
-const BALL = ['..oOo..', '.ooOoo.', 'oooOooo', 'OOOOOOO', 'oooOooo', '.ooOoo.', '..oOo..'];
 const CLOUD = [
-  '........cccc............',
-  '.....cccccccc...ccc.....',
-  '...cccccccccccccccccc...',
-  '.cccccccccccccccccccccc.',
+  '........llll............',
+  '.....llllcccl...lll.....',
+  '...lccccccccccllcccll...',
+  '.lccccccccccccccccccccl.',
   'cccccccccccccccccccccccc',
   '.dddddddddddddddddddddd.',
+  '...dddddd.....ddddd.....',
 ];
+const CAT = ['k...k...', 'kkkkk...', 'kekek...', 'kkkkk..k', '.kkk...k', 'kkkkk.k.', 'kkkkkkk.'];
 
 export const SPRITES = {
-  ball: { width: 7, height: 7, rects: fromPattern(0, 0, BALL, { o: PALETTE.ball, O: PALETTE.ballSeam }) },
-  cloud: { width: 24, height: 6, rects: fromPattern(0, 0, CLOUD, { c: PALETTE.cloud, d: PALETTE.cloudShade }) },
+  cloud: { width: 24, height: 7, rects: fromPattern(0, 0, CLOUD, { c: PALETTE.cloud, d: PALETTE.cloudShade, l: PALETTE.cloudLight }) },
   neon: { width: 13, height: 7, rects: fromPattern(0, 0, GAMEPAD, { n: PALETTE.neon }) },
   jet: {
     width: 5,
@@ -77,120 +45,188 @@ export const SPRITES = {
   },
   haloOuter: { width: 57, height: 57, rects: disc(28, 28, 28, PALETTE.lampLight) },
   haloInner: { width: 33, height: 33, rects: disc(16, 16, 16, PALETTE.lampLight) },
+  haloSmall: { width: 21, height: 21, rects: disc(10, 10, 10, PALETTE.warm) },
 };
 
 function sky() {
-  const stops = [0, 70, 140, 200, GROUND_Y];
-  const colors = [PALETTE.skyTop, PALETTE.skyMid, PALETTE.skyLow, PALETTE.skyHorizon];
+  const stops = [0, 30, 60, 92, 124, 156, 188, 220, GROUND_Y];
+  const colors = PALETTE.sky;
   const rects = colors.map((color, i) => rect(0, stops[i], TITLE_WORLD.width, stops[i + 1] - stops[i], color));
   for (let i = 1; i < colors.length; i++) {
-    for (let row = 0; row < 4; row++) {
-      const color = row < 2 ? colors[i] : colors[i - 1];
-      for (let x = row % 2; x < TITLE_WORLD.width; x += 2) rects.push(rect(x, stops[i] - 2 + row, 1, 1, color));
-    }
+    rects.push(...dither(0, stops[i] - 6, TITLE_WORLD.width, 6, colors[i]));
   }
   const { x, y, r } = ANCHORS.moon;
-  rects.push(...disc(x, y, r, PALETTE.moon), rect(x + 2, y - 5, 4, 3, PALETTE.moonShade),
-    rect(x - 6, y + 3, 3, 3, PALETTE.moonShade), rect(x + 4, y + 5, 2, 2, PALETTE.moonShade));
+  rects.push(...disc(x, y, r + 9, PALETTE.moonHalo), ...disc(x, y, r + 4, PALETTE.moonHaloInner));
+  rects.push(...disc(x, y, r, PALETTE.moon), ...disc(x + 2, y + 1, r - 1, PALETTE.moonShade), ...disc(x - 1, y - 1, r - 2, PALETTE.moon),
+    rect(x + 2, y - 5, 4, 3, PALETTE.moonShade), rect(x - 6, y + 3, 3, 3, PALETTE.moonShade), rect(x + 4, y + 5, 2, 2, PALETTE.moonShade));
   return rects;
 }
 
-function city(random) {
+function spire(x, base, height, color) {
   const rects = [];
-  for (let x = 0; x < TITLE_WORLD.width;) {
-    const w = Math.min(14 + Math.floor(random() * 22), TITLE_WORLD.width - x);
-    const h = 24 + Math.floor(random() * 56);
+  for (let dy = 0; dy < height; dy++) {
+    const half = Math.floor((dy * 3) / height);
+    rects.push(rect(x - half, base - height + dy, half * 2 + 1, 1, color));
+  }
+  return rects;
+}
+
+function skyline(random, { color, roof, minH, maxH, minW, maxW, lights, lightChance, landmarks = [] }) {
+  const rects = [];
+  for (let x = -4; x < TITLE_WORLD.width;) {
+    const w = minW + Math.floor(random() * (maxW - minW));
+    const h = minH + Math.floor(random() * (maxH - minH));
     const top = GROUND_Y - h;
-    rects.push(rect(x, top, w, h, PALETTE.city));
+    rects.push(rect(x, top, w, h, color), rect(x, top, w, 1, roof));
+    const shape = random();
+    if (shape < 0.25) {
+      for (let step = 1; step <= Math.floor(w / 2); step++) rects.push(rect(x + step, top - step, w - step * 2, 1, color));
+    } else if (shape < 0.45) rects.push(rect(x + 2 + Math.floor(random() * (w - 5)), top - 4, 2, 4, color));
     for (let wy = top + 4; wy < GROUND_Y - 6; wy += 6) {
       for (let wx = x + 3; wx + 2 <= x + w - 3; wx += 5) {
-        if (random() < 0.18) rects.push(rect(wx, wy, 2, 2, PALETTE.cityLight));
+        if (random() < lightChance) rects.push(rect(wx, wy, lights.size, lights.size, random() < 0.7 ? lights.colors[0] : lights.colors[1]));
       }
     }
     x += w + Math.floor(random() * 3);
   }
-  rects.push(rect(0, 240, 160, 10, PALETTE.lake));
-  for (let x = 4; x < 160; x += 9) rects.push(rect(x, 243 + (x % 2) * 3, 4, 1, PALETTE.lakeLight));
+  landmarks.forEach(({ x, h, w }) => {
+    rects.push(rect(x - w / 2, GROUND_Y - h, w, h, color), ...spire(x, GROUND_Y - h, 18, color));
+  });
   return rects;
 }
 
-function litWindow() {
-  const { x, y, w, h } = ANCHORS.window;
-  return [
-    rect(x - 1, y - 1, w + 2, h + 2, PALETTE.frame),
-    rect(x, y, w, h, PALETTE.glowDark),
-    rect(x + 2, y + 2, 4, 6, PALETTE.posterRed),
-    rect(x + 11, y + 2, 3, 5, PALETTE.posterGold),
-    rect(x + 2, y + 9, 6, 4, PALETTE.glowLight),
-    rect(x + 9, y + 9, 6, 4, PALETTE.glowLight),
-    rect(x, y + 18, w, 2, PALETTE.frame),
-    rect(x + 6, y + 11, 4, 4, PALETTE.silhouette),
-    rect(x + 4, y + 15, 8, 3, PALETTE.silhouette),
+function city(random) {
+  const rects = [
+    // Plan lointain dans la brume : la vieille ville et les flèches de la cathédrale.
+    ...skyline(random, {
+      color: PALETTE.cityFar, roof: PALETTE.cityFar, minH: 50, maxH: 92, minW: 18, maxW: 36,
+      lights: { size: 1, colors: [PALETTE.cityFarLight, PALETTE.cityFarLight] }, lightChance: 0.12,
+      landmarks: [{ x: 412, h: 104, w: 6 }, { x: 428, h: 98, w: 6 }],
+    }),
+    // Plan proche, plus sombre, avec des fenêtres chaudes.
+    ...skyline(random, {
+      color: PALETTE.cityNear, roof: PALETTE.cityNearRoof, minH: 22, maxH: 62, minW: 14, maxW: 34,
+      lights: { size: 2, colors: [PALETTE.cityLight, PALETTE.cityLightWarm] }, lightChance: 0.2,
+    }),
   ];
-}
-
-function shop() {
-  return [
-    rect(118, 192, 58, 4, PALETTE.roof),
-    rect(120, 196, 56, 54, PALETTE.shop),
-    ...fromPattern(ANCHORS.neon.x, ANCHORS.neon.y, GAMEPAD, { n: PALETTE.neonDim }),
-    rect(124, 222, 22, 16, PALETTE.shopWindow),
-    rect(127, 226, 5, 12, PALETTE.cabinetPink),
-    rect(136, 226, 5, 12, PALETTE.cabinetCyan),
-    rect(156, 226, 12, 24, PALETTE.frame),
-  ];
-}
-
-function building() {
-  const left = 176;
-  const right = 286;
-  const top = 90;
-  const rects = [rect(left, top, right - left, GROUND_Y - top, PALETTE.brick), rect(left - 2, top - 4, right - left + 4, 4, PALETTE.roof)];
-  for (let row = 0, y = top + 2; y < GROUND_Y; row++, y += 4) {
-    for (let x = left + (row % 2) * 4; x < right; x += 8) rects.push(rect(x, y, 1, 1, PALETTE.brickLine));
-  }
-  [104, 136, 168, 200].forEach((y) => [188, 223, 258].forEach((x) => {
-    if (x === 223 && (y === 200 || y === ANCHORS.window.y)) return;
-    const glass = x === 258 && y === 104 ? PALETTE.windowWarm : PALETTE.windowOff;
-    rects.push(rect(x - 1, y - 1, 18, 22, PALETTE.frame), rect(x, y, 16, 20, glass));
-  }));
-  rects.push(...litWindow());
-  rects.push(rect(222, 223, 18, 27, PALETTE.frame), rect(223, 224, 16, 26, PALETTE.windowOff));
-  rects.push(rect(281, 74, 1, 12, PALETTE.knight), ...fromPattern(278, 64, KNIGHT, { k: PALETTE.knight }));
-  rects.push(...shop());
+  // Lac Léman et reflets des lumières.
+  rects.push(rect(0, 238, 166, 12, PALETTE.lake), rect(0, 238, 166, 1, PALETTE.lakeLight), rect(0, 246, 166, 4, PALETTE.lakeDeep));
+  for (let x = 3; x < 164; x += 7) rects.push(rect(x, 240 + (x % 3) * 2, 3 + (x % 2), 1, PALETTE.lakeLight));
+  for (let x = 12; x < 160; x += 23) rects.push(rect(x, 241, 1, 2, PALETTE.lakeGlow), rect(x, 244, 1, 1, PALETTE.lakeGlow));
   return rects;
 }
 
-function court() {
+function tree(cx, top, random) {
+  const rects = [
+    rect(cx - 2, top + 24, 5, 34, PALETTE.trunk), rect(cx + 1, top + 24, 2, 34, PALETTE.trunkDark),
+    rect(cx - 4, top + 56, 9, 2, PALETTE.trunkDark),
+    ...disc(cx, top + 14, 16, PALETTE.treeDark),
+    ...disc(cx - 7, top + 10, 10, PALETTE.tree), ...disc(cx + 7, top + 12, 10, PALETTE.tree), ...disc(cx, top + 4, 9, PALETTE.tree),
+    ...disc(cx + 3, top + 4, 5, PALETTE.treeLight), ...disc(cx - 8, top + 8, 4, PALETTE.treeLight),
+    ...disc(cx + 12, top + 12, 4, PALETTE.treeLit),
+  ];
+  for (let i = 0; i < 40; i++) {
+    const dx = Math.floor(random() * 28) - 14;
+    const dy = Math.floor(random() * 24) - 6;
+    if (dx * dx + (dy - 8) * (dy - 8) < 180) rects.push(rect(cx + dx, top + dy, 1, 1, random() < 0.5 ? PALETTE.treeLight : PALETTE.treeDark));
+  }
+  return rects;
+}
+
+function lamp({ x, y }) {
+  const left = x - 5;
   return [
-    rect(0, GROUND_Y, TITLE_WORLD.width, TITLE_WORLD.height - GROUND_Y, PALETTE.asphalt),
-    rect(0, GROUND_Y, TITLE_WORLD.width, 2, PALETTE.curb),
-    rect(200, 276, 240, 1, PALETTE.line),
-    rect(280, 254, 1, 18, PALETTE.line), rect(316, 254, 1, 18, PALETTE.line), rect(280, 272, 37, 1, PALETTE.line),
-    rect(286, 188, 4, 2, PALETTE.pole),
-    rect(290, 184, 16, 13, PALETTE.board),
-    rect(294, 189, 8, 1, PALETTE.boardMark), rect(294, 189, 1, 6, PALETTE.boardMark), rect(301, 189, 1, 6, PALETTE.boardMark),
-    rect(292, 199, 12, 2, PALETTE.rim),
-    ...[293, 296, 299, 302].map((x) => rect(x, 201, 1, 6, PALETTE.net)),
-    rect(294, 206, 8, 1, PALETTE.net),
-    rect(344, 198, 2, 52, PALETTE.lampPole), rect(340, 194, 10, 4, PALETTE.lampPole), rect(342, 198, 6, 2, PALETTE.lampLight),
+    rect(x - 2, y + 8, 4, 50, PALETTE.lampPole), rect(x - 2, y + 8, 1, 50, PALETTE.lampPoleLight),
+    rect(x - 4, y + 52, 8, 4, PALETTE.lampPole), rect(x - 5, y + 56, 10, 2, PALETTE.lampPole),
+    rect(x - 1, y - 10, 2, 2, PALETTE.lampPole), rect(left + 1, y - 8, 9, 2, PALETTE.lampPole), rect(left - 1, y - 6, 13, 2, PALETTE.lampPole),
+    rect(left, y - 4, 11, 9, PALETTE.lampGlass), rect(left + 2, y - 2, 7, 5, PALETTE.lampLight),
+    rect(left, y - 4, 1, 9, PALETTE.lampPole), rect(left + 10, y - 4, 1, 9, PALETTE.lampPole),
+    rect(left - 1, y + 5, 13, 2, PALETTE.lampPole), rect(x - 3, y + 7, 6, 1, PALETTE.lampPole),
   ];
 }
 
-function foreground() {
-  const rects = [rect(0, 284, TITLE_WORLD.width, 16, PALETTE.fence), rect(0, 284, TITLE_WORLD.width, 1, PALETTE.fenceLight)];
-  for (let x = 0; x < TITLE_WORLD.width; x += 32) rects.push(rect(x, 280, 2, 20, PALETTE.fence));
-  for (let y = 287; y < TITLE_WORLD.height; y += 3) {
-    for (let x = (y % 2) * 3; x < TITLE_WORLD.width; x += 6) rects.push(rect(x, y, 1, 1, PALETTE.fenceLight));
+function bench(x) {
+  return [
+    rect(x, 244, 20, 2, PALETTE.bench), rect(x, 246, 20, 1, PALETTE.benchDark),
+    rect(x, 249, 20, 2, PALETTE.bench), rect(x, 251, 20, 1, PALETTE.benchDark),
+    rect(x + 1, 244, 1, 12, PALETTE.iron), rect(x + 18, 244, 1, 12, PALETTE.iron),
+  ];
+}
+
+function pot(x) {
+  return [
+    ...disc(x + 4, 240, 5, PALETTE.leafDark), ...disc(x + 3, 239, 3, PALETTE.leaf),
+    rect(x + 6, 237, 1, 1, PALETTE.flowerPink), rect(x + 1, 241, 1, 1, PALETTE.flowerYellow),
+    rect(x, 244, 9, 2, PALETTE.potDark), rect(x + 1, 246, 7, 5, PALETTE.pot), rect(x + 1, 246, 1, 5, PALETTE.potDark),
+  ];
+}
+
+function street(random) {
+  const width = TITLE_WORLD.width;
+  const rects = [
+    // Garde-corps du quai, devant le lac.
+    rect(0, 244, 117, 1, PALETTE.railingLight), rect(0, 245, 117, 1, PALETTE.railing),
+  ];
+  for (let x = 2; x < 117; x += 10) rects.push(rect(x, 245, 2, 5, PALETTE.railing));
+  // Trottoir dallé, bordure et chaussée pavée, réchauffés par la flaque de lumière du lampadaire.
+  const lit = (x, y) => ((x - ANCHORS.lamp.x) / 36) ** 2 + ((y - 262) / 14) ** 2 < 1;
+  rects.push(rect(0, GROUND_Y, width, 12, PALETTE.sidewalk), rect(0, GROUND_Y, width, 1, PALETTE.sidewalkLight));
+  for (let y = GROUND_Y + 1; y < 262; y++) {
+    const half = Math.round(36 * Math.sqrt(Math.max(0, 1 - ((y - 262) / 14) ** 2)));
+    if (half > 0) rects.push(rect(ANCHORS.lamp.x - half, y, half * 2, 1, PALETTE.sidewalkLit));
   }
+  rects.push(rect(0, 256, width, 1, PALETTE.sidewalkLine));
+  for (let x = 0; x < width; x += 12) rects.push(rect(x, 251, 1, 5, PALETTE.sidewalkLine), rect(x + 6, 257, 1, 5, PALETTE.sidewalkLine));
+  rects.push(rect(0, 262, width, 1, PALETTE.curbTop), rect(0, 263, width, 2, PALETTE.curbFace), rect(0, 265, width, 19, PALETTE.road));
+  for (let row = 0, y = 266; y < 284; row++, y += 4) {
+    for (let x = -(row % 2) * 3; x < width; x += 6) {
+      const warm = lit(x + 2, y);
+      rects.push(rect(x, y, 5, 3, warm ? PALETTE.cobbleLit : PALETTE.cobble));
+      if (random() < 0.6) rects.push(rect(x, y, 2, 1, warm ? PALETTE.cobbleLitLight : PALETTE.cobbleLight));
+    }
+  }
+  // Mobilier : pots de part et d'autre de la porte, banc et chat face au lac, arbre et lampadaire.
+  rects.push(...pot(207), ...pot(247), ...bench(78), ...fromPattern(88, 243, CAT, { k: PALETTE.silhouette, e: PALETTE.flowerYellow }));
+  rects.push(...tree(318, 186, random), ...lamp(ANCHORS.lamp), ...bench(392));
+  return rects;
+}
+
+function foreground(random) {
+  const width = TITLE_WORLD.width;
+  const rects = [rect(0, 290, width, 10, PALETTE.hedge)];
+  for (let x = 0; x < width; x += 4) {
+    const top = 284 + Math.floor(random() * 4);
+    rects.push(rect(x, top, 4, 290 - top, PALETTE.hedge), rect(x + 1, top, 2, 1, PALETTE.hedgeLight));
+  }
+  for (let i = 0; i < 260; i++) {
+    const x = Math.floor(random() * width);
+    const y = 287 + Math.floor(random() * 13);
+    rects.push(rect(x, y, 1, 1, random() < 0.5 ? PALETTE.hedgeLight : PALETTE.hedgeDark));
+  }
+  const flowers = [PALETTE.flowerPink, PALETTE.flowerYellow, PALETTE.awningLight];
+  for (let x = 3; x < width; x += 7 + Math.floor(random() * 6)) {
+    rects.push(rect(x, 288 + Math.floor(random() * 4), 1, 1, flowers[Math.floor(random() * flowers.length)]));
+  }
+  // Clôture en bois basse devant la haie.
+  rects.push(rect(0, 292, width, 2, PALETTE.fence), rect(0, 294, width, 1, PALETTE.fenceDark));
+  for (let x = 10; x < width; x += 40) rects.push(rect(x, 287, 3, 13, PALETTE.fence), rect(x, 287, 3, 1, PALETTE.fenceDark), rect(x + 2, 288, 1, 12, PALETTE.fenceDark));
   return rects;
 }
 
 export function buildScenery(seed = 7) {
   const { moon } = ANCHORS;
+  const { width, height } = TITLE_WORLD;
+  const layers = {
+    sky: sky(),
+    city: city(createRandom(seed)),
+    building: building(createRandom(seed + 2), ANCHORS),
+    street: street(createRandom(seed + 3)),
+    foreground: foreground(createRandom(seed + 4)),
+  };
+  Object.keys(layers).forEach((name) => { layers[name] = clip(layers[name], width, height); });
   return {
-    layers: { sky: sky(), city: city(createRandom(seed)), building: building(), court: court(), foreground: foreground() },
-    stars: generateStars(seed + 1, { width: TITLE_WORLD.width, height: 150, count: 70, avoid: [{ x: moon.x, y: moon.y, r: moon.r + 4 }] }),
+    layers,
+    stars: generateStars(seed + 1, { width, height: 140, count: 70, avoid: [{ x: moon.x, y: moon.y, r: moon.r + 10 }] }),
     clouds: [{ x: 30, y: 26, speed: 3 }, { x: 190, y: 56, speed: 2 }, { x: 340, y: 18, speed: 4 }],
     anchors: ANCHORS,
   };
