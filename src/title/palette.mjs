@@ -5,7 +5,7 @@ export const PALETTE = {
   cloud: '#3b3466', cloudShade: '#2c2650', cloudLight: '#4b4278',
   cityFar: '#2c2552', cityFarLight: '#7c6c9e', cityNear: '#1a1633', cityNearRoof: '#221c40', cityLight: '#f8d68b', cityLightWarm: '#ffb46b',
   lake: '#1e2850', lakeDeep: '#18203f', lakeLight: '#3d5a94', lakeGlow: '#c9a86a',
-  jet: '#dfefff', jetSide: '#9fc7ef',
+  jet: '#eef7ff', jetSide: '#a9cdf2', jetMist: '#5f7fb4',
 
   mortar: '#4a2219', brick: '#7a3a28', brickDark: '#6a3122', brickLight: '#874430', brickShade: '#56281c', brickLit: '#9a5236',
   stone: '#9a8b84', stoneLight: '#bfb0a2', stoneDark: '#6c5f5c', stoneDeep: '#4b4144',

@@ -17,8 +17,8 @@ export const ANCHORS = {
   door: { x: 222, y: 222, w: 18, h: 28 },
   lamp: { x: 346, y: 196 },
   warmLights: [{ x: 249, y: 225 }, { x: 266, y: 114 }, { x: 196, y: 178 }],
-  lake: { x: 292, y: 238, w: 188, h: 12 },
-  jet: { x: 400, y: 240, h: 72 },
+  lake: { x: 280, y: 238, w: 200, h: 12 },
+  jet: { x: 400, y: 241, h: 80 },
   neon: { x: 134, y: 205 },
   moon: { x: 404, y: 42, r: 12 },
 };
@@ -32,6 +32,32 @@ const CLOUD = [
   'cccccccccccccccccccccccc',
   '.dddddddddddddddddddddd.',
   '...dddddd.....ddddd.....',
+];
+const JET_CROWN = [
+  '..........mwm............',
+  '.........mwwwmm..........',
+  '........mswwwwsmm.m......',
+  '.......m.swwwwwssmm..m...',
+  '......m..sswwwssssmm.m...',
+  '.........s.swwsss.smm..m.',
+  '........m..s.w.ss.s.mm...',
+  '...........s.w.s.s..m.m.m',
+  '.......m.....w..s.s..m...',
+  '...........s.w..s..s..m.m',
+  '.............w.m...s...m.',
+  '...........s.w....s..m..m',
+  '.............w.m...s.....',
+  '...........s.w.......m..m',
+];
+const JET_FOAM = [
+  '..........sws............',
+  '....m....swwws....m......',
+  '...m.s..swwwwws..s.m.....',
+  '..m..ssswwwwwwwsss..m....',
+  '.m.ssswwwwwwwwwwwsss.m...',
+  'm.sswwwwwwwwwwwwwwwss.m..',
+  '.mmssssssssssssssssssmm..',
+  '...mm.mmmmmmmmmmmmm.mm...',
 ];
 const DOG = [
   '..ggg..............',
@@ -49,15 +75,30 @@ const DOG = [
   '...GG.GG....GG.GG..',
 ];
 
+// Jet d'eau de Genève : colonne fine, plumet rabattu par le vent vers la droite, rideau d'embruns et écume.
+export const JET_CENTER = 11;
+function jetRects() {
+  const c = JET_CENTER;
+  const colors = { w: PALETTE.jet, s: PALETTE.jetSide, m: PALETTE.jetMist };
+  const rects = [
+    rect(c, 1, 1, 73, PALETTE.jet), rect(c - 1, 16, 1, 58, PALETTE.jetSide), rect(c + 1, 12, 1, 62, PALETTE.jetSide),
+    rect(c + 2, 14, 1, 30, PALETTE.jetMist), rect(c - 2, 24, 1, 28, PALETTE.jetMist),
+  ];
+  const random = createRandom(11);
+  for (let y = 14; y < 66; y++) {
+    const spread = 4 + Math.floor((66 - y) / 6);
+    if (random() < 0.7) {
+      const dense = random() < 1 - (y - 14) / 60;
+      rects.push(rect(c + 2 + Math.floor(random() * spread), y, 1, 1, dense ? PALETTE.jetSide : PALETTE.jetMist));
+    }
+  }
+  return [...rects, ...fromPattern(0, 0, JET_CROWN, colors), ...fromPattern(0, 72, JET_FOAM, colors)];
+}
+
 export const SPRITES = {
   cloud: { width: 24, height: 7, rects: fromPattern(0, 0, CLOUD, { c: PALETTE.cloud, d: PALETTE.cloudShade, l: PALETTE.cloudLight }) },
   neon: { width: 13, height: 7, rects: fromPattern(0, 0, GAMEPAD, { n: PALETTE.neon }) },
-  jet: {
-    width: 5,
-    height: 72,
-    rects: [rect(2, 0, 1, 72, PALETTE.jet), rect(1, 8, 1, 64, PALETTE.jetSide), rect(3, 12, 1, 60, PALETTE.jetSide),
-      rect(0, 3, 1, 1, PALETTE.jetSide), rect(4, 5, 1, 1, PALETTE.jetSide), rect(1, 1, 1, 1, PALETTE.jet)],
-  },
+  jet: { width: 25, height: 80, rects: jetRects() },
   haloOuter: { width: 57, height: 57, rects: disc(28, 28, 28, PALETTE.lampLight) },
   haloInner: { width: 33, height: 33, rects: disc(16, 16, 16, PALETTE.lampLight) },
   haloSmall: { width: 21, height: 21, rects: disc(10, 10, 10, PALETTE.warm) },
@@ -154,8 +195,8 @@ function tree(cx, top, ground, random) {
 function lamp({ x, y }) {
   const left = x - 5;
   return [
-    rect(x - 2, y + 8, 4, 50, PALETTE.lampPole), rect(x - 2, y + 8, 1, 50, PALETTE.lampPoleLight),
-    rect(x - 4, y + 52, 8, 4, PALETTE.lampPole), rect(x - 5, y + 56, 10, 2, PALETTE.lampPole),
+    rect(x - 2, y + 8, 4, 52, PALETTE.lampPole), rect(x - 2, y + 8, 1, 52, PALETTE.lampPoleLight),
+    rect(x - 4, y + 56, 8, 4, PALETTE.lampPole), rect(x - 5, y + 60, 10, 2, PALETTE.lampPole),
     rect(x - 1, y - 10, 2, 2, PALETTE.lampPole), rect(left + 1, y - 8, 9, 2, PALETTE.lampPole), rect(left - 1, y - 6, 13, 2, PALETTE.lampPole),
     rect(left, y - 4, 11, 9, PALETTE.lampGlass), rect(left + 2, y - 2, 7, 5, PALETTE.lampLight),
     rect(left, y - 4, 1, 9, PALETTE.lampPole), rect(left + 10, y - 4, 1, 9, PALETTE.lampPole),
@@ -181,12 +222,10 @@ function pot(x) {
 
 function street(random) {
   const width = TITLE_WORLD.width;
-  const { x: lakeX, w: lakeW } = ANCHORS.lake;
-  const rects = [
-    // Garde-corps du quai, devant le lac.
-    rect(lakeX, 244, lakeW, 1, PALETTE.railingLight), rect(lakeX, 245, lakeW, 1, PALETTE.railing),
-  ];
-  for (let x = lakeX + 2; x < lakeX + lakeW; x += 10) rects.push(rect(x, 245, 2, 5, PALETTE.railing));
+  // Garde-corps du quai, du coin de l'immeuble jusqu'au bord droit.
+  const quay = 287;
+  const rects = [rect(quay, 244, width - quay, 1, PALETTE.railingLight), rect(quay, 245, width - quay, 1, PALETTE.railing)];
+  for (let x = quay + 3; x < width; x += 10) rects.push(rect(x, 245, 2, 5, PALETTE.railing));
   // Trottoir dallé, bordure et chaussée pavée, réchauffés par la flaque de lumière du lampadaire.
   const lit = (x, y) => ((x - ANCHORS.lamp.x) / 36) ** 2 + ((y - 262) / 14) ** 2 < 1;
   rects.push(rect(0, GROUND_Y, width, 12, PALETTE.sidewalk), rect(0, GROUND_Y, width, 1, PALETTE.sidewalkLight));

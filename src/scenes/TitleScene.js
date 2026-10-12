@@ -3,7 +3,7 @@ import AudioManager from '../audio/AudioManager.js';
 import TitleUI from '../ui/TitleUI.js';
 import { TITLE_ART } from '../config/assets.js';
 import { isUsableArtSize } from '../systems/assetManifest.mjs';
-import { buildScenery, TITLE_LAYERS, SPRITES } from '../title/scenery.mjs';
+import { buildScenery, TITLE_LAYERS, SPRITES, JET_CENTER } from '../title/scenery.mjs';
 import { computeTitleView, TITLE_WORLD } from '../title/layout.mjs';
 import { paintRects } from '../title/paint.js';
 
@@ -72,9 +72,26 @@ export default class TitleScene extends Phaser.Scene {
   }
 
   addJet() {
-    const { x, y } = this.scenery.anchors.jet;
-    const jet = this.add.image(x, y, this.texture('title-jet', SPRITES.jet)).setOrigin(0.5, 1).setDepth(DEPTH.jet);
-    if (!this.reducedMotion) this.tweens.add({ targets: jet, scaleY: 0.92, duration: 1300, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    const { x, y, h } = this.scenery.anchors.jet;
+    const jet = this.add.image(x, y, this.texture('title-jet', SPRITES.jet)).setOrigin(JET_CENTER / SPRITES.jet.width, 1).setDepth(DEPTH.jet);
+    if (this.reducedMotion) return;
+    this.tweens.add({ targets: jet, scaleY: 0.97, duration: 1300, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    // Embruns : gouttes qui quittent la couronne et retombent sous le vent, vers la droite.
+    for (let i = 0; i < 10; i++) {
+      const startX = x + (i % 3) - 1;
+      const startY = y - h + 3 + (i % 4);
+      const drop = this.add.rectangle(startX, startY, 1, 1, i % 3 ? 0xa9cdf2 : 0xeef7ff).setOrigin(0).setDepth(DEPTH.jet);
+      this.tweens.add({
+        targets: drop,
+        x: startX + 5 + (i % 5) * 3,
+        y: startY + 18 + (i % 4) * 7,
+        alpha: { from: 1, to: 0 },
+        duration: 1100 + (i % 4) * 250,
+        delay: i * 170,
+        repeat: -1,
+        ease: 'Quad.easeIn',
+      });
+    }
   }
 
   addWindowGlow() {
