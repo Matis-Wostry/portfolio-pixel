@@ -51,6 +51,10 @@ export const SEATS = [
   { id: 'chaise-bureau', label: 'Chaise de bureau', pose: 'dos', x: 294, y: 168, furniture: 'chaise', behind: true, rect: [273, 160, 42, 40] },
 ];
 
+// Lumière de la nuit qui entre par une fenêtre hors champ (côté caméra) et se pose au centre du parquet.
+// `alpha` : intensité de base, ajoutée à la couleur du sol ; des poussières flottent dans le faisceau.
+export const WINDOW_LIGHT = { key: 'lumiere-fenetre', file: 'effets/lumiere-fenetre.png', x: 196, y: 214, alpha: 0.22, dust: 'effets/poussiere.png' };
+
 export const ledKey = (index) => `serveur-led-${index}`;
 
 // Tous les fichiers de la chambre, avec la clé de texture correspondante.
@@ -58,6 +62,8 @@ export const ROOM_FILES = [
   ...TILES.floor.map((file, index) => ({ key: `sol-${index}`, file })),
   ...TILES.wall.map((file, index) => ({ key: `mur-${index}`, file })),
   ...Object.entries(TILES.border).map(([name, file]) => ({ key: `bord-${name}`, file })),
+  { key: WINDOW_LIGHT.key, file: WINDOW_LIGHT.file },
+  { key: 'poussiere', file: WINDOW_LIGHT.dust },
   ...FURNITURE.flatMap((item) => [
     { key: item.key, file: item.file },
     ...(item.overlays ?? []).map(({ key, file, frameWidth, frameHeight }) => ({ key, file, frameWidth, frameHeight })),
