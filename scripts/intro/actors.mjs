@@ -5,7 +5,7 @@ import { createRandom } from './random.mjs';
 // Personnages et véhicules animés de la rue, dessinés tournés vers la droite.
 const pad = (rows, width) => rows.map((row) => row.padEnd(width, '.').slice(0, width));
 const DOG_COLORS = { g: PALETTE.dog, G: PALETTE.dogDark, l: PALETTE.dogLight, e: PALETTE.silhouette, n: PALETTE.silhouette };
-const dog = (rows) => ({ width: 19, height: 13, rects: fromPattern(0, 0, pad(rows, 19), DOG_COLORS) });
+const dog = (rows) => ({ width: 19, height: 13, outline: true, rects: fromPattern(0, 0, pad(rows, 19), DOG_COLORS) });
 
 const DOG_HEAD = ['..ggg', '.ggggg', '.ggegGG', 'nggggGG'];
 const DOG_LEGS = ['...gG.gG....gG.gG', '...gG.gG....gG.gG', '...gG.gG....gG.gG', '...GG.GG....GG.GG'];
@@ -41,7 +41,7 @@ function cyclist(frame) {
   );
   if (frame === 0) rects.push(rect(8, 6, 1, 1, PALETTE.pants), rect(9, 7, 1, 3, PALETTE.pants), rect(9, 10, 2, 1, PALETTE.shoes));
   else rects.push(rect(6, 6, 1, 1, PALETTE.pants), rect(6, 8, 1, 3, PALETTE.pants), rect(5, 11, 2, 1, PALETTE.shoes));
-  return { width: 16, height: 14, rects };
+  return { width: 16, height: 14, outline: true, rects };
 }
 
 export const CYCLIST_FRAMES = [cyclist(0), cyclist(1)];
@@ -75,7 +75,7 @@ function tram() {
     rects.push(rect(bogie - 8, 27, 18, 2, PALETTE.iron));
     [bogie - 5, bogie + 5].forEach((wheel) => rects.push(rect(wheel - 2, 28, 5, 4, PALETTE.iron), rect(wheel, 29, 1, 1, PALETTE.pipeLight)));
   });
-  return { width, height: 32, rects };
+  return { width, height: 32, outline: true, rects };
 }
 
 export const TRAM = tram();

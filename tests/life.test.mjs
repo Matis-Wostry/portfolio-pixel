@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createRandom } from '../src/title/random.mjs';
+import { createRandom } from '../scripts/intro/random.mjs';
 import { PASSERS, nextPassage, crossing, nextDogAction, DOG_ACTIONS } from '../src/title/life.mjs';
 
 const many = (count, make) => Array.from({ length: count }, (_, i) => make(i));

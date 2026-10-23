@@ -3,7 +3,8 @@
 // Voir docs/design/demandes-designer.md pour les formats attendus.
 export const TITLE_ART = { sky: null, city: null, building: null, street: null, foreground: null };
 
-export const UI_ART = { logo: null, button: null };
+// Panneau titre et boutons : planches 9 tranches générées par `npm run assets:intro`.
+export const UI_ART = { logo: null, button: 'assets/interface/bouton.png', sign: 'assets/interface/panneau.png' };
 
 export const AUDIO_FILES = {
   music: { title: null, room: null },

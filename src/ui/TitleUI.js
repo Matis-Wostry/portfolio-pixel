@@ -19,7 +19,7 @@ export default class TitleUI {
     this.root.innerHTML = `
       <header class="title-header">
         <h1 class="title-sign">
-          <span class="title-sign-main">La Chambre du Dev</span>
+          <span class="title-sign-main">La Chambre <span class="title-sign-line">du Dev</span></span>
           <span class="title-sign-sub">Matis Wostry · développeur full-stack</span>
         </h1>
       </header>
@@ -66,6 +66,16 @@ export default class TitleUI {
       });
       image.src = assetURL(UI_ART.logo);
       sign.prepend(image);
+    }
+    if (isSafeAssetPath(UI_ART.sign)) {
+      const url = assetURL(UI_ART.sign);
+      const image = new Image();
+      this.listen(image, 'load', () => {
+        this.root.style.setProperty('--sign-image', `url("${url}")`);
+        this.root.classList.add('has-sign-image');
+      });
+      this.listen(image, 'error', () => console.warn(`Panneau introuvable : ${UI_ART.sign}. Panneau généré conservé.`));
+      image.src = url;
     }
     if (isSafeAssetPath(UI_ART.button)) {
       // Précharger la planche : les boutons générés restent en place si elle est inutilisable.

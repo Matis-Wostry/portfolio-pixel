@@ -1,9 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createRandom, generateStars } from '../src/title/random.mjs';
+import { createRandom, generateStars } from '../scripts/intro/random.mjs';
 import { computeTitleView, TITLE_WORLD } from '../src/title/layout.mjs';
-import { buildScenery, ANCHORS, SPRITES, TITLE_LAYERS, GROUND_Y, STAGE_X } from '../src/title/scenery.mjs';
-import { BUILDING } from '../src/title/building.mjs';
+import { buildScenery, ANCHORS, SPRITES, TITLE_LAYERS, GROUND_Y, STAGE_X } from '../scripts/intro/scenery.mjs';
+import { BUILDING } from '../scripts/intro/building.mjs';
+import { flatten } from '../scripts/intro/pixels.mjs';
 import { TITLE_ART } from '../src/config/assets.js';
 
 const SCREENS = [[1920, 1080], [1366, 768], [2560, 1080], [390, 844], [412, 915], [360, 800], [320, 568], [768, 1024], [844, 390], [667, 375]];
@@ -82,7 +83,8 @@ test('builds the same night for the same seed', () => {
 });
 
 test('draws only integer pixels inside the world and the sprites', () => {
-  const check = (rects, width, height, label) => {
+  const check = (items, width, height, label) => {
+    const rects = flatten(items);
     assert.ok(rects.length > 0, label);
     for (const { x, y, w, h, color } of rects) {
       assert.ok([x, y, w, h].every(Number.isInteger) && w > 0 && h > 0, `${label} ${x},${y}`);

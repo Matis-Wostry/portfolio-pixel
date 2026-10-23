@@ -1,5 +1,5 @@
 import { PALETTE } from './palette.mjs';
-import { rect, fromPattern } from './pixels.mjs';
+import { rect, fromPattern, outlined } from './pixels.mjs';
 
 // Immeuble de Matis (x 176 à 286, toit à y 90) et boutique d'arcade accolée à gauche.
 export const BUILDING = { left: 176, right: 286, top: 90, bottom: 250, plinth: 236 };
@@ -214,16 +214,19 @@ function shop(neon) {
   return rects;
 }
 
+// Boutique puis immeuble, chacun cerné du contour sombre du designer.
 export function building(random, anchors) {
   return [
-    ...shop(anchors.neon),
-    ...bricks(random),
-    ...cornice(),
-    ...roofline(),
-    ...windows(anchors),
-    ...plinth(),
-    ...entrance(anchors.door),
-    ...drainpipe(),
-    ...streetSign(),
+    outlined(shop(anchors.neon), PALETTE.outline),
+    outlined([
+      ...bricks(random),
+      ...cornice(),
+      ...roofline(),
+      ...windows(anchors),
+      ...plinth(),
+      ...entrance(anchors.door),
+      ...drainpipe(),
+      ...streetSign(),
+    ], PALETTE.outline),
   ];
 }

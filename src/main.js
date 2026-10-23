@@ -12,7 +12,7 @@ const config = {
   pixelArt: true,
   scale: { mode: Phaser.Scale.RESIZE },
   render: { roundPixels: true },
-  backgroundColor: '#1a1a2e',
+  backgroundColor: '#140f17',
   physics: {
     default: 'arcade',
     arcade: {

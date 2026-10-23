@@ -1,11 +1,11 @@
 import { createRandom, generateStars } from './random.mjs';
-import { TITLE_WORLD } from './layout.mjs';
+import { TITLE_WORLD } from '../../src/title/layout.mjs';
 import { PALETTE } from './palette.mjs';
-import { rect, fromPattern, disc, ellipse, dither, clip } from './pixels.mjs';
+import { rect, fromPattern, disc, ellipse, dither, clip, mapRects } from './pixels.mjs';
 import { building, facadeWindows, litWindowRects } from './building.mjs';
 import { street, foreground } from './street.mjs';
 import { DOG_FRAMES, CYCLIST_FRAMES, TRAM, LEAF, REFLECTIONS } from './actors.mjs';
-import { outline } from './lights.mjs';
+import { outline } from '../../src/title/lights.mjs';
 
 export { PALETTE } from './palette.mjs';
 export { fromPattern, disc } from './pixels.mjs';
@@ -103,7 +103,7 @@ function jetRects() {
 }
 
 export const SPRITES = {
-  cloud: { width: 24, height: 7, rects: fromPattern(0, 0, CLOUD, { c: PALETTE.cloud, d: PALETTE.cloudShade, l: PALETTE.cloudLight }) },
+  cloud: { width: 24, height: 7, outline: true, rects: fromPattern(0, 0, CLOUD, { c: PALETTE.cloud, d: PALETTE.cloudShade, l: PALETTE.cloudLight }) },
   // Tube allumé : cœur pâle cerné d'un liseré rose, posé un pixel au-dessus et à gauche de l'ancre.
   neon: {
     width: 15,
@@ -124,9 +124,20 @@ export const SPRITES = {
   haloOuter: { width: 57, height: 57, rects: disc(28, 28, 28, PALETTE.lampLight) },
   haloInner: { width: 33, height: 33, rects: disc(16, 16, 16, PALETTE.lampLight) },
   haloSmall: { width: 21, height: 21, rects: disc(10, 10, 10, PALETTE.warm) },
+  // Petits éléments animés par la scène (scintillement, embruns, lueurs).
+  star: { width: 1, height: 1, rects: [rect(0, 0, 1, 1, PALETTE.star)] },
+  starDim: { width: 1, height: 1, rects: [rect(0, 0, 1, 1, PALETTE.starDim)] },
+  drop: { width: 1, height: 1, rects: [rect(0, 0, 1, 1, PALETTE.jet)] },
+  dropSide: { width: 1, height: 1, rects: [rect(0, 0, 1, 1, PALETTE.jetSide)] },
+  firefly: { width: 1, height: 1, rects: [rect(0, 0, 1, 1, PALETTE.firefly)] },
+  bulb: { width: 7, height: 5, rects: [rect(0, 0, 7, 5, PALETTE.bulb)] },
+  windowGlow: { width: STAGE.window.w, height: STAGE.window.h, rects: [rect(0, 0, STAGE.window.w, STAGE.window.h, PALETTE.glowLight)] },
+  cityLightOff: { width: 2, height: 2, rects: [rect(0, 0, 2, 2, PALETTE.cityNear)] },
+  ...Object.fromEntries(PALETTE.arcadeScreens.map((color, index) => [`arcadeScreen${index}`, { width: 4, height: 3, rects: [rect(0, 0, 4, 3, color)] }])),
 };
 
-function sky() {
+// Les étoiles fixes sont peintes dans le ciel, derrière la lune ; celles qui scintillent restent à part.
+function sky(stars) {
   const stops = [0, 30, 60, 92, 124, 156, 188, 220, GROUND_Y];
   const colors = PALETTE.sky;
   const width = SPAN.right - SPAN.left;
@@ -134,6 +145,7 @@ function sky() {
   for (let i = 1; i < colors.length; i++) {
     rects.push(...dither(SPAN.left, stops[i] - 6, width, 6, colors[i]));
   }
+  stars.forEach(({ x: sx, y: sy, bright }) => rects.push(rect(sx - STAGE_X, sy, 1, 1, bright ? PALETTE.star : PALETTE.starDim)));
   const { x, y, r } = STAGE.moon;
   rects.push(...disc(x, y, r + 9, PALETTE.moonHalo), ...disc(x, y, r + 4, PALETTE.moonHaloInner));
   rects.push(...disc(x, y, r, PALETTE.moon), ...disc(x + 2, y + 1, r - 1, PALETTE.moonShade), ...disc(x - 1, y - 1, r - 2, PALETTE.moon),
@@ -201,7 +213,7 @@ function city(random, cityLights) {
   return rects;
 }
 
-const shiftRects = (rects) => rects.map((item) => ({ ...item, x: item.x + STAGE_X }));
+const shiftRects = (rects) => mapRects(rects, (item) => [{ ...item, x: item.x + STAGE_X }]);
 function shiftAnchors(value) {
   if (Array.isArray(value)) return value.map(shiftAnchors);
   if (value && typeof value === 'object') {
@@ -215,8 +227,10 @@ export const ANCHORS = shiftAnchors(STAGE);
 export function buildScenery(seed = 7) {
   const { width, height } = TITLE_WORLD;
   const cityLights = [];
+  const { moon } = ANCHORS;
+  const stars = generateStars(seed + 1, { width, height: 140, count: 105, avoid: [{ x: moon.x, y: moon.y, r: moon.r + 10 }] });
   const layers = {
-    sky: sky(),
+    sky: sky(stars.filter((_, index) => index % 3 !== 0)),
     city: city(createRandom(seed), cityLights),
     building: building(createRandom(seed + 2), STAGE),
     street: street(createRandom(seed + 3), STAGE, SPAN),
@@ -227,10 +241,10 @@ export function buildScenery(seed = 7) {
     const hidden = (x + 2 > 117 && x < 286 && y + 2 > 188) || (x + 2 > 176 && x < 286) || y + 2 > STAGE.lake.y;
     return x >= SPAN.left && x + 2 <= SPAN.right && !hidden;
   });
-  const { moon } = ANCHORS;
   return {
     layers,
-    stars: generateStars(seed + 1, { width, height: 140, count: 105, avoid: [{ x: moon.x, y: moon.y, r: moon.r + 10 }] }),
+    // Une étoile sur trois scintille : la scène l'anime à part.
+    stars: stars.filter((_, index) => index % 3 === 0),
     clouds: [{ x: 40, y: 30, speed: 3 }, { x: 150, y: 26, speed: 3 }, { x: 310, y: 56, speed: 2 }, { x: 460, y: 18, speed: 4 }, { x: 620, y: 44, speed: 2 }],
     anchors: ANCHORS,
     windows: shiftAnchors(facadeWindows(STAGE)),

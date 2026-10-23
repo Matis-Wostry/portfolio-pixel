@@ -4,6 +4,7 @@ import { buildPlaceholderFrames } from '../config/placeholder.mjs';
 import { TITLE_ART, AUDIO_FILES } from '../config/assets.js';
 import { listConfigured } from '../systems/assetManifest.mjs';
 import { ROOM_DIR, ROOM_FILES } from '../data/room.js';
+import { INTRO_DIR, introLayerKey, introSpriteKey } from '../title/intro.js';
 import { INTERFACE_DIR, CUE_FILES, ACTION_ICONS, iconKey } from '../config/interface.js';
 
 const assetURL = (path) => `${import.meta.env.BASE_URL}${path}`;
@@ -18,6 +19,12 @@ export default class BootScene extends Phaser.Scene {
     this.failedFiles = new Set();
     const onError = (file) => this.failedFiles.add(file.key);
     this.load.on('loaderror', onError);
+    // Écran titre : la description de la scène liste les calques et sprites à charger.
+    this.load.json('intro', assetURL(`${INTRO_DIR}/scene.json`));
+    this.load.once('filecomplete-json-intro', (key, type, scene) => {
+      scene.layers.forEach((name) => this.load.image(introLayerKey(name), assetURL(`${INTRO_DIR}/calques/${name}.png`)));
+      Object.keys(scene.sprites).forEach((name) => this.load.image(introSpriteKey(name), assetURL(`${INTRO_DIR}/sprites/${name}.png`)));
+    });
     ROOM_FILES.forEach(({ key, file, frameWidth, frameHeight }) => {
       const url = assetURL(`${ROOM_DIR}/${file}`);
       if (frameWidth) this.load.spritesheet(key, url, { frameWidth, frameHeight });
@@ -52,8 +59,10 @@ export default class BootScene extends Phaser.Scene {
   }
 
   create() {
+    const intro = this.cache.json.get('intro');
     const required = [...ROOM_FILES, ...CUE_FILES].map(({ key }) => key).concat(Object.keys(ACTION_ICONS).map(iconKey));
-    if (required.some((key) => this.failedFiles.has(key) || !this.textures.exists(key))) {
+    if (intro) required.push(...intro.layers.map(introLayerKey), ...Object.keys(intro.sprites).map(introSpriteKey));
+    if (!intro || required.some((key) => this.failedFiles.has(key) || !this.textures.exists(key))) {
       this.showError();
       return;
     }

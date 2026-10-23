@@ -3,9 +3,8 @@ import AudioManager from '../audio/AudioManager.js';
 import TitleUI from '../ui/TitleUI.js';
 import { TITLE_ART } from '../config/assets.js';
 import { isUsableArtSize } from '../systems/assetManifest.mjs';
-import { buildScenery, TITLE_LAYERS, SPRITES, JET_CENTER } from '../title/scenery.mjs';
 import { computeTitleView, TITLE_WORLD } from '../title/layout.mjs';
-import { paintRects } from '../title/paint.js';
+import { introLayerKey, introSpriteKey } from '../title/intro.js';
 import { flickerSequence, nextToggle } from '../title/lights.mjs';
 import { nextPassage, crossing, nextDogAction } from '../title/life.mjs';
 
@@ -17,7 +16,7 @@ const PASSER_LAYOUT = {
   cyclist: { frames: ['cyclist0', 'cyclist1'], bottom: 283, frameDelay: 150 },
   tram: { frames: ['tram'], bottom: 283, frameDelay: 0 },
 };
-const SCREEN_COLORS = [0x4ff0ff, 0xff4fd8, 0xf6d26a, 0x7cff8a, 0xb18cff];
+const SCREEN_FRAMES = 5;
 const ENTER_DURATION = 900;
 
 export default class TitleScene extends Phaser.Scene {
@@ -27,11 +26,12 @@ export default class TitleScene extends Phaser.Scene {
 
   create() {
     this.audio = AudioManager.get(this.game);
-    this.scenery = buildScenery();
+    // Décor et sprites en PNG (public/assets/intro/), positions dans scene.json.
+    this.scenery = this.cache.json.get('intro');
     this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.entering = false;
     this.generated = {};
-    TITLE_LAYERS.forEach((name) => { this.generated[name] = this.addLayer(name); });
+    this.scenery.layers.forEach((name) => { this.generated[name] = this.addLayer(name); });
     this.addReflections();
     this.addStars();
     this.addClouds();
@@ -59,12 +59,15 @@ export default class TitleScene extends Phaser.Scene {
     });
   }
 
-  texture(key, { width, height, rects }) {
-    if (!this.textures.exists(key)) this.textures.addCanvas(key, paintRects(rects, width, height));
-    return key;
+  sprite(name) {
+    return introSpriteKey(name);
   }
 
-  // Renvoie true quand le calque vient du décor généré par le code.
+  size(name) {
+    return this.scenery.sprites[name];
+  }
+
+  // Renvoie true quand le calque est celui livré avec le jeu (les lumières sont calées dessus).
   addLayer(name) {
     const fileKey = `title-${name}`;
     if (TITLE_ART[name] && this.textures.exists(fileKey)) {
@@ -74,8 +77,7 @@ export default class TitleScene extends Phaser.Scene {
       }
       console.warn(`Calque ${name} ignoré : ${TITLE_WORLD.width} × ${TITLE_WORLD.height} pixels attendus.`);
     }
-    const key = this.texture(`title-generated-${name}`, { ...TITLE_WORLD, rects: this.scenery.layers[name] });
-    this.add.image(0, 0, key).setOrigin(0).setDepth(DEPTH[name]);
+    this.add.image(0, 0, introLayerKey(name)).setOrigin(0).setDepth(DEPTH[name]);
     return true;
   }
 
@@ -111,20 +113,22 @@ export default class TitleScene extends Phaser.Scene {
     tick();
   }
 
-  glowImage(x, y, key, sprite, alpha, depth = DEPTH.glow) {
-    return this.add.image(x, y, this.texture(key, sprite)).setAlpha(alpha).setBlendMode(Phaser.BlendModes.ADD).setDepth(depth);
+  glowImage(x, y, name, alpha, depth = DEPTH.glow) {
+    return this.add.image(x, y, this.sprite(name)).setAlpha(alpha).setBlendMode(Phaser.BlendModes.ADD).setDepth(depth);
   }
 
   addStars() {
+    // Les étoiles fixes sont peintes dans le ciel ; celles-ci scintillent.
     this.scenery.stars.forEach(({ x, y, bright }, index) => {
-      const star = this.add.rectangle(x, y, 1, 1, bright ? 0xfff2d5 : 0x9d98c8).setOrigin(0).setDepth(DEPTH.stars);
-      if (this.reducedMotion || index % 3) return;
-      this.tweens.add({ targets: star, alpha: 0.2, duration: 900 + (index % 7) * 180, delay: (index * 137) % 1600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      const star = this.add.image(x, y, this.sprite(bright ? 'star' : 'starDim')).setOrigin(0).setDepth(DEPTH.stars);
+      if (this.reducedMotion) return;
+      const i = index * 3;
+      this.tweens.add({ targets: star, alpha: 0.2, duration: 900 + (i % 7) * 180, delay: (i * 137) % 1600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     });
   }
 
   addClouds() {
-    const key = this.texture('title-cloud', SPRITES.cloud);
+    const key = this.sprite('cloud');
     this.clouds = this.scenery.clouds.map(({ x, y, speed }) => ({
       image: this.add.image(x, y, key).setOrigin(0).setDepth(DEPTH.clouds),
       speed,
@@ -133,14 +137,14 @@ export default class TitleScene extends Phaser.Scene {
 
   addJet() {
     const { x, y, h } = this.scenery.anchors.jet;
-    const jet = this.add.image(x, y, this.texture('title-jet', SPRITES.jet)).setOrigin(JET_CENTER / SPRITES.jet.width, 1).setDepth(DEPTH.jet);
+    const jet = this.add.image(x, y, this.sprite('jet')).setOrigin(this.scenery.jetCenter / this.size('jet').width, 1).setDepth(DEPTH.jet);
     if (this.reducedMotion) return;
     this.tweens.add({ targets: jet, scaleY: 0.97, duration: 1300, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     // Embruns : gouttes qui quittent la couronne et retombent sous le vent, vers la droite.
     for (let i = 0; i < 10; i++) {
       const startX = x + (i % 3) - 1;
       const startY = y - h + 3 + (i % 4);
-      const drop = this.add.rectangle(startX, startY, 1, 1, i % 3 ? 0xa9cdf2 : 0xeef7ff).setOrigin(0).setDepth(DEPTH.jet);
+      const drop = this.add.image(startX, startY, this.sprite(i % 3 ? 'dropSide' : 'drop')).setOrigin(0).setDepth(DEPTH.jet);
       this.tweens.add({
         targets: drop,
         x: startX + 5 + (i % 5) * 3,
@@ -156,7 +160,7 @@ export default class TitleScene extends Phaser.Scene {
 
   addWindowGlow() {
     const { x, y, w, h } = this.scenery.anchors.window;
-    const glow = this.add.rectangle(x, y, w, h, 0x6fb7ff).setOrigin(0).setAlpha(0.3)
+    const glow = this.add.image(x, y, this.sprite('windowGlow')).setOrigin(0).setAlpha(0.3)
       .setBlendMode(Phaser.BlendModes.ADD).setDepth(DEPTH.glow);
     // Lumière d'écran : varie sans cesse, sans jamais s'éteindre.
     this.flicker((level) => {
@@ -169,10 +173,10 @@ export default class TitleScene extends Phaser.Scene {
     const { x, y } = this.scenery.anchors.neon;
     const centerX = x + 6.5;
     const centerY = y + 3.5;
-    const wide = this.glowImage(centerX, centerY, 'title-neon-glow', SPRITES.neonGlow, 0.08).setScale(1.9, 1.1);
-    const middle = this.glowImage(centerX, centerY, 'title-neon-glow', SPRITES.neonGlow, 0.08).setScale(1.35, 0.8);
-    const close = this.glowImage(centerX, centerY, 'title-neon-glow', SPRITES.neonGlow, 0.16).setScale(0.9, 0.55);
-    const tube = this.add.image(x - 1, y - 1, this.texture('title-neon', SPRITES.neon)).setOrigin(0).setDepth(DEPTH.glow);
+    const wide = this.glowImage(centerX, centerY, 'neonGlow', 0.08).setScale(1.9, 1.1);
+    const middle = this.glowImage(centerX, centerY, 'neonGlow', 0.08).setScale(1.35, 0.8);
+    const close = this.glowImage(centerX, centerY, 'neonGlow', 0.16).setScale(0.9, 0.55);
+    const tube = this.add.image(x - 1, y - 1, this.sprite('neon')).setOrigin(0).setDepth(DEPTH.glow);
     this.flicker((level) => {
       tube.setAlpha(level);
       wide.setAlpha(0.08 * level);
@@ -185,10 +189,10 @@ export default class TitleScene extends Phaser.Scene {
   addLamp() {
     // Chaque lampadaire grésille à son propre rythme.
     this.scenery.anchors.lamps.forEach(({ x, y }, index) => {
-      const outer = this.glowImage(x, y, 'title-halo-outer', SPRITES.haloOuter, 0.07, DEPTH.halo);
-      const inner = this.glowImage(x, y, 'title-halo-inner', SPRITES.haloInner, 0.1, DEPTH.halo);
-      const pool = this.glowImage(x, 262, 'title-lamp-pool', SPRITES.lampPool, 0.045, DEPTH.halo);
-      const bulb = this.add.rectangle(x - 3, y - 2, 7, 5, 0xffffff).setOrigin(0).setBlendMode(Phaser.BlendModes.ADD).setDepth(DEPTH.halo);
+      const outer = this.glowImage(x, y, 'haloOuter', 0.07, DEPTH.halo);
+      const inner = this.glowImage(x, y, 'haloInner', 0.1, DEPTH.halo);
+      const pool = this.glowImage(x, 262, 'lampPool', 0.045, DEPTH.halo);
+      const bulb = this.add.image(x - 3, y - 2, this.sprite('bulb')).setOrigin(0).setBlendMode(Phaser.BlendModes.ADD).setDepth(DEPTH.halo);
       this.flicker((level) => {
         outer.setAlpha(0.07 * level);
         inner.setAlpha(0.1 * level);
@@ -198,7 +202,7 @@ export default class TitleScene extends Phaser.Scene {
       }, { hum: 0.25, stutterChance: 0.03, outageChance: 0.005 });
     });
     const door = this.scenery.anchors.doorLamp;
-    const doorGlow = this.glowImage(door.x, door.y, 'title-halo-small', SPRITES.haloSmall, 0.1);
+    const doorGlow = this.glowImage(door.x, door.y, 'haloSmall', 0.1);
     this.flicker((level) => {
       doorGlow.setAlpha(0.1 * level);
       this.reflect('door', level);
@@ -208,9 +212,8 @@ export default class TitleScene extends Phaser.Scene {
   addWindows() {
     const states = this.scenery.windows.map(({ lit }) => lit);
     const lights = this.scenery.windows.map(({ x, y, lit, flowers }) => {
-      const sprite = flowers ? SPRITES.litWindowFlowers : SPRITES.litWindow;
-      const image = this.add.image(x - 1, y, this.texture(`title-lit-window${flowers ? '-flowers' : ''}`, sprite)).setOrigin(0).setDepth(DEPTH.windows);
-      const halo = this.glowImage(x + 8, y + 10, 'title-halo-small', SPRITES.haloSmall, 0.09);
+      const image = this.add.image(x - 1, y, this.sprite(flowers ? 'litWindowFlowers' : 'litWindow')).setOrigin(0).setDepth(DEPTH.windows);
+      const halo = this.glowImage(x + 8, y + 10, 'haloSmall', 0.09);
       [image, halo].forEach((item) => item.setVisible(lit));
       return { image, halo };
     });
@@ -234,18 +237,18 @@ export default class TitleScene extends Phaser.Scene {
     const lights = this.scenery.cityLights;
     const states = lights.map(() => true);
     // Un cache de la couleur des immeubles éteint la fenêtre peinte dessous.
-    const covers = lights.map(({ x, y, w, h }) => this.add.rectangle(x, y, w, h, 0x1a1633).setOrigin(0).setDepth(DEPTH.cityLights).setVisible(false));
+    const covers = lights.map(({ x, y }) => this.add.image(x, y, this.sprite('cityLightOff')).setOrigin(0).setDepth(DEPTH.cityLights).setVisible(false));
     this.toggleLoop(states, { minLit: lights.length - 6 }, (index, lit) => covers[index].setVisible(!lit), 3);
   }
 
   addArcadeScreens() {
-    const screens = this.scenery.anchors.screens.map(({ x, y, w, h }, index) => (
-      this.add.rectangle(x, y, w, h, SCREEN_COLORS[index]).setOrigin(0).setDepth(DEPTH.glow)
+    const screens = this.scenery.anchors.screens.map(({ x, y }, index) => (
+      this.add.image(x, y, this.sprite(`arcadeScreen${index}`)).setOrigin(0).setDepth(DEPTH.glow)
     ));
     if (this.reducedMotion) return;
     screens.forEach((screen) => {
       const change = () => {
-        screen.setFillStyle(SCREEN_COLORS[Math.floor(Math.random() * SCREEN_COLORS.length)]);
+        screen.setTexture(this.sprite(`arcadeScreen${Math.floor(Math.random() * SCREEN_FRAMES)}`));
         this.time.delayedCall(300 + Math.random() * 900, change);
       };
       change();
@@ -256,7 +259,7 @@ export default class TitleScene extends Phaser.Scene {
     if (this.reducedMotion) return;
     const { x, y } = this.scenery.anchors.tree;
     for (let i = 0; i < 6; i++) {
-      const fly = this.add.rectangle(x - 18 + i * 7, y - 6 + (i % 3) * 10, 1, 1, 0xe4f58a).setOrigin(0)
+      const fly = this.add.image(x - 18 + i * 7, y - 6 + (i % 3) * 10, this.sprite('firefly')).setOrigin(0)
         .setBlendMode(Phaser.BlendModes.ADD).setDepth(DEPTH.fireflies).setAlpha(0);
       const wander = () => this.tweens.add({
         targets: fly,
@@ -278,8 +281,7 @@ export default class TitleScene extends Phaser.Scene {
     this.reflections = [];
     if (!this.generated.street) return;
     this.reflections = this.scenery.anchors.reflections.map(({ x, color, light, column }) => {
-      const key = `reflection-${color}`;
-      const image = this.add.image(x - 3, 266, this.texture(`title-${key}`, SPRITES[key])).setOrigin(0)
+      const image = this.add.image(x - 3, 266, this.sprite(`reflection-${color}`)).setOrigin(0)
         .setBlendMode(Phaser.BlendModes.ADD).setDepth(DEPTH.reflections).setAlpha(0);
       return { image, light, column };
     });
@@ -291,13 +293,9 @@ export default class TitleScene extends Phaser.Scene {
     });
   }
 
-  frameTexture(name) {
-    return this.texture(`title-${name}`, SPRITES[name]);
-  }
-
   addDog() {
     const { x, y } = this.scenery.anchors.dog;
-    const dog = this.add.image(x, y, this.frameTexture('dogStand')).setOrigin(0).setDepth(DEPTH.dog);
+    const dog = this.add.image(x, y, this.sprite('dogStand')).setOrigin(0).setDepth(DEPTH.dog);
     if (this.reducedMotion) return;
     const frames = { idle: ['dogStand'], wag: ['dogStand', 'dogWag'], sit: ['dogSit'], sniff: ['dogSniff', 'dogStand', 'dogSniff'] };
     const act = () => {
@@ -305,13 +303,13 @@ export default class TitleScene extends Phaser.Scene {
       const sequence = frames[action];
       const step = action === 'wag' ? 160 : duration / sequence.length;
       let index = 0;
-      dog.setTexture(this.frameTexture(sequence[0]));
+      dog.setTexture(this.sprite(sequence[0]));
       const timer = this.time.addEvent({
         delay: step,
         loop: true,
         callback: () => {
           index += 1;
-          dog.setTexture(this.frameTexture(sequence[index % sequence.length]));
+          dog.setTexture(this.sprite(sequence[index % sequence.length]));
         },
       });
       this.time.delayedCall(duration, () => {
@@ -325,7 +323,7 @@ export default class TitleScene extends Phaser.Scene {
   addLeaves() {
     if (this.reducedMotion) return;
     const { x, y } = this.scenery.anchors.tree;
-    const key = this.frameTexture('leaf');
+    const key = this.sprite('leaf');
     const drop = () => {
       const startX = x - 14 + Math.random() * 28;
       const startY = y - 8 + Math.random() * 14;
@@ -361,9 +359,9 @@ export default class TitleScene extends Phaser.Scene {
 
   pass(passage, done) {
     const layout = PASSER_LAYOUT[passage.kind];
-    const sprite = SPRITES[layout.frames[0]];
+    const sprite = this.size(layout.frames[0]);
     const { fromX, toX, duration } = crossing(passage, TITLE_WORLD.width, sprite.width);
-    const passer = this.add.image(fromX, layout.bottom - sprite.height + 1, this.frameTexture(layout.frames[0]))
+    const passer = this.add.image(fromX, layout.bottom - sprite.height + 1, this.sprite(layout.frames[0]))
       .setOrigin(0).setDepth(DEPTH[passage.kind]).setFlipX(passage.direction === -1);
     let frame = 0;
     const timer = layout.frames.length > 1 ? this.time.addEvent({
@@ -371,7 +369,7 @@ export default class TitleScene extends Phaser.Scene {
       loop: true,
       callback: () => {
         frame += 1;
-        passer.setTexture(this.frameTexture(layout.frames[frame % layout.frames.length]));
+        passer.setTexture(this.sprite(layout.frames[frame % layout.frames.length]));
       },
     }) : null;
     this.tweens.add({
@@ -416,7 +414,7 @@ export default class TitleScene extends Phaser.Scene {
     if (this.reducedMotion) return;
     this.clouds.forEach((cloud) => {
       cloud.image.x += (cloud.speed * delta) / 1000;
-      if (cloud.image.x > TITLE_WORLD.width) cloud.image.x = -SPRITES.cloud.width;
+      if (cloud.image.x > TITLE_WORLD.width) cloud.image.x = -this.size('cloud').width;
     });
   }
 }

@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createRandom } from '../src/title/random.mjs';
+import { createRandom } from '../scripts/intro/random.mjs';
 import { flickerSequence, nextToggle, outline } from '../src/title/lights.mjs';
-import { buildScenery, SPRITES } from '../src/title/scenery.mjs';
+import { buildScenery, SPRITES } from '../scripts/intro/scenery.mjs';
 
 const many = (count, make) => Array.from({ length: count }, (_, i) => make(i));
 

@@ -1,6 +1,17 @@
 // Petites briques de dessin : le décor est une liste de rectangles colorés en pixels du monde.
 export const rect = (x, y, w, h, color) => ({ x, y, w, h, color });
 
+// Un objet (arbre, banc, lampadaire…) dessiné à part puis cerné d'un trait sombre, comme le mobilier
+// de la chambre : le contour suit la silhouette de l'objet, à l'extérieur.
+export const outlined = (rects, color) => ({ group: rects, outline: color });
+
+// Applique une transformation à chaque rectangle, y compris à l'intérieur des objets cernés.
+export const mapRects = (items, transform) => items.flatMap((item) => (
+  item.group ? [{ ...item, group: mapRects(item.group, transform) }] : transform(item)
+));
+
+export const flatten = (items) => items.flatMap((item) => (item.group ? flatten(item.group) : [item]));
+
 export function fromPattern(x, y, rows, colors) {
   const rects = [];
   rows.forEach((row, dy) => {
@@ -48,7 +59,7 @@ export function ellipse(cx, cy, rx, ry, color) {
 
 // Coupe les rectangles au cadre du calque pour que tout dessin débordant reste valide.
 export function clip(rects, width, height) {
-  return rects.flatMap(({ x, y, w, h, color }) => {
+  return mapRects(rects, ({ x, y, w, h, color }) => {
     const left = Math.max(0, x);
     const top = Math.max(0, y);
     const right = Math.min(width, x + w);

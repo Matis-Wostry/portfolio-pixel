@@ -1,5 +1,7 @@
 import { PALETTE } from './palette.mjs';
-import { rect, disc, ellipse } from './pixels.mjs';
+import { rect, disc, ellipse, outlined } from './pixels.mjs';
+
+const framed = (rects) => outlined(rects, PALETTE.outline);
 
 // Rue de nuit après une averse : quai, trottoir dallé, chaussée pavée mouillée et rails de tram.
 const SIDEWALK = { top: 250, bottom: 262 };
@@ -8,7 +10,7 @@ export const RAILS = [272, 280];
 
 
 function tree(cx, top, ground, random) {
-  const rects = [
+  const body = [
     rect(cx - 2, top + 24, 5, ground - top - 24, PALETTE.trunk), rect(cx + 1, top + 24, 2, ground - top - 24, PALETTE.trunkDark),
     rect(cx - 4, ground - 2, 9, 2, PALETTE.trunkDark), rect(cx - 7, ground, 15, 2, PALETTE.trunkDark),
     ...disc(cx, top + 14, 16, PALETTE.treeDark),
@@ -19,9 +21,10 @@ function tree(cx, top, ground, random) {
   for (let i = 0; i < 40; i++) {
     const dx = Math.floor(random() * 28) - 14;
     const dy = Math.floor(random() * 24) - 6;
-    if (dx * dx + (dy - 8) * (dy - 8) < 180) rects.push(rect(cx + dx, top + dy, 1, 1, random() < 0.5 ? PALETTE.treeLight : PALETTE.treeDark));
+    if (dx * dx + (dy - 8) * (dy - 8) < 180) body.push(rect(cx + dx, top + dy, 1, 1, random() < 0.5 ? PALETTE.treeLight : PALETTE.treeDark));
   }
-  // Quelques feuilles mortes au pied.
+  // Quelques feuilles mortes au pied, hors du contour de l'arbre.
+  const rects = [framed(body)];
   const leaves = [PALETTE.leafOrange, PALETTE.leafRed, PALETTE.leafGold];
   for (let i = 0; i < 14; i++) {
     rects.push(rect(cx - 16 + Math.floor(random() * 32), ground - 3 + Math.floor(random() * 6), 1, 1, leaves[i % leaves.length]));
@@ -31,30 +34,30 @@ function tree(cx, top, ground, random) {
 
 function lamp({ x, y }) {
   const left = x - 5;
-  return [
+  return [framed([
     rect(x - 2, y + 8, 4, 52, PALETTE.lampPole), rect(x - 2, y + 8, 1, 52, PALETTE.lampPoleLight),
     rect(x - 4, y + 56, 8, 4, PALETTE.lampPole), rect(x - 5, y + 60, 10, 2, PALETTE.lampPole),
     rect(x - 1, y - 10, 2, 2, PALETTE.lampPole), rect(left + 1, y - 8, 9, 2, PALETTE.lampPole), rect(left - 1, y - 6, 13, 2, PALETTE.lampPole),
     rect(left, y - 4, 11, 9, PALETTE.lampGlass), rect(left + 2, y - 2, 7, 5, PALETTE.lampLight),
     rect(left, y - 4, 1, 9, PALETTE.lampPole), rect(left + 10, y - 4, 1, 9, PALETTE.lampPole),
     rect(left - 1, y + 5, 13, 2, PALETTE.lampPole), rect(x - 3, y + 7, 6, 1, PALETTE.lampPole),
-  ];
+  ])];
 }
 
 function bench(x) {
-  return [
+  return [framed([
     rect(x, 244, 20, 2, PALETTE.bench), rect(x, 246, 20, 1, PALETTE.benchDark),
     rect(x, 249, 20, 2, PALETTE.bench), rect(x, 251, 20, 1, PALETTE.benchDark),
     rect(x + 1, 244, 1, 12, PALETTE.iron), rect(x + 18, 244, 1, 12, PALETTE.iron),
-  ];
+  ])];
 }
 
 function pot(x) {
-  return [
+  return [framed([
     ...disc(x + 4, 240, 5, PALETTE.leafDark), ...disc(x + 3, 239, 3, PALETTE.leaf),
     rect(x + 6, 237, 1, 1, PALETTE.flowerPink), rect(x + 1, 241, 1, 1, PALETTE.flowerYellow),
     rect(x, 244, 9, 2, PALETTE.potDark), rect(x + 1, 246, 7, 5, PALETTE.pot), rect(x + 1, 246, 1, 5, PALETTE.potDark),
-  ];
+  ])];
 }
 
 // Bac en bois planté de buissons ronds et de fleurs, posé sur le trottoir (bas à y 258).
@@ -68,7 +71,7 @@ function planter(x, w, random) {
   for (let i = 0; i < w / 3; i++) rects.push(rect(x + 1 + Math.floor(random() * (w - 2)), 242 + Math.floor(random() * 8), 1, 1, flowers[i % flowers.length]));
   rects.push(rect(x, 252, w, 6, PALETTE.box), rect(x, 252, w, 1, PALETTE.fence), rect(x, 257, w, 1, PALETTE.boxDark));
   for (let px = x + 4; px < x + w - 1; px += 5) rects.push(rect(px, 253, 1, 4, PALETTE.boxDark));
-  return rects;
+  return [framed(rects)];
 }
 
 // Touffe d'herbe et petites fleurs au pied d'un mur ou d'un garde-corps.
@@ -79,10 +82,10 @@ function tuft(x, y, random) {
 }
 
 function bin(x) {
-  return [
+  return [framed([
     rect(x - 1, 247, 9, 1, PALETTE.binDark), rect(x, 248, 7, 10, PALETTE.bin), rect(x, 248, 1, 10, PALETTE.fountainLight),
     rect(x + 2, 250, 1, 6, PALETTE.binDark), rect(x + 4, 250, 1, 6, PALETTE.binDark), rect(x + 1, 258, 5, 1, PALETTE.binDark),
-  ];
+  ])];
 }
 
 function sidewalk(random, anchors, { left, right }) {
@@ -194,5 +197,5 @@ export function foreground(random, { left, right }) {
   // Clôture en bois basse devant la haie.
   rects.push(rect(left, 292, width, 2, PALETTE.fence), rect(left, 294, width, 1, PALETTE.fenceDark));
   for (let x = left + 10; x < right; x += 40) rects.push(rect(x, 287, 3, 13, PALETTE.fence), rect(x, 287, 3, 1, PALETTE.fenceDark), rect(x + 2, 288, 1, 12, PALETTE.fenceDark));
-  return rects;
+  return [framed(rects)];
 }
