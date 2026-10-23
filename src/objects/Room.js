@@ -56,6 +56,10 @@ export default class Room {
     });
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     item.overlays?.forEach((overlay) => {
+      if (overlay.effect === 'random') {
+        overlay.spots.forEach((spot) => this.flickerRandomly(item, overlay, spot, depth + 0.3, reducedMotion));
+        return;
+      }
       if (overlay.effect === 'animation') {
         if (!scene.anims.exists(overlay.key)) {
           scene.anims.create({ key: overlay.key, frames: scene.anims.generateFrameNumbers(overlay.key), frameRate: overlay.frameRate, repeat: -1 });
@@ -71,6 +75,28 @@ export default class Room {
       }
     });
     if (item.leds) this.animateLeds(item, depth + 0.5);
+  }
+
+  // Change d'intensité au hasard : monte ou descend image par image vers un niveau tiré au sort, puis attend.
+  flickerRandomly(item, { key, levels }, { x, y, first }, depth, reducedMotion) {
+    const { scene } = this;
+    const sprite = scene.add.image(item.x + x, item.y + y, key, first).setOrigin(0).setDepth(depth);
+    if (reducedMotion) return;
+    let level = 0;
+    const next = () => {
+      const target = Math.floor(Math.random() * levels);
+      const step = () => {
+        if (level === target) {
+          scene.time.delayedCall(250 + Math.random() * 1500, next);
+          return;
+        }
+        level += Math.sign(target - level);
+        sprite.setFrame(first + level);
+        scene.time.delayedCall(70 + Math.random() * 60, step);
+      };
+      step();
+    };
+    next();
   }
 
   animateLeds(item, depth) {

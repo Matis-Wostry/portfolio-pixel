@@ -31,6 +31,10 @@ export const FURNITURE = [
       // Planche générée par `npm run assets:ecrans` : 32 images de 128 × 96 côte à côte.
       { key: 'bureau-ecrans', file: 'effets/bureau-ecrans-anim.png', effect: 'animation', frameWidth: 128, frameHeight: 96, frameRate: 8 },
       { key: 'bureau-lumiere', file: 'effets/bureau-lumiere.png', effect: 'glow' },
+      // Ventilateurs rouges de la tour : une ligne de 4 intensités par ventilateur (7 × 6 px chacune),
+      // chacun s'allume plus ou moins fort au hasard. `spots` : position dans l'image du bureau et première image.
+      { key: 'bureau-ventilateurs', file: 'effets/bureau-ventilateurs.png', effect: 'random', frameWidth: 7, frameHeight: 6, levels: 4,
+        spots: [{ x: 4, y: 35, first: 0 }, { x: 4, y: 41, first: 4 }] },
     ] },
   { key: 'chaise', file: 'meubles/chaise.png', x: 262, y: 136, solid: [[18, 50, 28, 14]] },
   { key: 'serveur', file: 'meubles/serveur.png', x: 360, y: 72, solid: [[0, 44, 32, 20]],
