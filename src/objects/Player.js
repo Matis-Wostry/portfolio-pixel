@@ -45,11 +45,35 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.shadow.setPosition(this.x, this.y + this.config.shadow.offsetY);
   }
 
+  // Pose assise : le corps physique est coupé et le joueur reprendra sa place en se levant.
+  sit(seat) {
+    this.standPosition = { x: this.x, y: this.y };
+    this.seat = seat;
+    this.setVelocity(0, 0);
+    this.body.enable = false;
+    this.anims.stop();
+    const texture = `${this.config.texture}-assis-${seat.pose}`;
+    if (this.scene.textures.exists(texture)) this.setTexture(texture);
+    this.setPosition(seat.x, seat.y).setDepth(seat.depth);
+    this.shadow?.setVisible(false);
+  }
+
+  stand() {
+    if (!this.seat) return;
+    this.seat = null;
+    this.body.enable = true;
+    this.body.reset(this.standPosition.x, this.standPosition.y);
+    this.shadow?.setVisible(true);
+    this.update();
+  }
+
   getFeet() {
+    if (this.seat) return { x: this.x, y: this.y };
     return { x: this.body.center.x, y: this.body.bottom };
   }
 
   update({ x = 0, y = 0 } = {}) {
+    if (this.seat) return;
     this.setVelocity(x * this.config.speed, y * this.config.speed);
     if (x < 0) this.lastDirection = 'left';
     else if (x > 0) this.lastDirection = 'right';

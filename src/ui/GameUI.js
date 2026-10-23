@@ -3,6 +3,9 @@ import { renderContent } from './renderContent.js';
 import { LandscapeSuggestion } from './orientation.mjs';
 import SoundButton from './SoundButton.js';
 import './game.css';
+import { INTERFACE_DIR, ACTION_ICONS, actionVerb } from '../config/interface.js';
+
+const iconURL = (action) => `${import.meta.env.BASE_URL}${INTERFACE_DIR}/${ACTION_ICONS[action]}`;
 
 export default class GameUI {
   constructor({ onJoystick, onAction, onCancel, onPauseChange = () => {}, audio = null }) {
@@ -23,8 +26,8 @@ export default class GameUI {
           <span class="joystick-caption">Déplacer</span>
         </div>
         <button class="action-button" type="button" disabled>
-          <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 9h18" stroke="currentColor" stroke-width="2"/></svg>
-          <span>Ouvrir</span>
+          <img class="action-icon" src="${iconURL('projets')}" alt="">
+          <span class="action-label">Ouvrir</span>
         </button>
       </div>`;
     document.body.append(this.root);
@@ -92,8 +95,11 @@ export default class GameUI {
   setTarget(zone) {
     if (this.target !== zone) {
       this.target = zone;
-      this.hint.textContent = zone ? `${zone.label} · Appuie sur E ou utilise Ouvrir.` : '';
-      this.actionButton.setAttribute('aria-label', zone ? `Ouvrir ${zone.label}` : 'Approche un objet pour ouvrir son contenu');
+      const verb = actionVerb(zone?.action);
+      this.hint.textContent = zone ? `${zone.label} · Appuie sur E ou utilise ${verb}.` : '';
+      this.actionButton.setAttribute('aria-label', zone ? `${verb} : ${zone.label}` : 'Approche un objet pour ouvrir son contenu');
+      this.actionButton.querySelector('.action-label').textContent = verb;
+      if (zone) this.actionButton.querySelector('.action-icon').src = iconURL(zone.action);
     }
     this.actionButton.disabled = !zone || !this.enabled;
   }

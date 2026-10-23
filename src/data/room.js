@@ -39,9 +39,16 @@ export const FURNITURE = [
     zone: { id: 'tableau', label: 'Compétences', action: 'skills', rect: [0, 0, 82, 96] } },
   { key: 'coin-gaming', file: 'meubles/coin-gaming.png', x: 40, y: 216,
     solid: [[0, 70, 46, 54], [64, 90, 38, 24], [121, 80, 30, 39]],
-    zone: { id: 'coin-gaming', label: 'Contact', action: 'contact', rect: [0, 24, 152, 104] },
+    zone: { id: 'coin-gaming', label: 'Contact', action: 'contact', rect: [112, 24, 40, 104] },
     overlays: [{ key: 'coin-gaming-lumiere', file: 'effets/tele-lumiere.png', effect: 'glow' }] },
   { key: 'coin-jeu', file: 'meubles/coin-jeu.png', x: 328, y: 264, solid: [[0, 36, 128, 28]] },
+];
+
+// Places assises : position du joueur assis (bas des pieds, en coordonnées de la chambre), pose
+// (`personnage/assis-<pose>.png`), meuble de référence pour la profondeur et zone d'approche [x, y, largeur, hauteur].
+// `behind: true` place le joueur derrière le meuble (le dossier de la chaise de bureau cache le bas du corps).
+export const SEATS = [
+  { id: 'chaise-bureau', label: 'Chaise de bureau', pose: 'dos', x: 294, y: 168, furniture: 'chaise', behind: true, rect: [273, 160, 42, 40] },
 ];
 
 export const ledKey = (index) => `serveur-led-${index}`;
@@ -59,7 +66,10 @@ export const ROOM_FILES = [
 ];
 
 // Zones au format attendu par normalizeZones, en coordonnées de la chambre.
-export const ROOM_ZONES = FURNITURE.filter((item) => item.zone).map(({ x, y, zone }) => ({
-  id: zone.id, label: zone.label, action: zone.action,
-  x: x + zone.rect[0], y: y + zone.rect[1], width: zone.rect[2], height: zone.rect[3],
-}));
+export const ROOM_ZONES = [
+  ...FURNITURE.filter((item) => item.zone).map(({ x, y, zone }) => ({
+    id: zone.id, label: zone.label, action: zone.action,
+    x: x + zone.rect[0], y: y + zone.rect[1], width: zone.rect[2], height: zone.rect[3],
+  })),
+  ...SEATS.map(({ id, label, rect: [x, y, width, height] }) => ({ id, label, action: 'sit', x, y, width, height })),
+];

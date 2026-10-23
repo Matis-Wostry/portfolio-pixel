@@ -18,7 +18,7 @@ canvas:focus-visible { outline: 3px solid #f8d68b; }
 .joystick-caption { position: absolute; bottom: -22px; width: 100%; text-align: center; font-size: 12px; }
 .action-button { position: absolute; right: max(20px, env(safe-area-inset-right)); bottom: max(40px, env(safe-area-inset-bottom)); min-width: 100px; min-height: 64px; padding: 12px; border: 3px solid #d8b889; border-radius: 12px; background: #4e392d; color: #fff2d5; font: inherit; pointer-events: auto; touch-action: manipulation; }
 .action-button:disabled { opacity: 0.45; }
-.action-icon { display: block; width: 24px; height: 24px; margin: 0 auto 4px; }
+.action-icon { display: block; width: 28px; height: 28px; margin: 0 auto 4px; image-rendering: pixelated; }
 .action-button:focus-visible { outline: 3px solid #ffffff; outline-offset: 3px; }
 .is-paused .touch-controls { visibility: hidden; }
 .load-error { position: fixed; inset: 35% 10% auto; padding: 24px; text-align: center; color: white; background: #342b40; z-index: 20; }

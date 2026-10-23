@@ -1,18 +1,22 @@
 import { normalizeZones, selectTarget } from './interactions.mjs';
 import { interactionCue } from './cues.mjs';
+import { iconKey } from '../config/interface.js';
 
 export default class InteractionSystem {
   constructor(scene, zones, onAction = () => {}) {
     this.zones = normalizeZones(zones);
     this.cues = [];
     this.target = null;
+    this.excluded = null;
     this.enabled = true;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.zones.forEach((zone) => {
       const position = interactionCue(zone);
-      const graphic = scene.add.graphics();
-      const text = scene.add.text(8, -1, '', { fontFamily: 'monospace', fontSize: '12px', fontStyle: 'bold' }).setOrigin(0.5);
-      const container = scene.add.container(position.x, position.y, [graphic, text]).setDepth(10001).setSize(64, 64)
+      // Bulle en pixel art : l'icône de l'action, puis la touche à presser quand l'objet est à portée.
+      const bubble = scene.add.image(0, 2, 'bulle');
+      const icon = scene.add.image(0, 0, iconKey(zone.action));
+      const keyCap = scene.add.image(11, 8, 'touche-e').setVisible(false);
+      const container = scene.add.container(position.x, position.y, [bubble, icon, keyCap]).setDepth(10001).setSize(40, 40)
         .setInteractive({ useHandCursor: true });
       container.on('pointerdown', () => {
         if (this.enabled && this.target === zone) onAction();
@@ -20,19 +24,25 @@ export default class InteractionSystem {
       const tween = reducedMotion ? null : scene.tweens.add({
         targets: container, y: position.y - 4, duration: 800, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
       });
-      this.cues.push({ zone, container, graphic, text, tween, key: null });
+      this.cues.push({ zone, container, bubble, keyCap, tween, key: null });
     });
     this.refreshCues();
   }
 
   update(feet) {
-    this.target = selectTarget(this.zones, feet);
+    this.target = selectTarget(this.zones.filter((zone) => zone.id !== this.excluded), feet);
     this.refreshCues();
     return this.target;
   }
 
   activate() {
     return this.target?.action ?? null;
+  }
+
+  // Ignore une zone (la place où le joueur est assis) ; null pour toutes les reprendre.
+  exclude(id) {
+    this.excluded = id;
+    this.cues.forEach(({ zone, container }) => container.setVisible(this.enabled && zone.id !== id));
   }
 
   refreshCues() {
@@ -42,20 +52,16 @@ export default class InteractionSystem {
       cue.container.input.enabled = state.active;
       if (cue.key === state.key) return;
       cue.key = state.key;
-      const foreground = state.active ? 0x282232 : 0xf8d68b;
-      cue.graphic.clear().fillStyle(state.active ? 0xf8d68b : 0x282232, 1)
-        .fillRect(-20, -12, 40, 24).fillTriangle(-6, 12, 2, 12, -2, 17)
-        .lineStyle(2, state.active ? 0xfff2d5 : 0x9d7859, 1).strokeRect(-20, -12, 40, 24)
-        .lineStyle(1, foreground, 1).strokeRect(-14, -7, 14, 12).lineBetween(-14, -3, 0, -3);
-      cue.text.setText(state.key).setColor(state.active ? '#282232' : '#f8d68b');
+      cue.bubble.setTexture(state.active ? 'bulle-active' : 'bulle');
+      cue.keyCap.setVisible(state.active).setTexture(touch ? 'touche-tap' : 'touche-e');
     });
   }
 
   setEnabled(enabled) {
     this.enabled = enabled;
     if (!enabled) this.target = null;
-    this.cues.forEach(({ container, tween }) => {
-      container.setVisible(enabled);
+    this.cues.forEach(({ zone, container, tween }) => {
+      container.setVisible(enabled && zone.id !== this.excluded);
       if (tween) enabled ? tween.resume() : tween.pause();
     });
     this.refreshCues();

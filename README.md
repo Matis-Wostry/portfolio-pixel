@@ -33,7 +33,7 @@ Les tests des déplacements, commandes, interactions et calculs de caméra s'ex�
 
 L'affichage s'adapte au portrait et au paysage. En portrait mobile, une invitation à tourner le téléphone met le jeu en pause ; elle se ferme après rotation ou avec Continuer en portrait. Une invitation fermée ne revient pas pendant les redimensionnements en portrait, mais peut revenir après un passage en paysage. Une rotation ou une perte de focus remet les commandes à zéro.
 
-Dans la chambre, quatre meubles sont interactifs : le bureau (projets), le tableau blanc (compétences), la bibliothèque (présentation) et le coin gaming (contact). Des bulles animées signalent les objets interactifs : le symbole de fenêtre annonce leur contenu, puis E (ou ! sur tactile) apparaît à portée. La bulle active est cliquable ; le bouton Ouvrir et E/Espace déclenchent la même action. L'animation respecte la préférence de réduction des mouvements.
+Dans la chambre, quatre meubles sont interactifs : le bureau (projets), le tableau blanc (compétences), la bibliothèque (présentation) et la télé du coin gaming (contact). On peut aussi s'asseoir sur la chaise de bureau avec E ; un déplacement fait se relever. Assis, les projets restent accessibles. Des bulles animées en pixel art signalent les objets interactifs : leur icône annonce le contenu (écran, étoile, portrait, enveloppe, chaise), puis la bulle s'allume et une touche E (ou ! sur tactile) apparaît à portée. La bulle active est cliquable ; le bouton Ouvrir et E/Espace déclenchent la même action. L'animation respecte la préférence de réduction des mouvements.
 
 Les premiers contenus sont adaptés de [matis-wostry.com](https://matis-wostry.com/) et de son [CV public](https://matis-wostry.com/assets/cv/CV_Matis_Wostry.pdf), consultés le 11 octobre 2026 : six projets, compétences, présentation, formation et contact. Ces données sont une copie locale modifiable dans `src/data/portfolio.js` ; elles ne se synchronisent pas automatiquement.
 
@@ -86,6 +86,10 @@ La chambre est construite par le code à partir des images du designer, rangées
 - `FURNITURE` : chaque meuble avec son image, sa position (coin haut-gauche, en pixels), ses empreintes bloquantes `solid`, ses calques animés (`overlays`, `leds`) et sa `zone` interactive facultative.
 
 Les écrans du bureau jouent la planche `effets/bureau-ecrans-anim.png` (32 images de 128 × 96 côte à côte, superposées au bureau) : éditeur de code qui défile à gauche, terminal à droite. Elle est générée à partir de la forme des écrans livrée par le designer (`scripts/sources/bureau-ecrans.png`) avec `npm run assets:ecrans` ; le contenu et les couleurs se modifient dans `scripts/screens.mjs`. Un calque `overlays` avec `effect: 'animation'` accepte n'importe quelle planche de ce type. Les lumières pulsent et les LEDs du serveur clignotent ; ces animations s'arrêtent si la réduction des mouvements est demandée.
+
+`SEATS` liste les places assises : position du joueur assis, pose (`assis-dos`), meuble de référence (le joueur passe devant, ou derrière avec `behind: true`) et zone d'approche.
+
+Les bulles, touches et icônes sont dans `public/assets/interface/` ; l'icône de chaque action se règle dans `src/config/interface.js`.
 
 Une `zone` indique `id`, `label`, `action` (`projets`, `skills`, `about` ou `contact`) et un rectangle relatif à l'image. La distance est mesurée entre les pieds du joueur et le bord du rectangle ; seul l'objet à portée le plus proche est actif. Les meubles passent devant ou derrière le personnage selon la position de leur base. Si une image de la chambre manque, un message d'erreur remplace le jeu.
 

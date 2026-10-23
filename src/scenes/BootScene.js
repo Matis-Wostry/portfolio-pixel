@@ -4,6 +4,7 @@ import { buildPlaceholderFrames } from '../config/placeholder.mjs';
 import { TITLE_ART, AUDIO_FILES } from '../config/assets.js';
 import { listConfigured } from '../systems/assetManifest.mjs';
 import { ROOM_DIR, ROOM_FILES } from '../data/room.js';
+import { INTERFACE_DIR, CUE_FILES, ACTION_ICONS, iconKey } from '../config/interface.js';
 
 const assetURL = (path) => `${import.meta.env.BASE_URL}${path}`;
 const frameKey = (row, column) => `${PLAYER.texture}-${row}-${column}`;
@@ -23,6 +24,9 @@ export default class BootScene extends Phaser.Scene {
       else this.load.image(key, url);
     });
     this.load.image(PLAYER.shadow.texture, assetURL(PLAYER.shadow.path));
+    PLAYER.seated.forEach((pose) => this.load.image(`${PLAYER.texture}-assis-${pose}`, assetURL(`${PLAYER.dir}/assis-${pose}.png`)));
+    CUE_FILES.forEach(({ key, file }) => this.load.image(key, assetURL(`${INTERFACE_DIR}/${file}`)));
+    Object.entries(ACTION_ICONS).forEach(([action, file]) => this.load.image(iconKey(action), assetURL(`${INTERFACE_DIR}/${file}`)));
     if (!this.textures.exists(PLAYER.texture)) {
       PLAYER.names.forEach((name, row) => {
         for (let column = 0; column < PLAYER.columns; column += 1) {
@@ -48,7 +52,8 @@ export default class BootScene extends Phaser.Scene {
   }
 
   create() {
-    if (ROOM_FILES.some(({ key }) => this.failedFiles.has(key) || !this.textures.exists(key))) {
+    const required = [...ROOM_FILES, ...CUE_FILES].map(({ key }) => key).concat(Object.keys(ACTION_ICONS).map(iconKey));
+    if (required.some((key) => this.failedFiles.has(key) || !this.textures.exists(key))) {
       this.showError();
       return;
     }

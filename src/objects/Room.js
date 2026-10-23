@@ -8,6 +8,8 @@ export default class Room {
     this.width = ROOM.columns * TILE;
     this.height = ROOM.rows * TILE;
     this.solids = scene.physics.add.staticGroup();
+    // Profondeur de chaque meuble, pour placer le joueur assis devant ou derrière.
+    this.depths = {};
     this.buildTiles();
     FURNITURE.forEach((item) => this.placeFurniture(item));
   }
@@ -48,6 +50,7 @@ export default class Room {
     const image = scene.add.image(item.x, item.y, item.key).setOrigin(0);
     const depth = item.wall ? -500 : item.y + image.height;
     image.setDepth(depth);
+    this.depths[item.key] = depth;
     item.solid?.forEach(([x, y, width, height]) => {
       this.solids.add(scene.add.zone(item.x + x + width / 2, item.y + y + height / 2, width, height));
     });

@@ -5,7 +5,7 @@ import GameControls from '../input/GameControls.js';
 import GameUI from '../ui/GameUI.js';
 import InteractionSystem from '../systems/InteractionSystem.js';
 import { PORTFOLIO } from '../data/portfolio.js';
-import { ROOM, ROOM_ZONES } from '../data/room.js';
+import { ROOM, ROOM_ZONES, SEATS } from '../data/room.js';
 import { computeView, computeBounds } from '../config/viewport.mjs';
 import AudioManager from '../audio/AudioManager.js';
 
@@ -35,6 +35,7 @@ export default class GameScene extends Phaser.Scene {
       this.controls.destroy();
     });
     const room = new Room(this);
+    this.room = room;
     this.mapSize = { width: room.width, height: room.height };
     this.interactions = new InteractionSystem(this, ROOM_ZONES, () => this.controls.requestAction());
 
@@ -78,15 +79,39 @@ export default class GameScene extends Phaser.Scene {
     this.ui.setTarget(null);
   }
 
+  sitOn(id) {
+    const seat = SEATS.find((candidate) => candidate.id === id);
+    if (!seat) return;
+    const furnitureDepth = this.room.depths[seat.furniture] ?? seat.y;
+    this.player.sit({ ...seat, depth: furnitureDepth + (seat.behind ? -0.75 : 0.75) });
+    this.interactions.exclude(id);
+  }
+
+  standUp() {
+    this.player.stand();
+    this.interactions.exclude(null);
+  }
+
   update() {
     if (!this.player) return;
-    this.player.update(this.controls.getDirection());
+    const direction = this.controls.getDirection();
+    // Assis, un déplacement fait se relever.
+    if (this.player.seat && !this.paused && (direction.x || direction.y)) this.standUp();
+    this.player.update(direction);
     if (this.paused) return;
     this.ui.setTarget(this.interactions.update(this.player.getFeet()));
     if (this.controls.consumeAction()) {
-      const content = PORTFOLIO[this.interactions.activate()];
-      if (!content) return;
-      this.ui.open(content);
+      const zone = this.interactions.target;
+      if (!zone) {
+        if (this.player.seat) this.standUp();
+        return;
+      }
+      if (zone.action === 'sit') {
+        this.sitOn(zone.id);
+        return;
+      }
+      const content = PORTFOLIO[zone.action];
+      if (content) this.ui.open(content);
     }
   }
 }

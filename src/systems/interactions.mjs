@@ -1,4 +1,4 @@
-export const ACTIONS = new Set(['projets', 'skills', 'about', 'contact']);
+export const ACTIONS = new Set(['projets', 'skills', 'about', 'contact', 'sit']);
 
 export function normalizeZone(object) {
   if (!object || object.ellipse || object.polygon || object.polyline || object.gid || object.point || (object.rotation ?? 0) !== 0) return null;
