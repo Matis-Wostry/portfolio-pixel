@@ -1,25 +1,14 @@
 import { normalizeZones, selectTarget } from './interactions.mjs';
-import { DEMO_ZONES } from '../data/interactables.js';
 import { interactionCue } from './cues.mjs';
 
 export default class InteractionSystem {
-  constructor(scene, map, onAction = () => {}) {
-    const layer = map.getObjectLayer('objets_interaction');
-    this.zones = normalizeZones(layer ? layer.objects : DEMO_ZONES);
-    this.markers = [];
+  constructor(scene, zones, onAction = () => {}) {
+    this.zones = normalizeZones(zones);
     this.cues = [];
     this.target = null;
     this.enabled = true;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.zones.forEach((zone) => {
-      if (!layer) {
-        const marker = scene.add.rectangle(zone.x + zone.width / 2, zone.y + zone.height / 2, zone.width, zone.height, 0x4e392d)
-          .setStrokeStyle(2, 0xd8b889).setDepth(zone.y + zone.height);
-        const label = scene.add.text(zone.x + zone.width / 2, zone.y + zone.height + 4, zone.label, {
-          fontFamily: 'monospace', fontSize: '10px', color: '#fff2d5', backgroundColor: '#201b2d', padding: { x: 3, y: 2 },
-        }).setOrigin(0.5, 0).setDepth(10000);
-        this.markers.push({ zone, marker, label });
-      }
       const position = interactionCue(zone);
       const graphic = scene.add.graphics();
       const text = scene.add.text(8, -1, '', { fontFamily: 'monospace', fontSize: '12px', fontStyle: 'bold' }).setOrigin(0.5);
@@ -38,7 +27,6 @@ export default class InteractionSystem {
 
   update(feet) {
     this.target = selectTarget(this.zones, feet);
-    this.markers.forEach(({ zone, marker }) => marker.setStrokeStyle(2, zone === this.target ? 0xffe59a : 0xd8b889));
     this.refreshCues();
     return this.target;
   }
@@ -76,8 +64,6 @@ export default class InteractionSystem {
   destroy() {
     this.cues.forEach(({ container, tween }) => { tween?.remove(); container.destroy(); });
     this.cues = [];
-    this.markers.forEach(({ marker, label }) => { marker.destroy(); label.destroy(); });
-    this.markers = [];
     this.zones = [];
     this.target = null;
   }

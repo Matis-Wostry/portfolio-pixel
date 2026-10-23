@@ -33,7 +33,7 @@ Les tests des déplacements, commandes, interactions et calculs de caméra s'ex�
 
 L'affichage s'adapte au portrait et au paysage. En portrait mobile, une invitation à tourner le téléphone met le jeu en pause ; elle se ferme après rotation ou avec Continuer en portrait. Une invitation fermée ne revient pas pendant les redimensionnements en portrait, mais peut revenir après un passage en paysage. Une rotation ou une perte de focus remet les commandes à zéro.
 
-La chambre actuelle contient quatre repères temporaires : projets, compétences, présentation et contact. Des bulles animées signalent les objets interactifs : le symbole de fenêtre annonce leur contenu, puis E (ou ! sur tactile) apparaît à portée. La bulle active est cliquable ; le bouton Ouvrir et E/Espace déclenchent la même action. L'animation respecte la préférence de réduction des mouvements.
+Dans la chambre, quatre meubles sont interactifs : le bureau (projets), le tableau blanc (compétences), la bibliothèque (présentation) et le coin gaming (contact). Des bulles animées signalent les objets interactifs : le symbole de fenêtre annonce leur contenu, puis E (ou ! sur tactile) apparaît à portée. La bulle active est cliquable ; le bouton Ouvrir et E/Espace déclenchent la même action. L'animation respecte la préférence de réduction des mouvements.
 
 Les premiers contenus sont adaptés de [matis-wostry.com](https://matis-wostry.com/) et de son [CV public](https://matis-wostry.com/assets/cv/CV_Matis_Wostry.pdf), consultés le 11 octobre 2026 : six projets, compétences, présentation, formation et contact. Ces données sont une copie locale modifiable dans `src/data/portfolio.js` ; elles ne se synchronisent pas automatiquement.
 
@@ -55,15 +55,14 @@ Un fichier absent ou invalide est ignoré avec un avertissement.
 │   └── superpowers/        # Plans et documents du plugin
 ├── public/
 │   └── assets/
-│       ├── sprites/
-│       ├── tilemaps/
-│       └── tilesets/
+│       ├── chambre/        # Images du designer : sol, mur, cadre, meubles, effets
+│       └── personnage/     # Un fichier par pas : face-1.png … droite-4.png
 ├── src/
 │   ├── main.js             # Initialisation du jeu
 │   ├── config/             # Sprite, hitbox et calculs de caméra
-│   ├── data/               # Contenus et zones provisoires
+│   ├── data/               # Contenus et disposition de la chambre
 │   ├── input/              # Commandes clavier et tactiles
-│   ├── objects/            # Objets du jeu (Player…)
+│   ├── objects/            # Objets du jeu (Player, Room)
 │   ├── scenes/             # Scènes Phaser
 │   ├── systems/            # Sélection et actions des objets
 │   └── ui/                 # Contrôles et fenêtres HTML
@@ -77,26 +76,21 @@ Un fichier absent ou invalide est ignoré avec un avertissement.
 Les briefs, notes et documents Superpowers doivent être placés dans `docs/`.
 Ce dossier, les dépendances et les fichiers générés sont exclus de Git.
 
-## Intégrer les assets définitifs
+## Chambre et personnage
 
-Le sprite se configure dans `src/config/player.js` : fichier, dimensions des frames, grille, ordre des directions, point d'ancrage et hitbox. Le sprite actuel utilise des frames de 19 × 32 pixels, quatre colonnes et quatre lignes. Si son fichier est absent, un personnage de secours animé est généré.
+La chambre est construite par le code à partir des images du designer, rangées dans `public/assets/chambre/` (`sol/`, `mur/`, `cadre/`, `meubles/`, `effets/`) ; aucune carte Tiled n'est utilisée. Sa disposition se règle dans `src/data/room.js` :
 
-La carte reste dans `public/assets/tilemaps/chambre.json`. Les noms et fichiers des tilesets chargés se trouvent dans `BootScene.js` ; leur association à Tiled est dans `GameScene.js`. Adapter ces listes si les tilesets changent.
+- `ROOM` : taille en tuiles de 32 pixels, nombre de rangées de mur et point d'apparition ;
+- `TILES` : images du sol (variantes mélangées), du mur et du cadre ;
+- `FURNITURE` : chaque meuble avec son image, sa position (coin haut-gauche, en pixels), ses empreintes bloquantes `solid`, ses calques animés (`overlays`, `leds`) et sa `zone` interactive facultative.
 
-Dans Tiled, ajouter un calque d'objets `objets_interaction`. Chaque objet est un rectangle non tourné, placé du côté accessible du meuble, avec ces propriétés personnalisées :
+Les écrans du bureau sont animés par le code à partir de leur forme (`effets/bureau-ecrans.png`) : éditeur de code qui défile à gauche, terminal à droite. Le contenu et les couleurs se modifient dans `src/objects/screens.mjs`. Les lumières pulsent et les LEDs du serveur clignotent ; ces animations s'arrêtent si la réduction des mouvements est demandée.
 
-| Propriété | Type | Exemple |
-|---|---|---|
-| `id` | Texte, unique | `bureau` |
-| `label` | Texte | `Projets` |
-| `action` | Texte | `projets`, `skills`, `about` ou `contact` |
-| `radius` | Nombre, facultatif | `32` |
+Une `zone` indique `id`, `label`, `action` (`projets`, `skills`, `about` ou `contact`) et un rectangle relatif à l'image. La distance est mesurée entre les pieds du joueur et le bord du rectangle ; seul l'objet à portée le plus proche est actif. Les meubles passent devant ou derrière le personnage selon la position de leur base. Si une image de la chambre manque, un message d'erreur remplace le jeu.
 
-Les repères temporaires de `src/data/interactables.js` disparaissent dès que ce calque existe, même s'il est vide. Les zones invalides sont ignorées avec un avertissement. La distance est mesurée entre les pieds du joueur et le bord du rectangle ; seul l'objet à portée le plus proche est actif.
+Le personnage se configure dans `src/config/player.js` : dossier des images (`public/assets/personnage/`, une image de 32 × 64 pixels par pas nommée `face-1.png`, `dos-1.png`, `gauche-1.png`, `droite-1.png`…), ordre des directions, point d'ancrage et hitbox. Si une image manque, un personnage de secours animé est généré.
 
 Les textes et liens se configurent dans `src/data/portfolio.js`. Chaque rubrique accepte `paragraphs`, `links` et des `cards` facultatives (titre, description, tags et liens). Les liens acceptent HTTP, HTTPS ou mailto. Aucun formulaire ni serveur de contact n'est inclus.
-
-Les calques `sol`, `murs` et `decorations` restent derrière les entités. Toutes les cases non vides de `murs` sont bloquantes. Le calque facultatif `premier_plan` passe au-dessus. Les meubles qui doivent alterner devant/derrière le personnage devront devenir des objets avec une profondeur fondée sur leur position aux pieds, ou être découpés entre décoration et premier plan. La nouvelle chambre doit être exportée depuis Tiled et ses zones repositionnées.
 
 ## Vérification manuelle
 

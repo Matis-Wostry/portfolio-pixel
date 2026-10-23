@@ -3,9 +3,11 @@ import { PLAYER } from '../config/player.js';
 import { buildPlaceholderFrames } from '../config/placeholder.mjs';
 import { TITLE_ART, AUDIO_FILES } from '../config/assets.js';
 import { listConfigured } from '../systems/assetManifest.mjs';
+import { ROOM_DIR, ROOM_FILES } from '../data/room.js';
+import { prepareRoomTextures } from '../objects/Room.js';
 
-export const TILESETS = ['Sol', 'Mur', 'Mur-bas', 'Mur-haut', 'Mur-droit', 'Mur-gauche', 'Mur-coin'];
 const assetURL = (path) => `${import.meta.env.BASE_URL}${path}`;
+const frameKey = (row, column) => `${PLAYER.texture}-${row}-${column}`;
 
 export default class BootScene extends Phaser.Scene {
   constructor() {
@@ -16,12 +18,12 @@ export default class BootScene extends Phaser.Scene {
     this.failedFiles = new Set();
     const onError = (file) => this.failedFiles.add(file.key);
     this.load.on('loaderror', onError);
-    this.load.tilemapTiledJSON('chambre', assetURL('assets/tilemaps/chambre.json'));
-    TILESETS.forEach((name) => this.load.image(name, assetURL(`assets/tilesets/${name}.png`)));
+    ROOM_FILES.forEach(({ key, file }) => this.load.image(key, assetURL(`${ROOM_DIR}/${file}`)));
     if (!this.textures.exists(PLAYER.texture)) {
-      this.load.spritesheet(PLAYER.texture, assetURL(PLAYER.path), {
-        frameWidth: PLAYER.frameWidth,
-        frameHeight: PLAYER.frameHeight,
+      PLAYER.names.forEach((name, row) => {
+        for (let column = 0; column < PLAYER.columns; column += 1) {
+          this.load.image(frameKey(row, column), assetURL(`${PLAYER.dir}/${name}-${column + 1}.png`));
+        }
       });
     }
     this.optionalFiles = [
@@ -42,7 +44,7 @@ export default class BootScene extends Phaser.Scene {
   }
 
   create() {
-    if (!this.cache.tilemap.exists('chambre') || TILESETS.some((key) => this.failedFiles.has(key))) {
+    if (ROOM_FILES.some(({ key }) => this.failedFiles.has(key) || !this.textures.exists(key))) {
       this.showError();
       return;
     }
@@ -50,9 +52,8 @@ export default class BootScene extends Phaser.Scene {
     // sans loaderror : on vérifie donc ce qui a réellement été chargé.
     this.optionalFiles.filter(({ key, type }) => !(type === 'image' ? this.textures.exists(key) : this.cache.audio.exists(key)))
       .forEach(({ key, path }) => console.warn(`Fichier ${path} inutilisable pour ${key} : version générée utilisée.`));
-    if (this.failedFiles.has(PLAYER.texture) || !this.textures.exists(PLAYER.texture)) {
-      this.createPlaceholder();
-    }
+    prepareRoomTextures(this);
+    if (!this.textures.exists(PLAYER.texture) && !this.createPlayerSheet()) this.createPlaceholder();
     this.scene.start('TitleScene');
   }
 
@@ -69,6 +70,24 @@ export default class BootScene extends Phaser.Scene {
     error.textContent = 'La chambre ne peut pas être chargée. Recharge la page pour réessayer.';
     document.body.append(error);
     this.events.once('shutdown', () => error.remove());
+  }
+
+  // Assemble les images du personnage en une planche : une ligne par direction, un pas par colonne.
+  createPlayerSheet() {
+    const { frameWidth: w, frameHeight: h, columns, rows } = PLAYER;
+    const keys = Array.from({ length: rows * columns }, (_, index) => frameKey(Math.floor(index / columns), index % columns));
+    if (keys.some((key) => this.failedFiles.has(key) || !this.textures.exists(key))) return false;
+    const canvas = document.createElement('canvas');
+    canvas.width = w * columns;
+    canvas.height = h * rows;
+    const context = canvas.getContext('2d');
+    keys.forEach((key, index) => context.drawImage(this.textures.get(key).getSourceImage(), (index % columns) * w, Math.floor(index / columns) * h));
+    const texture = this.textures.addCanvas(PLAYER.texture, canvas);
+    keys.forEach((key, index) => {
+      texture.add(index, 0, (index % columns) * w, Math.floor(index / columns) * h, w, h);
+      this.textures.remove(key);
+    });
+    return true;
   }
 
   createPlaceholder() {
