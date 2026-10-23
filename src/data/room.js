@@ -57,10 +57,22 @@ export const SEATS = [
 ];
 
 // Échiquier dessiné sur la table du coin jeu : coin haut-gauche dans l'image, cases de 2 pixels.
-// Une partie s'y joue toute seule ; `echecs-table.png` contient les pièces miniatures (blancs puis noirs, p n b r q k).
+// Une partie s'y joue toute seule : `echecs-plateau.png` repeint les cases, `echecs-table.png` contient
+// les pièces miniatures (blancs puis noirs, p n b r q k).
 export const CHESS_TABLE = {
-  key: 'echecs-table', file: 'effets/echecs-table.png', board: { x: 56, y: 25 }, square: 2,
-  minDelay: 1800, maxDelay: 3800, restartDelay: 5000, maxMoves: 160,
+  key: 'echecs-table', file: 'effets/echecs-table.png', boardKey: 'echecs-plateau', boardFile: 'effets/echecs-plateau.png',
+  board: { x: 56, y: 25 }, square: 2,
+  minDelay: 1800, maxDelay: 3800, restartDelay: 5000, maxMoves: 80,
+  // Positions de départ allégées (10 à 15 pièces, en notation FEN), tirées au hasard à chaque partie :
+  // l'échiquier reste aéré et lisible à cette taille, sans viser une partie réaliste.
+  positions: [
+    '4k3/pp3p2/2n1b3/3q4/3P4/2N1B3/PP3P2/3QK3 w - - 0 1',
+    '2r1k3/p4p2/1n2b3/8/3P4/2B2N2/P4P2/2R1K3 w - - 0 1',
+    '3qk3/1p3pb1/2n5/8/4P3/2N5/1P3PB1/3QK3 w - - 0 1',
+    'r3k3/5pp1/2b5/1p6/3NP3/6P1/5P2/R3K3 w - - 0 1',
+    '4k3/2r2p2/3np3/8/8/3BP3/2R2P2/4K3 w - - 0 1',
+    '1r2k3/p1q2p2/4bn2/8/8/2NB4/P1Q2P2/1R2K3 w - - 0 1',
+  ],
 };
 
 export const ledKey = (index) => `serveur-led-${index}`;
@@ -68,6 +80,7 @@ export const ledKey = (index) => `serveur-led-${index}`;
 // Tous les fichiers de la chambre, avec la clé de texture correspondante.
 export const ROOM_FILES = [
   { key: CHESS_TABLE.key, file: CHESS_TABLE.file, frameWidth: CHESS_TABLE.square, frameHeight: CHESS_TABLE.square },
+  { key: CHESS_TABLE.boardKey, file: CHESS_TABLE.boardFile },
   ...TILES.floor.map((file, index) => ({ key: `sol-${index}`, file })),
   ...TILES.wall.map((file, index) => ({ key: `mur-${index}`, file })),
   ...Object.entries(TILES.border).map(([name, file]) => ({ key: `bord-${name}`, file })),

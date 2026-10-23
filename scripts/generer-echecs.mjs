@@ -1,8 +1,8 @@
 // Génère les pièces d'échecs en pixel art, dans la palette du designer.
 // Usage : npm run assets:echecs
 // Sorties : public/assets/interface/echecs/{w,b}{p,n,b,r,q,k}.png (pièces de la fenêtre, 16 × 16),
-// public/assets/interface/icones/echecs.png (bulle) et public/assets/chambre/effets/echecs-table.png
-// (pièces miniatures de la table : 12 images de 2 × 2, blancs puis noirs, dans l'ordre p n b r q k).
+// public/assets/interface/icones/echecs.png (bulle), public/assets/chambre/effets/echecs-plateau.png (cases de la table)
+// et public/assets/chambre/effets/echecs-table.png (pièces miniatures : 12 images de 2 × 2, blancs puis noirs, p n b r q k).
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { encodePNG } from './png.mjs';
 
@@ -147,17 +147,28 @@ Object.entries(COLORS).forEach(([color, colors]) => Object.entries(SILHOUETTES).
 }));
 writeFileSync(new URL('interface/icones/echecs.png', root), encodePNG(piece(SILHOUETTES.n, COLORS.w)));
 
-// Pièces miniatures de l'échiquier de la table (cases de 2 × 2 pixels) : or pour les blancs, bordeaux pour les noirs.
-// Pion : une ligne de 2 pixels en bas ; pièces : un bloc 2 × 2 avec un reflet ; dame et roi : bloc plus clair.
-const TABLE = { w: { base: [242, 182, 109], light: [255, 226, 170] }, b: { base: [148, 57, 69], light: [196, 82, 92] } };
+// Échiquier de la table (cases de 2 × 2 pixels) : les cases sont repeintes dans deux gris doux du designer
+// pour que les pièces ressortent : crème pour les blancs, bordeaux de la chambre pour les noirs.
+// Pion : deux pixels en bas de la case ; pièces : un bloc 2 × 2 éclairé en haut ; dame et roi : couronne dorée.
+const BOARD = { light: [175, 167, 173], dark: [98, 86, 95] };
+const plateau = { width: 16, height: 16, data: Buffer.alloc(16 * 16 * 4) };
+for (let y = 0; y < 16; y += 1) {
+  for (let x = 0; x < 16; x += 1) {
+    const [r, g, b] = (Math.floor(x / 2) + Math.floor(y / 2)) % 2 ? BOARD.dark : BOARD.light;
+    plateau.data.set([r, g, b, 255], (y * 16 + x) * 4);
+  }
+}
+writeFileSync(new URL('chambre/effets/echecs-plateau.png', root), encodePNG(plateau));
+
+const TABLE = { w: { top: [255, 236, 231], base: [227, 197, 195] }, b: { top: [196, 82, 92], base: [148, 57, 69] } };
+const CROWN = [242, 182, 109];
 const order = ['p', 'n', 'b', 'r', 'q', 'k'];
 const sheet = { width: 2 * 12, height: 2, data: Buffer.alloc(24 * 2 * 4) };
 ['w', 'b'].forEach((color, side) => order.forEach((type, index) => {
   const x0 = (side * 6 + index) * 2;
-  const { base, light } = TABLE[color];
-  const pixels = type === 'p' ? [[0, 1, base], [1, 1, base]]
-    : 'qk'.includes(type) ? [[0, 0, light], [1, 0, light], [0, 1, light], [1, 1, base]]
-      : [[0, 0, light], [1, 0, base], [0, 1, base], [1, 1, base]];
+  const { top, base } = TABLE[color];
+  const pixels = type === 'p' ? [[0, 1, top], [1, 1, base]]
+    : [[0, 0, 'qk'.includes(type) ? CROWN : top], [1, 0, top], [0, 1, base], [1, 1, base]];
   pixels.forEach(([x, y, [r, g, b]]) => sheet.data.set([r, g, b, 255], (y * sheet.width + x0 + x) * 4));
 }));
 writeFileSync(new URL('chambre/effets/echecs-table.png', root), encodePNG(sheet));
