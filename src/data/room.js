@@ -28,7 +28,8 @@ export const FURNITURE = [
   { key: 'bureau', file: 'meubles/bureau.png', x: 224, y: 64, solid: [[0, 60, 123, 36]],
     zone: { id: 'bureau', label: 'Projets', action: 'projets', rect: [0, 0, 123, 96] },
     overlays: [
-      { key: 'bureau-ecrans', file: 'effets/bureau-ecrans.png', effect: 'screens' },
+      // Planche générée par `npm run assets:ecrans` : 32 images de 128 × 96 côte à côte.
+      { key: 'bureau-ecrans', file: 'effets/bureau-ecrans-anim.png', effect: 'animation', frameWidth: 128, frameHeight: 96, frameRate: 8 },
       { key: 'bureau-lumiere', file: 'effets/bureau-lumiere.png', effect: 'glow' },
     ] },
   { key: 'chaise', file: 'meubles/chaise.png', x: 262, y: 136, solid: [[18, 50, 28, 14]] },
@@ -52,7 +53,7 @@ export const ROOM_FILES = [
   ...Object.entries(TILES.border).map(([name, file]) => ({ key: `bord-${name}`, file })),
   ...FURNITURE.flatMap((item) => [
     { key: item.key, file: item.file },
-    ...(item.overlays ?? []).map(({ key, file }) => ({ key, file })),
+    ...(item.overlays ?? []).map(({ key, file, frameWidth, frameHeight }) => ({ key, file, frameWidth, frameHeight })),
     ...(item.leds ?? []).map((file, index) => ({ key: ledKey(index), file })),
   ]),
 ];

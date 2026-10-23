@@ -1,8 +1,5 @@
 import Phaser from 'phaser';
 import { TILE, ROOM, TILES, FURNITURE, ledKey } from '../data/room.js';
-import { findScreens, screenFrame, SCREEN_FRAMES, SCREEN_FPS } from './screens.mjs';
-
-const animatedKey = (key) => `${key}-anim`;
 
 // Dessine la chambre et renvoie ses dimensions et ses obstacles.
 export default class Room {
@@ -56,9 +53,12 @@ export default class Room {
     });
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     item.overlays?.forEach((overlay) => {
-      if (overlay.effect === 'screens') {
-        const screens = scene.add.sprite(item.x, item.y, animatedKey(overlay.key), 0).setOrigin(0).setDepth(depth + 0.25);
-        if (!reducedMotion) screens.play(animatedKey(overlay.key));
+      if (overlay.effect === 'animation') {
+        if (!scene.anims.exists(overlay.key)) {
+          scene.anims.create({ key: overlay.key, frames: scene.anims.generateFrameNumbers(overlay.key), frameRate: overlay.frameRate, repeat: -1 });
+        }
+        const sprite = scene.add.sprite(item.x, item.y, overlay.key, 0).setOrigin(0).setDepth(depth + 0.25);
+        if (!reducedMotion) sprite.play(overlay.key);
         return;
       }
       const layer = scene.add.image(item.x, item.y, overlay.key).setOrigin(0).setDepth(depth + 0.5)
@@ -83,41 +83,4 @@ export default class Room {
       },
     });
   }
-}
-
-// Fabrique la planche animée des écrans à partir de leur forme (une image par pas d'animation).
-export function prepareRoomTextures(scene) {
-  FURNITURE.flatMap((item) => item.overlays ?? []).filter(({ effect }) => effect === 'screens').forEach(({ key }) => {
-    const sheetKey = animatedKey(key);
-    if (scene.textures.exists(sheetKey)) return;
-    const source = scene.textures.get(key).getSourceImage();
-    const { width, height } = source;
-    const mask = document.createElement('canvas');
-    mask.width = width;
-    mask.height = height;
-    const maskContext = mask.getContext('2d', { willReadFrequently: true });
-    maskContext.drawImage(source, 0, 0);
-    const data = maskContext.getImageData(0, 0, width, height).data;
-    const alpha = new Uint8Array(width * height).map((_, i) => data[i * 4 + 3]);
-    const screens = findScreens(alpha, width, height);
-
-    const canvas = document.createElement('canvas');
-    canvas.width = width * SCREEN_FRAMES;
-    canvas.height = height;
-    const context = canvas.getContext('2d');
-    for (let frame = 0; frame < SCREEN_FRAMES; frame += 1) {
-      screenFrame(screens, frame).forEach(({ x, y, color }) => {
-        context.fillStyle = color;
-        context.fillRect(frame * width + x, y, 1, 1);
-      });
-    }
-    const texture = scene.textures.addCanvas(sheetKey, canvas);
-    for (let frame = 0; frame < SCREEN_FRAMES; frame += 1) texture.add(frame, 0, frame * width, 0, width, height);
-    scene.anims.create({
-      key: sheetKey,
-      frames: Array.from({ length: SCREEN_FRAMES }, (_, frame) => ({ key: sheetKey, frame })),
-      frameRate: SCREEN_FPS,
-      repeat: -1,
-    });
-  });
 }

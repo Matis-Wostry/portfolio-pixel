@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { findScreens, screenFrame, SCREEN_FRAMES } from '../src/objects/screens.mjs';
+import { findScreens, screenFrame, SCREEN_FRAMES } from '../scripts/screens.mjs';
 
 // Deux écrans inclinés en miroir, comme sur le bureau.
 const width = 40;

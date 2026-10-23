@@ -1,9 +1,9 @@
-// Animation des écrans du bureau, calculée à partir de la forme livrée par le designer
-// (bureau-ecrans.png) : écran gauche = éditeur de code qui défile, écran droit = terminal.
+// Contenu animé des écrans du bureau, calculé à partir de la forme livrée par le designer
+// (sources/bureau-ecrans.png) : écran gauche = éditeur de code qui défile, écran droit = terminal.
+// Utilisé par animer-ecrans.mjs pour produire la planche PNG chargée par le jeu.
 // Les lignes suivent l'inclinaison de chaque écran en partant de son bord supérieur.
 
 export const SCREEN_FRAMES = 32;
-export const SCREEN_FPS = 8;
 
 const COLORS = {
   background: '#1d1b2e',

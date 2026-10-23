@@ -4,7 +4,6 @@ import { buildPlaceholderFrames } from '../config/placeholder.mjs';
 import { TITLE_ART, AUDIO_FILES } from '../config/assets.js';
 import { listConfigured } from '../systems/assetManifest.mjs';
 import { ROOM_DIR, ROOM_FILES } from '../data/room.js';
-import { prepareRoomTextures } from '../objects/Room.js';
 
 const assetURL = (path) => `${import.meta.env.BASE_URL}${path}`;
 const frameKey = (row, column) => `${PLAYER.texture}-${row}-${column}`;
@@ -18,7 +17,11 @@ export default class BootScene extends Phaser.Scene {
     this.failedFiles = new Set();
     const onError = (file) => this.failedFiles.add(file.key);
     this.load.on('loaderror', onError);
-    ROOM_FILES.forEach(({ key, file }) => this.load.image(key, assetURL(`${ROOM_DIR}/${file}`)));
+    ROOM_FILES.forEach(({ key, file, frameWidth, frameHeight }) => {
+      const url = assetURL(`${ROOM_DIR}/${file}`);
+      if (frameWidth) this.load.spritesheet(key, url, { frameWidth, frameHeight });
+      else this.load.image(key, url);
+    });
     if (!this.textures.exists(PLAYER.texture)) {
       PLAYER.names.forEach((name, row) => {
         for (let column = 0; column < PLAYER.columns; column += 1) {
@@ -52,7 +55,6 @@ export default class BootScene extends Phaser.Scene {
     // sans loaderror : on vérifie donc ce qui a réellement été chargé.
     this.optionalFiles.filter(({ key, type }) => !(type === 'image' ? this.textures.exists(key) : this.cache.audio.exists(key)))
       .forEach(({ key, path }) => console.warn(`Fichier ${path} inutilisable pour ${key} : version générée utilisée.`));
-    prepareRoomTextures(this);
     if (!this.textures.exists(PLAYER.texture) && !this.createPlayerSheet()) this.createPlaceholder();
     this.scene.start('TitleScene');
   }

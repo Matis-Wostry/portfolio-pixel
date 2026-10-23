@@ -57,6 +57,7 @@ Un fichier absent ou invalide est ignoré avec un avertissement.
 │   └── assets/
 │       ├── chambre/        # Images du designer : sol, mur, cadre, meubles, effets
 │       └── personnage/     # Un fichier par pas : face-1.png … droite-4.png
+├── scripts/                # Génération d'assets (planche des écrans) et leurs sources
 ├── src/
 │   ├── main.js             # Initialisation du jeu
 │   ├── config/             # Sprite, hitbox et calculs de caméra
@@ -84,7 +85,7 @@ La chambre est construite par le code à partir des images du designer, rangées
 - `TILES` : images du sol (variantes mélangées), du mur et du cadre ;
 - `FURNITURE` : chaque meuble avec son image, sa position (coin haut-gauche, en pixels), ses empreintes bloquantes `solid`, ses calques animés (`overlays`, `leds`) et sa `zone` interactive facultative.
 
-Les écrans du bureau sont animés par le code à partir de leur forme (`effets/bureau-ecrans.png`) : éditeur de code qui défile à gauche, terminal à droite. Le contenu et les couleurs se modifient dans `src/objects/screens.mjs`. Les lumières pulsent et les LEDs du serveur clignotent ; ces animations s'arrêtent si la réduction des mouvements est demandée.
+Les écrans du bureau jouent la planche `effets/bureau-ecrans-anim.png` (32 images de 128 × 96 côte à côte, superposées au bureau) : éditeur de code qui défile à gauche, terminal à droite. Elle est générée à partir de la forme des écrans livrée par le designer (`scripts/sources/bureau-ecrans.png`) avec `npm run assets:ecrans` ; le contenu et les couleurs se modifient dans `scripts/screens.mjs`. Un calque `overlays` avec `effect: 'animation'` accepte n'importe quelle planche de ce type. Les lumières pulsent et les LEDs du serveur clignotent ; ces animations s'arrêtent si la réduction des mouvements est demandée.
 
 Une `zone` indique `id`, `label`, `action` (`projets`, `skills`, `about` ou `contact`) et un rectangle relatif à l'image. La distance est mesurée entre les pieds du joueur et le bord du rectangle ; seul l'objet à portée le plus proche est actif. Les meubles passent devant ou derrière le personnage selon la position de leur base. Si une image de la chambre manque, un message d'erreur remplace le jeu.
 
