@@ -22,6 +22,7 @@ export default class BootScene extends Phaser.Scene {
       if (frameWidth) this.load.spritesheet(key, url, { frameWidth, frameHeight });
       else this.load.image(key, url);
     });
+    this.load.image(PLAYER.shadow.texture, assetURL(PLAYER.shadow.path));
     if (!this.textures.exists(PLAYER.texture)) {
       PLAYER.names.forEach((name, row) => {
         for (let column = 0; column < PLAYER.columns; column += 1) {

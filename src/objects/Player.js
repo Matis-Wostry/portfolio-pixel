@@ -11,6 +11,15 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.body.setSize(config.hitbox.width, config.hitbox.height);
     this.body.setOffset(config.hitbox.x, config.hitbox.y);
     this.lastDirection = 'down';
+    // L'ombre reste au sol, sous les meubles, et suit les pieds après chaque pas de la physique.
+    if (config.shadow && scene.textures.exists(config.shadow.texture)) {
+      this.shadow = scene.add.image(x, y + config.shadow.offsetY, config.shadow.texture).setDepth(-900);
+      scene.events.on(Phaser.Scenes.Events.POST_UPDATE, this.syncShadow, this);
+      this.once(Phaser.GameObjects.Events.DESTROY, () => {
+        scene.events.off(Phaser.Scenes.Events.POST_UPDATE, this.syncShadow, this);
+        this.shadow.destroy();
+      });
+    }
     config.directions.forEach((direction, row) => {
       const start = row * config.columns;
       if (!scene.anims.exists(`${config.texture}-walk-${direction}`)) {
@@ -30,6 +39,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         });
       }
     });
+  }
+
+  syncShadow() {
+    this.shadow.setPosition(this.x, this.y + this.config.shadow.offsetY);
   }
 
   getFeet() {

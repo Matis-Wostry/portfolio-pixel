@@ -89,7 +89,7 @@ Les écrans du bureau jouent la planche `effets/bureau-ecrans-anim.png` (32 imag
 
 Une `zone` indique `id`, `label`, `action` (`projets`, `skills`, `about` ou `contact`) et un rectangle relatif à l'image. La distance est mesurée entre les pieds du joueur et le bord du rectangle ; seul l'objet à portée le plus proche est actif. Les meubles passent devant ou derrière le personnage selon la position de leur base. Si une image de la chambre manque, un message d'erreur remplace le jeu.
 
-Le personnage se configure dans `src/config/player.js` : dossier des images (`public/assets/personnage/`, une image de 32 × 64 pixels par pas nommée `face-1.png`, `dos-1.png`, `gauche-1.png`, `droite-1.png`…), ordre des directions, point d'ancrage et hitbox. Si une image manque, un personnage de secours animé est généré.
+Le personnage se configure dans `src/config/player.js` : dossier des images (`public/assets/personnage/`, une image de 32 × 64 pixels par pas nommée `face-1.png`, `dos-1.png`, `gauche-1.png`, `droite-1.png`…), ordre des directions, point d'ancrage, hitbox et ombre (`personnage/ombre.png`, posée au sol sous les pieds, de la même couleur que les ombres des meubles). Si une image manque, un personnage de secours animé est généré.
 
 Les textes et liens se configurent dans `src/data/portfolio.js`. Chaque rubrique accepte `paragraphs`, `links` et des `cards` facultatives (titre, description, tags et liens). Les liens acceptent HTTP, HTTPS ou mailto. Aucun formulaire ni serveur de contact n'est inclus.
 
