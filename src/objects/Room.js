@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { TILE, ROOM, TILES, FURNITURE, WINDOW_LIGHT, ledKey } from '../data/room.js';
+import { TILE, ROOM, TILES, FURNITURE, ledKey } from '../data/room.js';
 
 // Dessine la chambre et renvoie ses dimensions et ses obstacles.
 export default class Room {
@@ -11,7 +11,6 @@ export default class Room {
     // Profondeur de chaque meuble, pour placer le joueur assis devant ou derrière.
     this.depths = {};
     this.buildTiles();
-    this.addWindowLight();
     FURNITURE.forEach((item) => this.placeFurniture(item));
   }
 
@@ -44,37 +43,6 @@ export default class Room {
     border('topRight', last.x, 0);
     border('bottomLeft', 0, last.y);
     border('bottomRight', last.x, last.y);
-  }
-
-  // Tache de lumière posée sur le parquet, sous les meubles et l'ombre du joueur : elle respire
-  // lentement, comme si des nuages passaient, et quelques poussières dérivent dans le faisceau.
-  addWindowLight() {
-    const { scene } = this;
-    const { key, x, y, alpha } = WINDOW_LIGHT;
-    const light = scene.add.image(x, y, key).setOrigin(0).setDepth(-950).setAlpha(alpha).setBlendMode(Phaser.BlendModes.ADD);
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    scene.tweens.add({ targets: light, alpha: { from: alpha, to: alpha * 0.7 }, duration: 5200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-    const { width, height } = light;
-    for (let i = 0; i < 8; i += 1) {
-      const mote = scene.add.image(0, 0, 'poussiere').setDepth(9000).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0);
-      const drift = () => {
-        const startX = x + 16 + Math.random() * (width - 32);
-        const startY = y - 40 + Math.random() * (height + 20);
-        mote.setPosition(startX, startY).setAlpha(0);
-        scene.tweens.add({
-          targets: mote,
-          x: startX + (Math.random() - 0.5) * 16,
-          y: startY + 10 + Math.random() * 14,
-          alpha: { from: 0, to: 0.7 },
-          duration: 2600 + Math.random() * 2400,
-          yoyo: true,
-          delay: Math.random() * 3000,
-          ease: 'Sine.easeInOut',
-          onComplete: drift,
-        });
-      };
-      drift();
-    }
   }
 
   placeFurniture(item) {
