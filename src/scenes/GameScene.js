@@ -110,6 +110,10 @@ export default class GameScene extends Phaser.Scene {
         this.sitOn(zone.id);
         return;
       }
+      if (zone.action === 'chess') {
+        this.ui.openChess();
+        return;
+      }
       const content = PORTFOLIO[zone.action];
       if (content) this.ui.open(content);
     }

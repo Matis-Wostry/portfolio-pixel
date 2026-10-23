@@ -15,9 +15,11 @@ export const ACTION_ICONS = {
   about: 'icones/presentation.png',
   contact: 'icones/contact.png',
   sit: 'icones/asseoir.png',
+  chess: 'icones/echecs.png',
 };
 
 export const iconKey = (action) => `icone-${action}`;
 
 // Verbe du bouton tactile et de l'aide, selon l'action.
-export const actionVerb = (action) => (action === 'sit' ? 'S’asseoir' : 'Ouvrir');
+const VERBS = { sit: 'S’asseoir', chess: 'Jouer' };
+export const actionVerb = (action) => VERBS[action] ?? 'Ouvrir';

@@ -55,3 +55,18 @@ canvas:focus-visible { outline: 3px solid #f2b66d; }
   .mobile-help { display: inline; }
   .game-help { font-size: 12px; }
 }
+/* Échecs : échiquier en bois clair et foncé, pièces en pixel art agrandies sans lissage. */
+.chess { display: grid; justify-items: center; gap: 12px; }
+.chess-status { margin: 0; min-height: 1.7em; text-align: center; color: #f7cc9b; }
+.chess-board { --square: min(48px, calc((100vw - 96px) / 8), calc((100dvh - 240px) / 8)); display: grid; grid-template-columns: repeat(8, var(--square)); border: 4px solid #1d171b; box-shadow: 0 0 0 2px #e3c5c3; }
+.chess-square { position: relative; display: grid; place-items: center; width: var(--square); height: var(--square); padding: 0; border: 0; cursor: pointer; touch-action: manipulation; }
+.chess-square.is-light { background: #cd9e80; }
+.chess-square.is-dark { background: #86483a; }
+.chess-square img { width: 100%; height: 100%; image-rendering: pixelated; pointer-events: none; }
+.chess-square.is-last { box-shadow: inset 0 0 0 3px #f2b66d88; }
+.chess-square.is-selected { box-shadow: inset 0 0 0 3px #f2b66d; }
+.chess-square.is-check { box-shadow: inset 0 0 0 3px #e5739d; }
+.chess-square.is-target::after { content: ''; position: absolute; width: 28%; height: 28%; background: #1d171b88; }
+.chess-square:focus-visible { outline: 3px solid #ffece7; outline-offset: -3px; z-index: 1; }
+.chess-new { min-height: 48px; padding: 8px 16px; color: #ffece7; background: #86302a; border: 2px solid #1d171b; font: inherit; cursor: pointer; }
+.chess-new:focus-visible { outline: 3px solid #ffece7; outline-offset: 3px; }

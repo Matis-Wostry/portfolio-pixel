@@ -2,6 +2,7 @@ import { joystickDirection } from '../input/direction.mjs';
 import { renderContent } from './renderContent.js';
 import { LandscapeSuggestion } from './orientation.mjs';
 import SoundButton from './SoundButton.js';
+import ChessView from './ChessView.js';
 import './game.css';
 import { INTERFACE_DIR, ACTION_ICONS, actionVerb } from '../config/interface.js';
 
@@ -201,6 +202,19 @@ export default class GameUI {
     this.dialog.showModal();
     this.syncPause();
     body.scrollTop = 0;
+    this.dialog.querySelector('.close-button').focus();
+  }
+
+  // Partie d'échecs contre l'ordinateur, dans la même fenêtre que les rubriques ; elle reprend où on l'a laissée.
+  openChess() {
+    if (this.dialog.open) return;
+    this.chess = this.chess ?? new ChessView({ audio: this.audio });
+    this.dialog.querySelector('h1').textContent = 'Échecs';
+    this.dialog.querySelector('.dialog-content').replaceChildren(this.chess.element);
+    this.chess.render();
+    this.audio?.play('open');
+    this.dialog.showModal();
+    this.syncPause();
     this.dialog.querySelector('.close-button').focus();
   }
 

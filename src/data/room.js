@@ -45,7 +45,8 @@ export const FURNITURE = [
     solid: [[0, 70, 46, 54], [64, 90, 38, 24], [121, 80, 30, 39]],
     zone: { id: 'coin-gaming', label: 'Contact', action: 'contact', rect: [112, 24, 40, 104] },
     overlays: [{ key: 'coin-gaming-lumiere', file: 'effets/tele-lumiere.png', effect: 'glow' }] },
-  { key: 'coin-jeu', file: 'meubles/coin-jeu.png', x: 328, y: 264, solid: [[0, 36, 128, 28]] },
+  { key: 'coin-jeu', file: 'meubles/coin-jeu.png', x: 328, y: 264, solid: [[0, 36, 128, 28]],
+    zone: { id: 'echecs', label: 'Échecs', action: 'chess', rect: [30, 4, 68, 60] }, chess: true },
 ];
 
 // Places assises : position du joueur assis (bas des pieds, en coordonnées de la chambre), pose
@@ -55,10 +56,18 @@ export const SEATS = [
   { id: 'chaise-bureau', label: 'Chaise de bureau', pose: 'dos', x: 294, y: 168, furniture: 'chaise', behind: true, rect: [273, 160, 42, 40] },
 ];
 
+// Échiquier dessiné sur la table du coin jeu : coin haut-gauche dans l'image, cases de 2 pixels.
+// Une partie s'y joue toute seule ; `echecs-table.png` contient les pièces miniatures (blancs puis noirs, p n b r q k).
+export const CHESS_TABLE = {
+  key: 'echecs-table', file: 'effets/echecs-table.png', board: { x: 56, y: 25 }, square: 2,
+  minDelay: 1800, maxDelay: 3800, restartDelay: 5000, maxMoves: 160,
+};
+
 export const ledKey = (index) => `serveur-led-${index}`;
 
 // Tous les fichiers de la chambre, avec la clé de texture correspondante.
 export const ROOM_FILES = [
+  { key: CHESS_TABLE.key, file: CHESS_TABLE.file, frameWidth: CHESS_TABLE.square, frameHeight: CHESS_TABLE.square },
   ...TILES.floor.map((file, index) => ({ key: `sol-${index}`, file })),
   ...TILES.wall.map((file, index) => ({ key: `mur-${index}`, file })),
   ...Object.entries(TILES.border).map(([name, file]) => ({ key: `bord-${name}`, file })),

@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import TableChess from './TableChess.js';
 import { TILE, ROOM, TILES, FURNITURE, ledKey } from '../data/room.js';
 
 // Dessine la chambre et renvoie ses dimensions et ses obstacles.
@@ -75,6 +76,7 @@ export default class Room {
       }
     });
     if (item.leds) this.animateLeds(item, depth + 0.5);
+    if (item.chess) this.chess = new TableChess(scene, { x: item.x, y: item.y, depth: depth + 0.5 });
   }
 
   // Change d'intensité au hasard : monte ou descend image par image vers un niveau tiré au sort, puis attend.
