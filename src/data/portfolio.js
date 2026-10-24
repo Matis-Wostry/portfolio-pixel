@@ -19,13 +19,13 @@ export const PORTFOLIO = {
       },
       {
         id: 'mb-ventilation', category: 'pro', title: 'MB Ventilation',
-        description: 'Site WordPress dédié à la ventilation.', tags: ['WordPress'],
-        links: [],
+        description: 'Site WordPress dédié aux systèmes de ventilation.', tags: ['WordPress'],
+        links: [{ label: 'Site', href: 'https://mb-ventilation.fr/' }],
       },
       {
         id: 'mb-home', category: 'pro', title: 'MB Home',
-        description: 'Site WordPress dédié à la maison.', tags: ['WordPress'],
-        links: [],
+        description: 'Site WordPress dédié au carrelage, au placo et à la démolition.', tags: ['WordPress'],
+        links: [{ label: 'Site', href: 'https://mb-home.fr/' }],
       },
       {
         id: 'pokedex', category: 'ecole', title: 'Pokédex',
