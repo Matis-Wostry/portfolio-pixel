@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { PLAYER } from '../config/player.js';
+import { facingDirection } from '../input/direction.mjs';
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, config = PLAYER) {
@@ -75,10 +76,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   update({ x = 0, y = 0 } = {}) {
     if (this.seat) return;
     this.setVelocity(x * this.config.speed, y * this.config.speed);
-    if (x < 0) this.lastDirection = 'left';
-    else if (x > 0) this.lastDirection = 'right';
-    else if (y < 0) this.lastDirection = 'up';
-    else if (y > 0) this.lastDirection = 'down';
+    this.lastDirection = facingDirection({ x, y }, this.lastDirection);
     this.play(`${this.config.texture}-${x || y ? 'walk' : 'idle'}-${this.lastDirection}`, true);
     this.setDepth(this.getFeet().y);
   }

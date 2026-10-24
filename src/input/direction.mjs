@@ -9,6 +9,14 @@ export function resolveDirection(keyboard = {}, joystick = {}) {
   return length > 1 ? { x: x / length, y: y / length } : { x, y };
 }
 
+// Sens dans lequel regarde le personnage : l'axe dominant l'emporte, pour qu'un joystick poussé vers le haut
+// avec un léger décalage garde le sprite de dos. À égalité (diagonale au clavier), le côté l'emporte.
+export function facingDirection({ x = 0, y = 0 } = {}, previous = 'down') {
+  if (!x && !y) return previous;
+  if (Math.abs(x) >= Math.abs(y)) return x < 0 ? 'left' : 'right';
+  return y < 0 ? 'up' : 'down';
+}
+
 export function joystickDirection(dx, dy, radius, deadZone = 0.15) {
   if (![dx, dy, radius].every(Number.isFinite) || radius <= 0) return { x: 0, y: 0 };
   const distance = Math.hypot(dx, dy);
