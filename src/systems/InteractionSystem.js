@@ -1,5 +1,5 @@
 import { normalizeZones, selectTarget } from './interactions.mjs';
-import { interactionCue } from './cues.mjs';
+import { interactionCue, isCueVisible } from './cues.mjs';
 import { iconKey } from '../config/interface.js';
 
 export default class InteractionSystem {
@@ -42,12 +42,13 @@ export default class InteractionSystem {
   // Ignore une zone (la place où le joueur est assis) ; null pour toutes les reprendre.
   exclude(id) {
     this.excluded = id;
-    this.cues.forEach(({ zone, container }) => container.setVisible(this.enabled && zone.id !== id));
+    this.refreshCues();
   }
 
   refreshCues() {
     const touch = window.matchMedia('(any-pointer: coarse), (max-width: 760px)').matches;
     this.cues.forEach((cue) => {
+      cue.container.setVisible(isCueVisible(cue.zone, this));
       const state = interactionCue(cue.zone, { active: this.enabled && cue.zone === this.target, touch });
       cue.container.input.enabled = state.active;
       if (cue.key === state.key) return;
@@ -60,8 +61,7 @@ export default class InteractionSystem {
   setEnabled(enabled) {
     this.enabled = enabled;
     if (!enabled) this.target = null;
-    this.cues.forEach(({ zone, container, tween }) => {
-      container.setVisible(enabled && zone.id !== this.excluded);
+    this.cues.forEach(({ tween }) => {
       if (tween) enabled ? tween.resume() : tween.pause();
     });
     this.refreshCues();

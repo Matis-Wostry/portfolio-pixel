@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { interactionCue } from '../src/systems/cues.mjs';
+import { interactionCue, isCueVisible } from '../src/systems/cues.mjs';
 
 const zone = { x: 100, y: 120, width: 48, height: 32, label: 'Projets' };
 
@@ -14,4 +14,14 @@ test('cue placement follows edited object geometry', () => {
   const cue = interactionCue({ ...zone, x: 320, y: 240, width: 64 }, { active: true });
   assert.equal(cue.x, 352);
   assert.equal(cue.y, 220);
+});
+
+test('portfolio cues stay visible while the others only appear within reach', () => {
+  const projets = { ...zone, id: 'bureau', action: 'projets' };
+  const panier = { ...zone, id: 'panier', action: 'shoot' };
+  assert.equal(isCueVisible(projets), true);
+  assert.equal(isCueVisible(panier), false);
+  assert.equal(isCueVisible(panier, { target: panier }), true);
+  assert.equal(isCueVisible(projets, { enabled: false }), false);
+  assert.equal(isCueVisible(panier, { target: panier, excluded: 'panier' }), false);
 });
