@@ -45,6 +45,12 @@ export const PORTFOLIO = {
         ],
       },
       {
+        id: 'gestion-ecole', category: 'ecole', title: 'Gestion d’école',
+        description: 'Application Java pour gérer élèves, livres, UV et inscriptions, avec une base MySQL en JDBC et une interface Swing testée.',
+        tags: ['Java', 'MySQL', 'JDBC', 'Swing', 'JUnit'],
+        links: [{ label: 'Code', href: 'https://github.com/Matis-Wostry/gestionEcole' }],
+      },
+      {
         id: 'azteka', category: 'ecole', title: 'Azteka',
         description: 'Intégration responsive de la maquette Figma d’une équipe e-sport.', tags: ['HTML', 'CSS', 'Figma'],
         links: [
