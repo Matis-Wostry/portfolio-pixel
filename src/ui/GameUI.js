@@ -191,7 +191,7 @@ export default class GameUI {
 
   restoreFocus() {
     const focusTarget = this.orientationDialog.open ? this.orientationDialog.querySelector('button')
-      : this.dialog.open ? (this.dialog.classList.contains('is-terminal') ? this.terminal.input : this.dialog.querySelector('.close-button'))
+      : this.dialog.open ? (this.dialog.classList.contains('is-terminal') && this.terminal.autoFocus ? this.terminal.input : this.dialog.querySelector('.close-button'))
         : document.querySelector('canvas');
     focusTarget?.focus({ preventScroll: true });
   }
@@ -231,7 +231,7 @@ export default class GameUI {
   openTerminal(content) {
     this.terminal = this.terminal ?? new TerminalView({ content, audio: this.audio, onExit: () => this.close() });
     this.dialog.querySelector('.dialog-content').replaceChildren(this.terminal.element);
-    this.show(`Terminal · ${content.title}`, { terminal: true, focusTarget: this.terminal.input });
+    this.show(`Terminal · ${content.title}`, { terminal: true, focusTarget: this.terminal.autoFocus ? this.terminal.input : undefined });
     this.terminal.start();
   }
 

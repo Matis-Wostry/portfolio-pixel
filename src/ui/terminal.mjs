@@ -1,7 +1,8 @@
 // Terminal de l'ordinateur : interprète les commandes tapées et renvoie des blocs que TerminalView affiche.
 // Dans l'aide, cliquer sur une commande à argument lance son exemple.
 // Blocs : { type: 'text', text, tone? } ; { type: 'list', items: [{ label, detail, command }] } (lignes cliquables) ;
-// { type: 'project', card, category } ; { type: 'hints', commands } (suggestions cliquables).
+// { type: 'carousel', category, cards } (projets d'un dossier en cartes) ; { type: 'project', card, category } ;
+// { type: 'hints', commands } (suggestions cliquables).
 // `state.cwd` est le dossier courant : null pour ~/projets, sinon l'identifiant d'une catégorie.
 
 export const COMMANDS = [
@@ -43,7 +44,13 @@ function listCategories(content) {
 }
 
 function listProjects(content, category) {
-  return { type: 'list', items: projectsIn(content, category).map((card) => ({ label: card.id, detail: card.title, command: `open ${card.id}` })) };
+  return { type: 'carousel', category: content.categories.find(({ id }) => id === category), cards: projectsIn(content, category) };
+}
+
+// Place d'une carte par rapport à celle du milieu (0), en boucle : -1 à gauche, 1 à droite, au-delà cachée.
+export function slideOffset(index, current, count) {
+  const distance = (((index - current) % count) + count) % count;
+  return distance > count / 2 ? distance - count : distance;
 }
 
 const error = (text) => [{ type: 'text', text, tone: 'error' }];

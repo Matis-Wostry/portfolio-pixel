@@ -1,5 +1,5 @@
 import { runCommand, complete, prompt } from './terminal.mjs';
-import { appendLinks } from './renderContent.js';
+import ProjectCarousel, { renderProjectCard } from './ProjectCarousel.js';
 
 const TYPE_DELAY = { min: 40, max: 85 };
 
@@ -31,7 +31,7 @@ export default class TerminalView {
     this.input.addEventListener('keydown', (event) => this.onKey(event));
     // Cliquer dans le vide de l'écran rend la main au clavier, sans voler un clic sur un lien ou une commande.
     this.output.addEventListener('click', (event) => {
-      if (!event.target.closest('a, button') && !window.getSelection()?.toString()) this.focus();
+      if (!event.target.closest('a, button, .carousel') && !window.getSelection()?.toString()) this.focus();
     });
   }
 
@@ -49,8 +49,13 @@ export default class TerminalView {
     this.type('ls');
   }
 
+  // Sur téléphone, donner la main à la ligne ouvrirait le clavier virtuel par-dessus l'écran : on attend qu'on la touche.
+  get autoFocus() {
+    return !window.matchMedia('(pointer: coarse)').matches;
+  }
+
   focus() {
-    this.input.focus({ preventScroll: true });
+    if (this.autoFocus) this.input.focus({ preventScroll: true });
   }
 
   // Coupe une frappe en cours (fenêtre fermée ou écran rallumé).
@@ -180,26 +185,13 @@ export default class TerminalView {
       block.commands.forEach((command) => hints.append(this.commandButton(command)));
       return hints;
     }
+    if (block.type === 'carousel') {
+      return new ProjectCarousel({ cards: block.cards, category: block.category, audio: this.audio }).element;
+    }
     if (block.type === 'project') {
-      const { card, category } = block;
-      const project = document.createElement('article');
-      project.className = 'terminal-project';
-      const title = document.createElement('h2');
-      title.textContent = card.title;
-      if (category) {
-        const tag = document.createElement('span');
-        tag.className = 'terminal-category';
-        tag.textContent = `[${category.title}]`;
-        title.append(' ', tag);
-      }
-      const description = document.createElement('p');
-      description.textContent = card.description;
-      const tags = document.createElement('p');
-      tags.className = 'terminal-tags';
-      tags.textContent = card.tags.map((tag) => `#${tag}`).join(' ');
-      project.append(title, description, tags);
-      appendLinks(project, card.links ?? []);
-      return project;
+      const card = renderProjectCard(block.card, block.category);
+      card.classList.add('is-single');
+      return card;
     }
     const line = document.createElement('p');
     line.className = `terminal-text${block.tone ? ` is-${block.tone}` : ''}`;

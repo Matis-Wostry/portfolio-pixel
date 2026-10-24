@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { PORTFOLIO } from '../src/data/portfolio.js';
-import { runCommand, complete, parseCommand, prompt } from '../src/ui/terminal.mjs';
+import { runCommand, complete, parseCommand, prompt, slideOffset } from '../src/ui/terminal.mjs';
 
 const content = PORTFOLIO.projets;
 const root = { cwd: null };
@@ -20,8 +20,11 @@ test('ls lists the folders, cd enters one and lists its projects, cd .. comes ba
   const inside = runCommand(content, root, 'cd École/');
   assert.equal(inside.state.cwd, 'ecole');
   assert.equal(prompt(inside.state), 'matis@chambre:~/projets/ecole$');
-  assert.ok(commandsOf(inside.output).includes('open pokedex'));
-  assert.ok(!commandsOf(inside.output).includes('open mieuxdisant'));
+  const carousel = inside.output.find(({ type }) => type === 'carousel');
+  assert.equal(carousel.category.id, 'ecole');
+  assert.ok(carousel.cards.some(({ id }) => id === 'pokedex'));
+  assert.ok(carousel.cards.every(({ category }) => category === 'ecole'));
+  assert.deepEqual(runCommand(content, inside.state, 'ls').output[0].cards, carousel.cards);
   assert.equal(runCommand(content, inside.state, 'cd ..').state.cwd, null);
   assert.equal(runCommand(content, root, 'cd nulle-part').output[0].tone, 'error');
 });
@@ -57,4 +60,11 @@ test('help commands all run without error when clicked', () => {
   commandsOf(output).forEach((command) => {
     assert.ok(!runCommand(content, root, command).output.some(({ tone }) => tone === 'error'), command);
   });
+});
+
+test('the carousel loops so the middle card always has a neighbour on each side', () => {
+  assert.deepEqual([0, 1, 2].map((index) => slideOffset(index, 0, 3)), [0, 1, -1]);
+  assert.deepEqual([0, 1, 2].map((index) => slideOffset(index, 2, 3)), [1, -1, 0]);
+  assert.deepEqual([0, 1, 2, 3, 4].map((index) => slideOffset(index, 0, 5)), [0, 1, 2, -2, -1]);
+  assert.deepEqual([0, 1].map((index) => slideOffset(index, 1, 2)), [1, 0]);
 });
