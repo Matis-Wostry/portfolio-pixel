@@ -47,15 +47,15 @@ function timeline(steps) {
   return ol;
 }
 
-// Hobbies en tuiles illustrées, avec l'endroit où les retrouver dans la chambre.
+// Hobbies en tuiles illustrées.
 function hobbies(items) {
   const ul = element('ul', 'persona-hobbies');
-  items.forEach(({ label, icon, room }) => {
+  items.forEach(({ label, icon }) => {
     const item = element('li');
     const image = element('img', 'persona-hobby-icon');
     image.src = `${import.meta.env.BASE_URL}${INTERFACE_DIR}/${icon}`;
     image.alt = '';
-    item.append(image, element('strong', '', label), element('span', 'persona-room', `Dans la chambre : ${room}`));
+    item.append(image, element('strong', '', label));
     ul.append(item);
   });
   return ul;

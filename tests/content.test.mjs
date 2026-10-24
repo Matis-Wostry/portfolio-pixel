@@ -67,5 +67,5 @@ test('the presentation is a persona backed by proofs, a dated path and illustrat
   });
   const starts = persona.timeline.map(({ period }) => Number(period.slice(0, 4)));
   assert.deepEqual(starts, [...starts].sort((a, b) => a - b));
-  persona.hobbies.forEach(({ label, icon, room }) => assert.ok(label && room && existsSync(new URL(`../public/assets/interface/${icon}`, import.meta.url)), label));
+  persona.hobbies.forEach(({ label, icon }) => assert.ok(label && existsSync(new URL(`../public/assets/interface/${icon}`, import.meta.url)), label));
 });

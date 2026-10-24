@@ -122,12 +122,12 @@ export const PORTFOLIO = {
         { period: '2025–2028', kind: 'etudes', title: 'Bachelor Développement web & IA', place: 'CREA Genève' },
         { period: '2026–2027', kind: 'pro', title: 'Alternance · Octoplus Solutions', place: 'Développeur full-stack junior' },
       ],
-      // `icon` : image dans public/assets/interface/ ; `room` : où retrouver le hobby dans la chambre.
+      // `icon` : image dans public/assets/interface/.
       hobbies: [
-        { label: 'Basket', icon: 'hobbies/basket.png', room: 'le panier au-dessus de la poubelle' },
-        { label: 'Échecs', icon: 'icones/echecs.png', room: 'la partie sur la table ronde' },
-        { label: 'Jeux vidéo', icon: 'hobbies/jeux-video.png', room: 'le coin gaming' },
-        { label: 'Mangas', icon: 'hobbies/mangas.png', room: 'la bibliothèque' },
+        { label: 'Basket', icon: 'hobbies/basket.png' },
+        { label: 'Échecs', icon: 'icones/echecs.png' },
+        { label: 'Jeux vidéo', icon: 'hobbies/jeux-video.png' },
+        { label: 'Mangas', icon: 'hobbies/mangas.png' },
       ],
     },
     links: [{ label: 'CV (PDF)', href: 'https://matis-wostry.com/assets/cv/CV_Matis_Wostry.pdf' }],

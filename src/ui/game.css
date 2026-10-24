@@ -180,7 +180,6 @@ canvas:focus-visible { outline: 3px solid #f2b66d; }
 .persona-hobbies li { display: grid; justify-items: center; align-content: start; gap: 4px; padding: 12px 8px; text-align: center; background: #3a2929; border: 2px solid #a84d36; box-shadow: 3px 3px 0 #1d171b; }
 .persona-hobby-icon { width: 48px; height: 48px; image-rendering: pixelated; }
 .persona-hobbies strong { font-size: 14px; color: #ffece7; }
-.persona-room { font-size: 12px; line-height: 1.35; color: #afa7ad; }
 @media (max-width: 600px) {
   .persona-id { flex-wrap: wrap; align-items: flex-start; }
   .persona-card { flex-basis: 100%; order: 2; }
