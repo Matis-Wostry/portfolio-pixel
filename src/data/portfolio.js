@@ -18,6 +18,16 @@ export const PORTFOLIO = {
         links: [{ label: 'Site', href: 'https://lemieuxdisant.fr/' }],
       },
       {
+        id: 'mb-ventilation', category: 'pro', title: 'MB Ventilation',
+        description: 'Site WordPress dédié à la ventilation.', tags: ['WordPress'],
+        links: [],
+      },
+      {
+        id: 'mb-home', category: 'pro', title: 'MB Home',
+        description: 'Site WordPress dédié à la maison.', tags: ['WordPress'],
+        links: [],
+      },
+      {
         id: 'pokedex', category: 'ecole', title: 'Pokédex',
         description: 'Une API REST documentée avec Swagger et une interface React pour chercher et filtrer les Pokémon.',
         tags: ['React', 'Express', 'MongoDB', 'Swagger'],
