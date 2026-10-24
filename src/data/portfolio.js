@@ -1,38 +1,42 @@
 // Sources: https://matis-wostry.com/ and its published CV, consulted 2026-10-11.
 // These are editable local snapshots, not a live synchronization.
 export const PORTFOLIO = {
+  // Ouvert dans le terminal de l'ordinateur : un dossier par contexte (`categories`), un projet par carte.
   projets: {
     title: 'Projets',
-    paragraphs: ['Quelques réalisations web et outils d’automatisation.'],
+    paragraphs: ['Des projets en ligne, du site vitrine à l’API, pensés, codés et déployés de bout en bout.'],
     links: [],
+    categories: [
+      { id: 'pro', title: 'Projets pro', description: 'En entreprise et en freelance.' },
+      { id: 'ecole', title: 'Projets école', description: 'Réalisés pendant mes études.' },
+      { id: 'perso', title: 'Projets perso', description: 'Pour apprendre et expérimenter.' },
+    ],
     cards: [
       {
-        id: 'weather', title: 'Application météo', description: 'Prévisions et notifications email.', tags: ['Laravel', 'PHP'],
-        links: [
-          { label: 'Code', href: 'https://github.com/Matis-Wostry/iut-weather' },
-          { label: 'Démo', href: 'https://iut-weather.matis-wostry.com/' },
-        ],
+        id: 'mieuxdisant', category: 'pro', title: 'Le MieuxDisant',
+        description: 'Site WordPress conçu sur Figma puis développé pendant mon alternance.', tags: ['WordPress', 'Figma'],
+        links: [{ label: 'Site', href: 'https://lemieuxdisant.fr/' }],
       },
       {
-        id: 'pokedex', title: 'Pokédex', description: 'Recherche et filtres de Pokémon.', tags: ['React', 'Express', 'MongoDB', 'Swagger'],
+        id: 'pokedex', category: 'ecole', title: 'Pokédex',
+        description: 'Une API REST documentée avec Swagger et une interface React pour chercher et filtrer les Pokémon.',
+        tags: ['React', 'Express', 'MongoDB', 'Swagger'],
         links: [
           { label: 'Code', href: 'https://github.com/Matis-Wostry/Pokedex' },
           { label: 'Démo', href: 'https://pokedex.matis-wostry.com/' },
         ],
       },
       {
-        id: 'portfolio', title: 'Portfolio personnel', description: 'Site déployé sur mon serveur.', tags: ['HTML', 'CSS', 'JavaScript', 'CI/CD'],
+        id: 'meteo', category: 'ecole', title: 'Application météo',
+        description: 'Prévisions par ville et alertes par email planifiées, en Laravel.', tags: ['Laravel', 'PHP'],
         links: [
-          { label: 'Code', href: 'https://github.com/Matis-Wostry/cv' },
-          { label: 'Site', href: 'https://matis-wostry.com/' },
+          { label: 'Code', href: 'https://github.com/Matis-Wostry/iut-weather' },
+          { label: 'Démo', href: 'https://iut-weather.matis-wostry.com/' },
         ],
       },
       {
-        id: 'wordpress-tool', title: 'Articles WordPress', description: 'Réécriture automatisée avec OpenAI.', tags: ['Python', 'API'],
-        links: [{ label: 'Code', href: 'https://github.com/Matis-Wostry/SEO-article' }],
-      },
-      {
-        id: 'azteka', title: 'Azteka', description: 'Intégration d’une maquette e-sport.', tags: ['HTML', 'CSS', 'Figma'],
+        id: 'azteka', category: 'ecole', title: 'Azteka',
+        description: 'Intégration responsive de la maquette Figma d’une équipe e-sport.', tags: ['HTML', 'CSS', 'Figma'],
         links: [
           { label: 'Code', href: 'https://github.com/Matis-Wostry/integration-maquette' },
           { label: 'Démo', href: 'https://azteka.matis-wostry.com/' },
@@ -40,8 +44,17 @@ export const PORTFOLIO = {
         ],
       },
       {
-        id: 'mieuxdisant', title: 'Le MieuxDisant', description: 'Site réalisé pendant mon alternance.', tags: ['WordPress', 'Figma'],
-        links: [{ label: 'Site', href: 'https://lemieuxdisant.fr/' }],
+        id: 'articles-ia', category: 'perso', title: 'Articles WordPress',
+        description: 'Script Python qui réécrit automatiquement des articles WordPress avec l’API d’OpenAI.', tags: ['Python', 'OpenAI', 'API'],
+        links: [{ label: 'Code', href: 'https://github.com/Matis-Wostry/SEO-article' }],
+      },
+      {
+        id: 'portfolio', category: 'perso', title: 'Portfolio personnel',
+        description: 'Mon site, déployé sur mon propre serveur avec une mise en ligne automatique.', tags: ['HTML', 'CSS', 'JavaScript', 'CI/CD'],
+        links: [
+          { label: 'Code', href: 'https://github.com/Matis-Wostry/cv' },
+          { label: 'Site', href: 'https://matis-wostry.com/' },
+        ],
       },
     ],
   },

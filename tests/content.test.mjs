@@ -30,7 +30,7 @@ test('every interaction has real portfolio content and safe links', () => {
 
 test('project cards preserve the six projects and their published destinations', () => {
   assert.equal(PORTFOLIO.projets.cards.length, 6);
-  const weather = PORTFOLIO.projets.cards.find((card) => card.id === 'weather');
+  const weather = PORTFOLIO.projets.cards.find((card) => card.id === 'meteo');
   assert.ok(weather.tags.includes('Laravel'));
   assert.ok(weather.links.some(({ href }) => href === 'https://github.com/Matis-Wostry/iut-weather'));
   const pokedex = PORTFOLIO.projets.cards.find((card) => card.id === 'pokedex');

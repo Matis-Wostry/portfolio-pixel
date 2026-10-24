@@ -3,6 +3,7 @@ import { renderContent } from './renderContent.js';
 import { LandscapeSuggestion } from './orientation.mjs';
 import SoundButton from './SoundButton.js';
 import ChessView from './ChessView.js';
+import TerminalView from './TerminalView.js';
 import './game.css';
 import { INTERFACE_DIR, ACTION_ICONS, actionVerb } from '../config/interface.js';
 
@@ -125,6 +126,7 @@ export default class GameUI {
     document.body.append(this.dialog);
     this.listen(this.dialog.querySelector('.close-button'), 'click', () => this.close());
     this.listen(this.dialog, 'close', () => {
+      this.terminal?.stop();
       this.audio?.play('close');
       this.setTarget(null);
       this.syncPause();
@@ -189,33 +191,48 @@ export default class GameUI {
 
   restoreFocus() {
     const focusTarget = this.orientationDialog.open ? this.orientationDialog.querySelector('button')
-      : this.dialog.open ? this.dialog.querySelector('.close-button') : document.querySelector('canvas');
+      : this.dialog.open ? (this.dialog.classList.contains('is-terminal') ? this.terminal.input : this.dialog.querySelector('.close-button'))
+        : document.querySelector('canvas');
     focusTarget?.focus({ preventScroll: true });
   }
 
   open(content) {
     if (this.dialog.open) return;
-    this.dialog.querySelector('h1').textContent = content.title;
+    // Les rubriques rangées en dossiers (les projets) s'ouvrent dans le terminal de l'ordinateur.
+    if (content.categories) {
+      this.openTerminal(content);
+      return;
+    }
     const body = this.dialog.querySelector('.dialog-content');
     renderContent(body, content);
+    this.show(content.title);
+    body.scrollTop = 0;
+  }
+
+  // Ouvre la fenêtre avec le contenu déjà en place ; `focusTarget` reçoit le clavier (le bouton Fermer par défaut).
+  show(title, { terminal = false, focusTarget = this.dialog.querySelector('.close-button') } = {}) {
+    this.dialog.querySelector('h1').textContent = title;
+    this.dialog.classList.toggle('is-terminal', terminal);
     this.audio?.play('open');
     this.dialog.showModal();
     this.syncPause();
-    body.scrollTop = 0;
-    this.dialog.querySelector('.close-button').focus();
+    focusTarget.focus();
   }
 
   // Partie d'échecs contre l'ordinateur, dans la même fenêtre que les rubriques ; elle reprend où on l'a laissée.
   openChess() {
     if (this.dialog.open) return;
     this.chess = this.chess ?? new ChessView({ audio: this.audio });
-    this.dialog.querySelector('h1').textContent = 'Échecs';
     this.dialog.querySelector('.dialog-content').replaceChildren(this.chess.element);
     this.chess.render();
-    this.audio?.play('open');
-    this.dialog.showModal();
-    this.syncPause();
-    this.dialog.querySelector('.close-button').focus();
+    this.show('Échecs');
+  }
+
+  openTerminal(content) {
+    this.terminal = this.terminal ?? new TerminalView({ content, audio: this.audio, onExit: () => this.close() });
+    this.dialog.querySelector('.dialog-content').replaceChildren(this.terminal.element);
+    this.show(`Terminal · ${content.title}`, { terminal: true, focusTarget: this.terminal.input });
+    this.terminal.start();
   }
 
   close() {
@@ -223,6 +240,7 @@ export default class GameUI {
   }
 
   destroy() {
+    this.terminal?.stop();
     this.soundButton?.destroy();
     this.cancelGesture();
     this.abort.abort();

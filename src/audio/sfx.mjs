@@ -9,6 +9,8 @@ export const SFX = {
   enter: [tone('triangle', 220, 880, 0, 0.45, 0.18)],
   // Boule de papier : froissement du filet, ou choc métallique sur l'arceau.
   swish: [tone('noise', 3000, 1200, 0, 0.22, 0.2)],
+  // Touche du clavier du terminal : petit clic sec.
+  key: [tone('noise', 2600, 1800, 0, 0.03, 0.16), tone('square', 190, 120, 0, 0.02, 0.04)],
   rim: [tone('square', 880, 820, 0, 0.12, 0.1), tone('triangle', 1320, 1240, 0, 0.25, 0.08)],
 };
 
