@@ -22,13 +22,13 @@ export const TILES = {
 };
 
 export const FURNITURE = [
-  { key: 'bibliotheque', file: 'meubles/bibliotheque.png', x: 40, y: 32, solid: [[0, 72, 64, 24]],
+  // Mur du fond, de gauche à droite : bibliothèques, tableau, bureau au centre, panier, bibliothèque et serveur.
+  { key: 'bibliotheque', file: 'meubles/bibliotheque.png', x: 12, y: 32, solid: [[0, 72, 64, 24]],
     zone: { id: 'bibliotheque', label: 'Présentation', action: 'about', rect: [0, 0, 64, 96] } },
-  { key: 'panier', file: 'meubles/panier-basket.png', x: 152, y: 6, wall: true },
-  // Poubelle sous le panier, qui reçoit les boules de papier ; la zone est à sa gauche pour que la bulle ne cache pas le filet.
-  { key: 'poubelle', file: 'meubles/poubelle.png', x: 174, y: 85, solid: [[2, 18, 16, 9]],
-    zone: { id: 'panier', label: 'Panier', action: 'shoot', rect: [-46, 5, 40, 30] } },
-  { key: 'bureau', file: 'meubles/bureau.png', x: 224, y: 64, solid: [[0, 60, 98, 36]],
+  { key: 'bibliotheque-2', file: 'meubles/bibliotheque-2.png', x: 78, y: 32, solid: [[0, 72, 40, 24]] },
+  { key: 'tableau', file: 'meubles/tableau-blanc.png', x: 122, y: 48, solid: [[0, 76, 82, 20]],
+    zone: { id: 'tableau', label: 'Compétences', action: 'skills', rect: [0, 0, 82, 96] } },
+  { key: 'bureau', file: 'meubles/bureau.png', x: 208, y: 64, solid: [[0, 60, 98, 36]],
     zone: { id: 'bureau', label: 'Projets', action: 'projets', rect: [0, 0, 98, 96] },
     overlays: [
       // Planche générée par `npm run assets:ecrans` : 32 images de 128 × 96 côte à côte.
@@ -39,24 +39,28 @@ export const FURNITURE = [
       { key: 'bureau-ventilateurs', file: 'effets/bureau-ventilateurs.png', effect: 'random', frameWidth: 7, frameHeight: 6, levels: 4,
         spots: [{ x: 4, y: 35, first: 0 }, { x: 4, y: 41, first: 4 }] },
     ] },
-  { key: 'chaise', file: 'meubles/chaise.png', x: 262, y: 136, solid: [[18, 50, 28, 14]] },
-  { key: 'serveur', file: 'meubles/serveur.png', x: 360, y: 72, solid: [[0, 44, 32, 20]],
+  { key: 'chaise', file: 'meubles/chaise.png', x: 246, y: 136, solid: [[18, 50, 28, 14]] },
+  { key: 'panier', file: 'meubles/panier-basket.png', x: 334, y: 6, wall: true },
+  // Poubelle sous le panier, qui reçoit les boules de papier ; la zone est à sa gauche pour que la bulle ne cache pas le filet.
+  { key: 'poubelle', file: 'meubles/poubelle.png', x: 356, y: 85, solid: [[2, 18, 16, 9]],
+    zone: { id: 'panier', label: 'Panier', action: 'shoot', rect: [-46, 5, 40, 30] } },
+  { key: 'bibliotheque-3', file: 'meubles/bibliotheque-3.png', x: 426, y: 32, solid: [[0, 72, 40, 24]] },
+  { key: 'serveur', file: 'meubles/serveur.png', x: 470, y: 72, solid: [[0, 44, 32, 20]],
     leds: [1, 2, 3].map((n) => `effets/serveur-led-${n}.png`) },
-  { key: 'tableau', file: 'meubles/tableau-blanc.png', x: 408, y: 48, solid: [[0, 76, 82, 20]],
-    zone: { id: 'tableau', label: 'Compétences', action: 'skills', rect: [0, 0, 82, 96] } },
-  { key: 'coin-gaming', file: 'meubles/coin-gaming.png', x: 40, y: 216,
+  // Coin jeu contre le mur de gauche, coin télé contre le mur de droite.
+  { key: 'coin-jeu', file: 'meubles/coin-jeu.png', x: 12, y: 264, solid: [[0, 36, 128, 28]],
+    zone: { id: 'echecs', label: 'Échecs', action: 'chess', rect: [30, 4, 68, 60] }, chess: true },
+  { key: 'coin-gaming', file: 'meubles/coin-gaming.png', x: 350, y: 216,
     solid: [[0, 70, 46, 54], [64, 90, 38, 24], [121, 80, 30, 39]],
     zone: { id: 'coin-gaming', label: 'Contact', action: 'contact', rect: [112, 24, 40, 104] },
     overlays: [{ key: 'coin-gaming-lumiere', file: 'effets/tele-lumiere.png', effect: 'glow' }] },
-  { key: 'coin-jeu', file: 'meubles/coin-jeu.png', x: 328, y: 264, solid: [[0, 36, 128, 28]],
-    zone: { id: 'echecs', label: 'Échecs', action: 'chess', rect: [30, 4, 68, 60] }, chess: true },
 ];
 
 // Places assises : position du joueur assis (bas des pieds, en coordonnées de la chambre), pose
 // (`personnage/assis-<pose>.png`), meuble de référence pour la profondeur et zone d'approche [x, y, largeur, hauteur].
 // `behind: true` place le joueur derrière le meuble (le dossier de la chaise de bureau cache le bas du corps).
 export const SEATS = [
-  { id: 'chaise-bureau', label: 'Chaise de bureau', pose: 'dos', x: 294, y: 168, furniture: 'chaise', behind: true, rect: [273, 160, 42, 40] },
+  { id: 'chaise-bureau', label: 'Chaise de bureau', pose: 'dos', x: 278, y: 168, furniture: 'chaise', behind: true, rect: [257, 160, 42, 40] },
 ];
 
 // Échiquier dessiné sur la table du coin jeu : coin haut-gauche dans l'image, cases de 2 pixels.
@@ -82,7 +86,7 @@ export const CHESS_TABLE = {
 // et ouverture de la poubelle. `success` : chance de marquer ; durées en millisecondes.
 export const PAPER_SHOT = {
   key: 'boule-papier', file: 'effets/boule-papier.png', frameWidth: 5, frameHeight: 5,
-  rim: { x: 184, y: 52, halfWidth: 13 }, netBottom: 82, bin: { x: 184, y: 90 }, floor: 118,
+  rim: { x: 366, y: 52, halfWidth: 13 }, netBottom: 82, bin: { x: 366, y: 90 }, floor: 118,
   success: 0.7, flight: 650, fall: 320,
 };
 
