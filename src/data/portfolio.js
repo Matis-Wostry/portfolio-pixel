@@ -54,6 +54,12 @@ export const PORTFOLIO = {
         ],
       },
       {
+        id: 'chambre-du-dev', category: 'perso', title: 'La Chambre du Dev',
+        description: 'Ce portfolio : une chambre en pixel art à explorer, avec un moteur d’échecs, des sons synthétisés et ce terminal.',
+        tags: ['Phaser', 'JavaScript', 'Vite', 'PixelArt', 'WebAudio'],
+        links: [{ label: 'Code', href: 'https://github.com/Matis-Wostry/portfolio-pixel' }],
+      },
+      {
         id: 'articles-ia', category: 'perso', title: 'Articles WordPress',
         description: 'Script Python qui réécrit automatiquement des articles WordPress avec l’API d’OpenAI.', tags: ['Python', 'OpenAI', 'API'],
         links: [{ label: 'Code', href: 'https://github.com/Matis-Wostry/SEO-article' }],

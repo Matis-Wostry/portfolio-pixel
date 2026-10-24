@@ -28,8 +28,8 @@ test('every interaction has real portfolio content and safe links', () => {
   }
 });
 
-test('project cards preserve the eight projects and their published destinations', () => {
-  assert.equal(PORTFOLIO.projets.cards.length, 8);
+test('project cards preserve the nine projects and their published destinations', () => {
+  assert.equal(PORTFOLIO.projets.cards.length, 9);
   const weather = PORTFOLIO.projets.cards.find((card) => card.id === 'meteo');
   assert.ok(weather.tags.includes('Laravel'));
   assert.ok(weather.links.some(({ href }) => href === 'https://github.com/Matis-Wostry/iut-weather'));
