@@ -92,6 +92,14 @@ export default class GameScene extends Phaser.Scene {
     this.interactions.exclude(null);
   }
 
+  // Le joueur se tourne vers le mur et lance depuis sa main, à mi-hauteur du corps.
+  shootPaper() {
+    if (this.room.paperShot.busy) return;
+    const feet = this.player.getFeet();
+    this.player.lastDirection = 'up';
+    this.room.paperShot.shoot({ x: feet.x, y: feet.y - 22 }, (sound) => this.audio.play(sound));
+  }
+
   update() {
     if (!this.player) return;
     const direction = this.controls.getDirection();
@@ -112,6 +120,10 @@ export default class GameScene extends Phaser.Scene {
       }
       if (zone.action === 'chess') {
         this.ui.openChess();
+        return;
+      }
+      if (zone.action === 'shoot') {
+        this.shootPaper();
         return;
       }
       const content = PORTFOLIO[zone.action];

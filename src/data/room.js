@@ -25,8 +25,11 @@ export const FURNITURE = [
   { key: 'bibliotheque', file: 'meubles/bibliotheque.png', x: 40, y: 32, solid: [[0, 72, 64, 24]],
     zone: { id: 'bibliotheque', label: 'Présentation', action: 'about', rect: [0, 0, 64, 96] } },
   { key: 'panier', file: 'meubles/panier-basket.png', x: 152, y: 6, wall: true },
-  { key: 'bureau', file: 'meubles/bureau.png', x: 224, y: 64, solid: [[0, 60, 123, 36]],
-    zone: { id: 'bureau', label: 'Projets', action: 'projets', rect: [0, 0, 123, 96] },
+  // Poubelle sous le panier, qui reçoit les boules de papier ; la zone est à sa gauche pour que la bulle ne cache pas le filet.
+  { key: 'poubelle', file: 'meubles/poubelle.png', x: 174, y: 85, solid: [[2, 18, 16, 9]],
+    zone: { id: 'panier', label: 'Panier', action: 'shoot', rect: [-46, 5, 40, 30] } },
+  { key: 'bureau', file: 'meubles/bureau.png', x: 224, y: 64, solid: [[0, 60, 98, 36]],
+    zone: { id: 'bureau', label: 'Projets', action: 'projets', rect: [0, 0, 98, 96] },
     overlays: [
       // Planche générée par `npm run assets:ecrans` : 32 images de 128 × 96 côte à côte.
       { key: 'bureau-ecrans', file: 'effets/bureau-ecrans-anim.png', effect: 'animation', frameWidth: 128, frameHeight: 96, frameRate: 8 },
@@ -75,12 +78,21 @@ export const CHESS_TABLE = {
   ],
 };
 
+// Lancer de boule de papier au panier, en coordonnées de la chambre : centre de l'arceau, bas du filet
+// et ouverture de la poubelle. `success` : chance de marquer ; durées en millisecondes.
+export const PAPER_SHOT = {
+  key: 'boule-papier', file: 'effets/boule-papier.png', frameWidth: 5, frameHeight: 5,
+  rim: { x: 184, y: 52, halfWidth: 13 }, netBottom: 82, bin: { x: 184, y: 90 }, floor: 118,
+  success: 0.7, flight: 650, fall: 320,
+};
+
 export const ledKey = (index) => `serveur-led-${index}`;
 
 // Tous les fichiers de la chambre, avec la clé de texture correspondante.
 export const ROOM_FILES = [
   { key: CHESS_TABLE.key, file: CHESS_TABLE.file, frameWidth: CHESS_TABLE.square, frameHeight: CHESS_TABLE.square },
   { key: CHESS_TABLE.boardKey, file: CHESS_TABLE.boardFile },
+  { key: PAPER_SHOT.key, file: PAPER_SHOT.file, frameWidth: PAPER_SHOT.frameWidth, frameHeight: PAPER_SHOT.frameHeight },
   ...TILES.floor.map((file, index) => ({ key: `sol-${index}`, file })),
   ...TILES.wall.map((file, index) => ({ key: `mur-${index}`, file })),
   ...Object.entries(TILES.border).map(([name, file]) => ({ key: `bord-${name}`, file })),

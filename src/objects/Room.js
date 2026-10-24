@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import TableChess from './TableChess.js';
+import PaperShot from './PaperShot.js';
 import { TILE, ROOM, TILES, FURNITURE, ledKey } from '../data/room.js';
 
 // Dessine la chambre et renvoie ses dimensions et ses obstacles.
@@ -13,6 +14,7 @@ export default class Room {
     this.depths = {};
     this.buildTiles();
     FURNITURE.forEach((item) => this.placeFurniture(item));
+    this.paperShot = new PaperShot(scene, { hoopDepth: this.depths.panier, binDepth: this.depths.poubelle });
   }
 
   // Zone de déplacement : le mur du fond et le cadre bloquent le joueur.

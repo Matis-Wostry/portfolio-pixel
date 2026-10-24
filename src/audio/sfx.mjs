@@ -7,6 +7,9 @@ export const SFX = {
   open: [tone('square', 392, 392, 0, 0.07, 0.12), tone('square', 587, 587, 0.07, 0.1, 0.12)],
   close: [tone('square', 587, 587, 0, 0.07, 0.12), tone('square', 392, 392, 0.07, 0.1, 0.12)],
   enter: [tone('triangle', 220, 880, 0, 0.45, 0.18)],
+  // Boule de papier : froissement du filet, ou choc métallique sur l'arceau.
+  swish: [tone('noise', 3000, 1200, 0, 0.22, 0.2)],
+  rim: [tone('square', 880, 820, 0, 0.12, 0.1), tone('triangle', 1320, 1240, 0, 0.25, 0.08)],
 };
 
 export const SFX_NAMES = Object.keys(SFX);

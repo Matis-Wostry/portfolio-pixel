@@ -8,5 +8,5 @@ export const UI_ART = { logo: null, button: 'assets/interface/bouton.png', sign:
 
 export const AUDIO_FILES = {
   music: { title: null, room: null },
-  sfx: { click: null, open: null, close: null, enter: null },
+  sfx: { click: null, open: null, close: null, enter: null, swish: null, rim: null },
 };

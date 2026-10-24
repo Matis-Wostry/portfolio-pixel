@@ -31,7 +31,7 @@ test('falls back to sound on when storage is missing or blocked', () => {
 });
 
 test('defines every short sound used by the title and the room', () => {
-  assert.deepEqual([...SFX_NAMES].sort(), ['click', 'close', 'enter', 'open']);
+  assert.deepEqual([...SFX_NAMES].sort(), ['click', 'close', 'enter', 'open', 'rim', 'swish']);
   assert.deepEqual(Object.keys(AUDIO_FILES.sfx).sort(), [...SFX_NAMES].sort());
   for (const name of SFX_NAMES) {
     assert.ok(isValidRecipe(SFX[name]), name);

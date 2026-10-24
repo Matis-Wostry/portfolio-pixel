@@ -9,7 +9,8 @@
     "test": "node --test tests/*.test.mjs",
     "assets:ecrans": "node scripts/animer-ecrans.mjs",
     "assets:intro": "node scripts/generer-intro.mjs",
-    "assets:echecs": "node scripts/generer-echecs.mjs"
+    "assets:echecs": "node scripts/generer-echecs.mjs",
+    "assets:papier": "node scripts/generer-papier.mjs"
   },
   "dependencies": {
     "@fontsource/pixelify-sans": "^5.3.0",
