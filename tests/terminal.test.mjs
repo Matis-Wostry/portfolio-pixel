@@ -51,7 +51,7 @@ test('tab completes a single match and leaves ambiguous input alone', () => {
   assert.equal(complete(content, root, 'he'), 'help ');
   assert.equal(complete(content, root, 'cd ec'), 'cd ecole');
   assert.equal(complete(content, root, 'open pok'), 'open pokedex');
-  assert.equal(complete(content, { cwd: 'perso' }, 'open p'), 'open portfolio');
+  assert.equal(complete(content, { cwd: 'perso' }, 'open ch'), 'open chambre-du-dev');
   assert.equal(complete(content, root, 'c'), 'c');
 });
 

@@ -64,14 +64,6 @@ export const PORTFOLIO = {
         description: 'Script Python qui réécrit automatiquement des articles WordPress avec l’API d’OpenAI.', tags: ['Python', 'OpenAI', 'API'],
         links: [{ label: 'Code', href: 'https://github.com/Matis-Wostry/SEO-article' }],
       },
-      {
-        id: 'portfolio', category: 'perso', title: 'Portfolio personnel',
-        description: 'Mon site, déployé sur mon propre serveur avec une mise en ligne automatique.', tags: ['HTML', 'CSS', 'JavaScript', 'CI/CD'],
-        links: [
-          { label: 'Code', href: 'https://github.com/Matis-Wostry/cv' },
-          { label: 'Site', href: 'https://matis-wostry.com/' },
-        ],
-      },
     ],
   },
   skills: {
