@@ -102,6 +102,12 @@ export default class TitleUI {
       <div class="dialog-content"></div>`;
     document.body.append(this.dialog);
     this.listen(this.dialog.querySelector('.close-button'), 'click', () => this.dialog.close());
+    // Échap ferme la fenêtre dans tous les navigateurs, quel que soit l'élément qui a le focus.
+    window.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || !this.dialog.open) return;
+      event.preventDefault();
+      this.dialog.close();
+    }, { capture: true, signal: this.abort.signal });
     this.listen(this.dialog, 'close', () => {
       this.audio.play('close');
       this.returnFocus?.focus({ preventScroll: true });

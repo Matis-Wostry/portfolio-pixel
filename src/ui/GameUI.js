@@ -51,6 +51,18 @@ export default class GameUI {
     });
     this.createDialog();
     this.createOrientationDialog();
+    // Échap ferme la fenêtre ouverte dans tous les navigateurs, sans dépendre de l'élément qui a le focus
+    // (capture : la ligne du terminal ou une autre vue ne peut pas l'intercepter).
+    window.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      if (this.orientationDialog.open) {
+        event.preventDefault();
+        this.dismissOrientation();
+      } else if (this.dialog.open) {
+        event.preventDefault();
+        this.close();
+      }
+    }, { capture: true, signal: this.abort.signal });
   }
 
   listen(target, type, listener) {
