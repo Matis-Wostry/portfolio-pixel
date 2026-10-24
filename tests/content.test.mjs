@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { existsSync } from 'node:fs';
 import { safeLink } from '../src/ui/content.mjs';
 import { PORTFOLIO } from '../src/data/portfolio.js';
 import { TITLE_CONTENT } from '../src/data/title.js';
@@ -53,4 +54,18 @@ test('title windows explain the controls and credit the project', () => {
   }
   const credits = JSON.stringify(TITLE_CONTENT.credits);
   assert.ok(credits.includes('Matis Wostry') && credits.includes('Pixelify Sans'));
+});
+
+test('the presentation is a persona backed by proofs, a dated path and illustrated hobbies', () => {
+  const { persona } = PORTFOLIO.about;
+  assert.equal(persona.name, 'Matis Wostry');
+  for (const key of ['goals', 'motivations', 'frustrations', 'workStyle', 'timeline', 'hobbies']) assert.ok(persona[key].length, key);
+  persona.workStyle.forEach(({ quality, proof }) => assert.ok(quality && proof));
+  persona.timeline.forEach(({ period, kind }) => {
+    assert.match(period, /^\d{4}–\d{4}$/);
+    assert.ok(['etudes', 'pro'].includes(kind));
+  });
+  const starts = persona.timeline.map(({ period }) => Number(period.slice(0, 4)));
+  assert.deepEqual(starts, [...starts].sort((a, b) => a - b));
+  persona.hobbies.forEach(({ label, icon, room }) => assert.ok(label && room && existsSync(new URL(`../public/assets/interface/${icon}`, import.meta.url)), label));
 });

@@ -1,5 +1,6 @@
 import { joystickDirection } from '../input/direction.mjs';
 import { renderContent } from './renderContent.js';
+import { renderPersona } from './renderPersona.js';
 import { LandscapeSuggestion } from './orientation.mjs';
 import SoundButton from './SoundButton.js';
 import ChessView from './ChessView.js';
@@ -216,7 +217,7 @@ export default class GameUI {
       return;
     }
     const body = this.dialog.querySelector('.dialog-content');
-    renderContent(body, content);
+    (content.persona ? renderPersona : renderContent)(body, content);
     this.show(content.title);
     body.scrollTop = 0;
   }

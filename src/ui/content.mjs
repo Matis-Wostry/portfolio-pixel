@@ -7,3 +7,4 @@ export function safeLink(href) {
     return null;
   }
 }
+

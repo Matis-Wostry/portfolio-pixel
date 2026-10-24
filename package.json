@@ -10,7 +10,8 @@
     "assets:ecrans": "node scripts/animer-ecrans.mjs",
     "assets:intro": "node scripts/generer-intro.mjs",
     "assets:echecs": "node scripts/generer-echecs.mjs",
-    "assets:papier": "node scripts/generer-papier.mjs"
+    "assets:papier": "node scripts/generer-papier.mjs",
+    "assets:hobbies": "node scripts/generer-hobbies.mjs"
   },
   "dependencies": {
     "@fontsource/pixelify-sans": "^5.3.0",

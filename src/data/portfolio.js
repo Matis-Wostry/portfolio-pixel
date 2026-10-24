@@ -77,18 +77,59 @@ export const PORTFOLIO = {
       { title: 'Design & SEO', tags: ['Figma', 'Photoshop', 'Illustrator', 'Canva', 'Analytics', 'Search Console', 'SEMrush'] },
     ],
   },
+  // Fiche persona : affichée par renderPersona (portrait, citation, objectifs, curseurs, parcours).
   about: {
     title: 'Présentation',
     paragraphs: [
       'Je suis Matis Wostry, développeur full-stack junior et étudiant à CREA Genève.',
-      'Je recherche une alternance de deux ans à Genève.',
+      'Je recherche une alternance d’un an à Genève, à partir de septembre 2027.',
     ],
-    cards: [
-      { title: 'Bachelor Web & IA', description: 'CREA Genève · 2025–2028' },
-      { title: 'BUT MMI', description: 'IUT Dijon-Auxerre · 2022–2025' },
-      { title: 'Le MieuxDisant', description: 'WordPress en alternance, puis SEO en freelance.' },
-      { title: 'Hors du clavier', tags: ['Basket', 'Jeux vidéo', 'Mangas', 'Échecs'] },
-    ],
+    persona: {
+      name: 'Matis Wostry',
+      role: 'Développeur full-stack junior',
+      facts: [
+        { label: 'Base', value: 'Genève' },
+        { label: 'Études', value: 'Bachelor Développement web & IA · CREA' },
+        { label: 'Statut', value: 'Cherche une alternance d’un an dès sept. 2027' },
+      ],
+      quote: 'Un projet n’est fini que quand il est en ligne et que quelqu’un s’en sert.',
+      goals: [
+        'Décrocher une alternance d’un an à partir de septembre 2027 à Genève',
+        'Monter en compétence sur le web et l’IA',
+        'Créer des projets qui aident le plus possible au quotidien',
+      ],
+      motivations: [
+        'Automatiser ce qui se répète',
+        'Apprendre en construisant',
+        'Faire beaucoup de projets',
+      ],
+      frustrations: [
+        'Les tâches répétitives faites à la main',
+        'Un projet qui reste sur mon ordinateur',
+      ],
+      // Qualités appuyées chacune par une preuve tirée des projets.
+      workStyle: [
+        { quality: 'Autonome', proof: 'Je mène seul des sites WordPress de A à Z en freelance.' },
+        { quality: 'Curieux', proof: 'Je teste de nouveaux outils, comme l’API d’OpenAI, dans mes projets.' },
+        { quality: 'Concret', proof: 'Mes projets finissent en ligne, utilisables par d’autres.' },
+        { quality: 'Polyvalent', proof: 'De la maquette Figma au déploiement sur serveur.' },
+      ],
+      // Du plus ancien au plus récent ; `kind` distingue les études ('etudes') de l'expérience ('pro').
+      timeline: [
+        { period: '2022–2025', kind: 'etudes', title: 'BUT MMI', place: 'IUT Dijon-Auxerre' },
+        { period: '2024–2025', kind: 'pro', title: 'Alternance · Le MieuxDisant', place: 'Intégrateur web' },
+        { period: '2025–2027', kind: 'pro', title: 'Freelance', place: 'Développeur et SEO' },
+        { period: '2025–2028', kind: 'etudes', title: 'Bachelor Développement web & IA', place: 'CREA Genève' },
+        { period: '2026–2027', kind: 'pro', title: 'Alternance · Octoplus Solutions', place: 'Développeur full-stack junior' },
+      ],
+      // `icon` : image dans public/assets/interface/ ; `room` : où retrouver le hobby dans la chambre.
+      hobbies: [
+        { label: 'Basket', icon: 'hobbies/basket.png', room: 'le panier au-dessus de la poubelle' },
+        { label: 'Échecs', icon: 'icones/echecs.png', room: 'la partie sur la table ronde' },
+        { label: 'Jeux vidéo', icon: 'hobbies/jeux-video.png', room: 'le coin gaming' },
+        { label: 'Mangas', icon: 'hobbies/mangas.png', room: 'la bibliothèque' },
+      ],
+    },
     links: [{ label: 'CV (PDF)', href: 'https://matis-wostry.com/assets/cv/CV_Matis_Wostry.pdf' }],
   },
   contact: {
