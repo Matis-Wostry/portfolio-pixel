@@ -2,7 +2,6 @@ import '@fontsource/pixelify-sans/400.css';
 import '@fontsource/pixelify-sans/700.css';
 import Phaser from 'phaser';
 import BootScene from './scenes/BootScene.js';
-import TitleScene from './scenes/TitleScene.js';
 import GameScene from './scenes/GameScene.js';
 
 const config = {
@@ -21,7 +20,7 @@ const config = {
     }
   },
   input: { keyboard: false },
-  scene: [BootScene, TitleScene, GameScene]
+  scene: [BootScene, GameScene]
 };
 
 new Phaser.Game(config);

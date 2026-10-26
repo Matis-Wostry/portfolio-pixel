@@ -37,17 +37,14 @@ Dans la chambre, quatre meubles sont interactifs : le bureau (projets), le table
 
 Les premiers contenus sont adaptés de [matis-wostry.com](https://matis-wostry.com/) et de son [CV public](https://matis-wostry.com/assets/cv/CV_Matis_Wostry.pdf), consultés le 11 octobre 2026 : six projets, compétences, présentation, formation et contact. Ces données sont une copie locale modifiable dans `src/data/portfolio.js` ; elles ne se synchronisent pas automatiquement.
 
-## Écran titre et son
+## Son
 
-Le jeu s'ouvre sur une rue de Genève la nuit, en pixel art dans la palette du designer (contour sombre autour des objets, bois et briques chauds, crèmes, nuit prune).
-Le décor, les sprites animés (tram, cycliste, chien, nuages, fenêtres allumées, lueurs…), le panneau titre et les boutons sont des PNG :
-`public/assets/intro/` (calques, sprites et `scene.json` qui décrit les positions) et `public/assets/interface/{panneau,bouton}.png`.
-Ils sont générés par `npm run assets:intro` à partir du dessin de `scripts/intro/` (palette dans `scripts/intro/palette.mjs`) ; le jeu se contente de les afficher et de les animer.
+Le jeu s'ouvre directement sur la chambre.
 Les bruitages sont synthétisés dans le navigateur ; aucune musique n'est jouée sans fichier.
 Le bouton son, en haut à droite, est mémorisé dans le navigateur.
 
-Les fichiers du designer remplacent ces images : déposer le fichier dans `public/`
-et renseigner son chemin dans `src/config/assets.js` (calques en 720 × 300 pixels, panneau et bouton en planches 9 tranches à coins de 6 pixels, sons en MP3).
+Les fichiers du designer remplacent ces sons : déposer le fichier MP3 dans `public/`
+et renseigner son chemin dans `src/config/assets.js`.
 Un fichier absent ou invalide est ignoré avec un avertissement.
 
 ## Arborescence
@@ -60,7 +57,7 @@ Un fichier absent ou invalide est ignoré avec un avertissement.
 │   └── assets/
 │       ├── chambre/        # Images du designer : sol, mur, cadre, meubles, effets
 │       └── personnage/     # Un fichier par pas : face-1.png … droite-4.png
-├── scripts/                # Génération d'assets (écrans du bureau, écran titre) et leurs sources
+├── scripts/                # Génération d'assets (écrans du bureau, icônes, échecs) et leurs sources
 ├── src/
 │   ├── main.js             # Initialisation du jeu
 │   ├── config/             # Sprite, hitbox et calculs de caméra
