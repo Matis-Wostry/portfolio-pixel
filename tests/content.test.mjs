@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import { safeLink } from '../src/ui/content.mjs';
 import { PORTFOLIO } from '../src/data/portfolio.js';
+import { SKILL_LOGOS } from '../src/config/interface.js';
 
 test('portfolio links support web and email destinations', () => {
   for (const href of ['https://example.com/work', 'http://example.com', 'mailto:dev@example.com']) {
@@ -45,6 +46,11 @@ test('skills fill a whiteboard with one colored magnet per category', () => {
     assert.match(color, /^#[0-9a-f]{6}$/);
   });
   assert.equal(new Set(board.map(({ color }) => color)).size, board.length);
+  const tags = new Set(board.flatMap((category) => category.tags));
+  for (const [tag, file] of Object.entries(SKILL_LOGOS)) {
+    assert.ok(tags.has(tag), `logo sans compétence : ${tag}`);
+    assert.ok(existsSync(new URL(`../public/assets/interface/${file}`, import.meta.url)), file);
+  }
 });
 
 test('contact and profile use the published identity and contact destinations', () => {

@@ -1,3 +1,5 @@
+import { INTERFACE_DIR, SKILL_LOGOS } from '../config/interface.js';
+
 // Degrés de rotation par pixel de glissé pendant qu'on tient le tableau.
 const DRAG_RATIO = 1.2;
 
@@ -57,7 +59,19 @@ export default class SkillsBoard {
     const { title, tags } = this.categories[index];
     const content = element('div', 'board-content');
     const notes = element('ul', 'board-notes');
-    tags.forEach((tag) => notes.append(element('li', '', tag)));
+    tags.forEach((tag) => {
+      const note = element('li');
+      if (SKILL_LOGOS[tag]) {
+        const logo = element('img', 'board-logo');
+        logo.src = `${import.meta.env.BASE_URL}${INTERFACE_DIR}/${SKILL_LOGOS[tag]}`;
+        logo.alt = '';
+        // Sinon le navigateur lance un glisser-déposer de l'image au lieu de faire basculer le tableau.
+        logo.draggable = false;
+        note.append(logo);
+      }
+      note.append(tag);
+      notes.append(note);
+    });
     content.append(element('h2', 'board-title', title), notes);
     const magnets = element('div', 'board-magnets');
     this.categories.forEach((category, target) => {

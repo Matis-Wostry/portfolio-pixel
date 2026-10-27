@@ -21,6 +21,33 @@ export const ACTION_ICONS = {
 
 export const iconKey = (action) => `icone-${action}`;
 
+// Logo affiché sur le post-it de chaque compétence qui en a un (logos/ : Simple Icons, voir le README ; Ps et Ai dessinés à la main).
+export const SKILL_LOGOS = {
+  HTML: 'logos/html5.svg',
+  CSS: 'logos/css.svg',
+  JavaScript: 'logos/javascript.svg',
+  PHP: 'logos/php.svg',
+  Python: 'logos/python.svg',
+  C: 'logos/c.svg',
+  Java: 'logos/openjdk.svg',
+  React: 'logos/react.svg',
+  Laravel: 'logos/laravel.svg',
+  'Node.js': 'logos/nodedotjs.svg',
+  WordPress: 'logos/wordpress.svg',
+  MySQL: 'logos/mysql.svg',
+  MongoDB: 'logos/mongodb.svg',
+  Docker: 'logos/docker.svg',
+  Linux: 'logos/linux.svg',
+  Git: 'logos/git.svg',
+  GitHub: 'logos/github.svg',
+  Figma: 'logos/figma.svg',
+  Photoshop: 'logos/photoshop.svg',
+  Illustrator: 'logos/illustrator.svg',
+  Analytics: 'logos/googleanalytics.svg',
+  'Search Console': 'logos/googlesearchconsole.svg',
+  SEMrush: 'logos/semrush.svg',
+};
+
 // Verbe du bouton tactile et de l'aide, selon l'action.
 const VERBS = { sit: 'S’asseoir', chess: 'Jouer', shoot: 'Lancer' };
 export const actionVerb = (action) => VERBS[action] ?? 'Ouvrir';
