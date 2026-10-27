@@ -11,8 +11,7 @@
     "assets:echecs": "node scripts/generer-echecs.mjs",
     "assets:papier": "node scripts/generer-papier.mjs",
     "assets:hobbies": "node scripts/generer-hobbies.mjs",
-    "assets:favicon": "node scripts/generer-favicon.mjs",
-    "assets:bibliotheques": "node scripts/generer-bibliotheques.mjs"
+    "assets:favicon": "node scripts/generer-favicon.mjs"
   },
   "dependencies": {
     "@fontsource/pixelify-sans": "^5.3.0",
