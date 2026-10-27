@@ -148,7 +148,7 @@ canvas { display: block; image-rendering: pixelated; outline: none; }
 }
 /* Sur écran tactile, 16 px évitent le zoom automatique d'iOS quand on touche la ligne de commande. */
 @media (pointer: coarse) { .terminal-input { font-size: 16px; } }
-/* Fiche persona (Présentation) : portrait pixel art encadré, CV en haut à droite, citation, colonnes,
+/* Fiche persona (Présentation) : portrait pixel art encadré, CV en haut à droite, colonnes,
    qualités prouvées, frise verticale du parcours et hobbies en tuiles illustrées. */
 .persona { display: grid; gap: 18px; }
 .persona p, .persona ul, .persona ol, .persona dl { margin: 0; }
@@ -162,7 +162,6 @@ canvas { display: block; image-rendering: pixelated; outline: none; }
 .persona-facts { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font-size: 14px; }
 .persona-facts dt { color: #afa7ad; }
 .persona-facts dd { margin: 0; }
-.persona-quote { margin: 0; padding: 12px 16px; font-style: italic; color: #ffece7; background: #3a2929; border-left: 4px solid #f2b66d; }
 .persona-columns { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .persona-columns .persona-section { padding: 12px; background: #3a2929; border: 2px solid #a84d36; }
 .persona-heading { margin: 0 0 8px; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #f2b66d; }

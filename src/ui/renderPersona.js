@@ -80,8 +80,6 @@ export function renderPersona(body, content) {
   // Le CV en haut à droite de la fiche.
   appendLinks(identity, content.links ?? []);
 
-  const quote = element('blockquote', 'persona-quote', `« ${persona.quote} »`);
-
   const columns = element('div', 'persona-columns');
   columns.append(
     section('Objectifs', list(persona.goals)),
@@ -91,7 +89,6 @@ export function renderPersona(body, content) {
 
   root.append(
     identity,
-    quote,
     columns,
     section('Ma façon de travailler', workStyle(persona.workStyle)),
     section('Parcours', timeline(persona.timeline)),

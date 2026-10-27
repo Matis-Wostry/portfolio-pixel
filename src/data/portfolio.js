@@ -83,7 +83,7 @@ export const PORTFOLIO = {
       { title: 'Design & SEO', tags: ['Figma', 'Photoshop', 'Illustrator', 'Canva', 'Analytics', 'Search Console', 'SEMrush'] },
     ],
   },
-  // Fiche persona : affichée par renderPersona (portrait, citation, objectifs, curseurs, parcours).
+  // Fiche persona : affichée par renderPersona (portrait, objectifs, curseurs, parcours).
   about: {
     title: 'Présentation',
     paragraphs: [
@@ -98,7 +98,6 @@ export const PORTFOLIO = {
         { label: 'Études', value: 'Bachelor Développement web & IA · CREA' },
         { label: 'Statut', value: 'Cherche une alternance d’un an dès sept. 2027' },
       ],
-      quote: 'Un projet n’est fini que quand il est en ligne et que quelqu’un s’en sert.',
       goals: [
         'Décrocher une alternance d’un an à partir de septembre 2027 à Genève',
         'Monter en compétence sur le web et l’IA',
@@ -115,10 +114,10 @@ export const PORTFOLIO = {
       ],
       // Qualités appuyées chacune par une preuve tirée des projets.
       workStyle: [
-        { quality: 'Autonome', proof: 'Je mène seul des sites WordPress de A à Z en freelance.' },
-        { quality: 'Curieux', proof: 'Je teste de nouveaux outils, comme l’API d’OpenAI, dans mes projets.' },
-        { quality: 'Concret', proof: 'Mes projets finissent en ligne, utilisables par d’autres.' },
-        { quality: 'Polyvalent', proof: 'De la maquette Figma au déploiement sur serveur.' },
+        { quality: 'Autonome', proof: 'En freelance, et en apprenant seul certaines compétences.' },
+        { quality: 'Curieux', proof: 'Toujours un œil sur les tendances de l’univers du développement.' },
+        { quality: 'Concret', proof: 'Mon but : créer des outils utiles à mon quotidien, qui me facilitent certaines tâches.' },
+        { quality: 'Polyvalent', proof: 'Mes différentes formations me donnent plusieurs casquettes.' },
       ],
       // Du plus ancien au plus récent ; `kind` distingue les études ('etudes') de l'expérience ('pro').
       timeline: [
