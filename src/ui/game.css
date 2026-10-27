@@ -55,7 +55,7 @@ canvas { display: block; image-rendering: pixelated; outline: none; }
 .skills-board { position: relative; padding: 0 22px 46px; perspective: 1000px; outline-offset: 4px; }
 .board { display: grid; grid-template-columns: minmax(0, 1fr); transform-style: preserve-3d; transition: transform .7s cubic-bezier(.5, .1, .3, 1.2); cursor: grab; touch-action: pan-x; user-select: none; }
 .board.is-dragging { transition: none; cursor: grabbing; }
-.board-face { grid-area: 1 / 1; display: flex; min-height: 260px; color: #292355; background: #e3c5c3; border: 8px solid #8e838b; border-top-color: #afa7ad; border-bottom-color: #62565f; box-shadow: 0 0 0 2px #1d171b, inset 0 0 0 2px #4a3e47, inset 5px 5px 0 #a0818a; font-family: 'Pixelify Sans', ui-monospace, monospace; line-height: 1.3; overflow-wrap: break-word; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+.board-face { grid-area: 1 / 1; display: flex; min-height: clamp(220px, calc(100dvh - 150px), 380px); color: #292355; background: #e3c5c3; border: 8px solid #8e838b; border-top-color: #afa7ad; border-bottom-color: #62565f; box-shadow: 0 0 0 2px #1d171b, inset 0 0 0 2px #4a3e47, inset 5px 5px 0 #a0818a; font-family: 'Pixelify Sans', ui-monospace, monospace; line-height: 1.3; overflow-wrap: break-word; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
 .board-face.is-back { transform: rotateX(180deg); }
 .board-content { flex: 1; min-width: 0; padding: 16px 18px 14px 20px; }
 .board-title { margin: 0 0 12px; font-size: 26px; color: #97345f; }
@@ -70,11 +70,11 @@ canvas { display: block; image-rendering: pixelated; outline: none; }
 .board-magnet:focus-visible { outline: 3px solid #1d171b; outline-offset: 2px; }
 .board-magnet::before { content: ""; position: absolute; top: -7px; left: 50%; width: 14px; height: 14px; margin-left: -7px; background: var(--magnet); box-shadow: 0 0 0 2px #1d171b, inset 3px 3px 0 #ffffff40, inset -2px -2px 0 #0000004d; }
 .board-stand { position: absolute; inset: 0; pointer-events: none; }
-.board-post { position: absolute; top: -8px; bottom: 16px; left: 4px; width: 14px; background: #8e838b; box-shadow: 0 0 0 2px #1d171b, inset 3px 0 0 #afa7ad, inset -3px 0 0 #62565f; }
+.board-post { position: absolute; top: calc(50% - 33px); bottom: 16px; left: 4px; width: 14px; background: #8e838b; box-shadow: 0 0 0 2px #1d171b, inset 3px 0 0 #afa7ad, inset -3px 0 0 #62565f; }
 .board-post + .board-post { left: auto; right: 4px; }
-/* Pivot au milieu du tableau : le montant dépasse de 8px en haut et s'arrête 16px avant le bas du bloc (46px de pied),
-   donc le centre du tableau tombe 11px au-dessus du milieu du montant. */
-.board-pivot { position: absolute; top: calc(50% - 21px); left: 50%; width: 20px; height: 20px; margin-left: -10px; background: #62565f; box-shadow: 0 0 0 2px #1d171b, inset 3px 3px 0 #8e838b; }
+/* Les montants partent du pivot, au milieu du tableau : le bloc compte 46px de pied sous le tableau, donc son centre
+   est 23px au-dessus du milieu du bloc, et le pivot de 20px commence 10px plus haut. */
+.board-pivot { position: absolute; top: 0; left: 50%; width: 20px; height: 20px; margin-left: -10px; background: #62565f; box-shadow: 0 0 0 2px #1d171b, inset 3px 3px 0 #8e838b; }
 .board-foot { position: absolute; bottom: -4px; left: 50%; width: 56px; height: 10px; margin-left: -28px; background: #8e838b; box-shadow: 0 0 0 2px #1d171b, inset 0 3px 0 #afa7ad, inset 0 -3px 0 #62565f; }
 .board-foot::before, .board-foot::after { content: ""; position: absolute; bottom: -12px; width: 10px; height: 10px; background: #342a31; box-shadow: 0 0 0 2px #1d171b, inset 3px 3px 0 #4c3f48; }
 .board-foot::before { left: 2px; }
@@ -83,7 +83,7 @@ canvas { display: block; image-rendering: pixelated; outline: none; }
    juste un bouton × épinglé dans le coin ; rien ne rogne le tableau quand il bascule. */
 .portfolio-dialog.is-board { overflow: visible; background: none; border: 0; box-shadow: none; }
 .is-board .dialog-content { padding: 0; overflow: visible; line-height: normal; }
-.is-board .dialog-header { position: absolute; top: -18px; right: 36px; z-index: 1; padding: 0; border: 0; }
+.is-board .dialog-header { position: absolute; top: -16px; right: -13px; z-index: 1; padding: 0; border: 0; }
 .is-board .dialog-header h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .is-board .close-button { display: grid; place-items: center; width: 48px; padding: 0; font-size: 0; box-shadow: 3px 3px 0 #1d171b; cursor: pointer; }
 .is-board .close-button::before { content: "×"; font-size: 28px; line-height: 1; }
