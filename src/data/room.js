@@ -22,12 +22,12 @@ export const TILES = {
 };
 
 export const FURNITURE = [
-  // Mur du fond, de gauche à droite : bibliothèque, tableau, bureau au centre, panier et serveur.
+  // Mur du fond, de gauche à droite : bibliothèque, bureau au centre, panier et serveur ; tableau posé devant, à gauche du bureau.
   { key: 'bibliotheque', file: 'meubles/bibliotheque.png', x: 12, y: 32, solid: [[0, 72, 64, 24]],
     zone: { id: 'bibliotheque', label: 'Présentation', action: 'about', rect: [0, 0, 64, 96] } },
-  { key: 'tableau', file: 'meubles/tableau-blanc.png', x: 122, y: 48, solid: [[0, 76, 82, 20]],
+  { key: 'tableau', file: 'meubles/tableau-blanc.png', x: 100, y: 86, solid: [[0, 76, 82, 20]],
     zone: { id: 'tableau', label: 'Compétences', action: 'skills', rect: [0, 0, 82, 96] } },
-  { key: 'bureau', file: 'meubles/bureau.png', x: 208, y: 64, solid: [[0, 60, 98, 36]],
+  { key: 'bureau', file: 'meubles/bureau.png', x: 208, y: 52, solid: [[0, 60, 98, 36]],
     zone: { id: 'bureau', label: 'Projets', action: 'projets', rect: [0, 0, 98, 96] },
     overlays: [
       // Planche générée par `npm run assets:ecrans` : 32 images de 128 × 96 côte à côte.
@@ -38,15 +38,15 @@ export const FURNITURE = [
       { key: 'bureau-ventilateurs', file: 'effets/bureau-ventilateurs.png', effect: 'random', frameWidth: 7, frameHeight: 6, levels: 4,
         spots: [{ x: 4, y: 35, first: 0 }, { x: 4, y: 41, first: 4 }] },
     ] },
-  { key: 'chaise', file: 'meubles/chaise.png', x: 246, y: 136, solid: [[18, 50, 28, 14]] },
+  { key: 'chaise', file: 'meubles/chaise.png', x: 246, y: 124, solid: [[18, 50, 28, 14]] },
   { key: 'panier', file: 'meubles/panier-basket.png', x: 334, y: 6, wall: true },
   // Poubelle sous le panier, qui reçoit les boules de papier ; la zone est à sa gauche pour que la bulle ne cache pas le filet.
   { key: 'poubelle', file: 'meubles/poubelle.png', x: 356, y: 85, solid: [[2, 18, 16, 9]],
     zone: { id: 'panier', label: 'Panier', action: 'shoot', rect: [-46, 5, 40, 30] } },
   { key: 'serveur', file: 'meubles/serveur.png', x: 470, y: 72, solid: [[0, 44, 32, 20]],
     leds: [1, 2, 3].map((n) => `effets/serveur-led-${n}.png`) },
-  // Coin jeu contre le mur de gauche, coin télé contre le mur de droite.
-  { key: 'coin-jeu', file: 'meubles/coin-jeu.png', x: 12, y: 264, solid: [[0, 36, 128, 28]],
+  // Coin jeu en bas à gauche, coin télé contre le mur de droite.
+  { key: 'coin-jeu', file: 'meubles/coin-jeu.png', x: 63, y: 264, solid: [[0, 36, 128, 28]],
     zone: { id: 'echecs', label: 'Échecs', action: 'chess', rect: [30, 4, 68, 60] }, chess: true },
   { key: 'coin-gaming', file: 'meubles/coin-gaming.png', x: 350, y: 216,
     solid: [[0, 70, 46, 54], [64, 90, 38, 24], [121, 80, 30, 39]],
@@ -58,7 +58,7 @@ export const FURNITURE = [
 // (`personnage/assis-<pose>.png`), meuble de référence pour la profondeur et zone d'approche [x, y, largeur, hauteur].
 // `behind: true` place le joueur derrière le meuble (le dossier de la chaise de bureau cache le bas du corps).
 export const SEATS = [
-  { id: 'chaise-bureau', label: 'Chaise de bureau', pose: 'dos', x: 278, y: 168, furniture: 'chaise', behind: true, rect: [257, 160, 42, 40] },
+  { id: 'chaise-bureau', label: 'Chaise de bureau', pose: 'dos', x: 278, y: 156, furniture: 'chaise', behind: true, rect: [257, 148, 42, 40] },
 ];
 
 // Échiquier dessiné sur la table du coin jeu : coin haut-gauche dans l'image, cases de 2 pixels.
