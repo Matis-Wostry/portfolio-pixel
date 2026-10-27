@@ -29,6 +29,15 @@ canvas { display: block; image-rendering: pixelated; outline: none; }
 .close-button { flex-shrink: 0; min-height: 48px; min-width: 48px; padding: 8px 12px; background: #86302a; border: 2px solid #1d171b; color: inherit; font: inherit; touch-action: manipulation; }
 .close-button:focus-visible, .dialog-content a:focus-visible { outline: 3px solid #ffece7; outline-offset: 3px; }
 .dialog-content { min-height: 0; padding: 16px 24px; overflow-y: auto; overscroll-behavior: contain; line-height: 1.7; overflow-wrap: anywhere; }
+/* Barres de défilement en blocs pixel, aux couleurs des fenêtres. Chrome et Safari prennent les pseudo-éléments
+   ::-webkit-scrollbar ; Firefox, qui ne les connaît pas, se rabat sur scrollbar-color. */
+.dialog-content::-webkit-scrollbar, .terminal-output::-webkit-scrollbar, .orientation-dialog::-webkit-scrollbar { width: 14px; }
+.dialog-content::-webkit-scrollbar-track, .terminal-output::-webkit-scrollbar-track, .orientation-dialog::-webkit-scrollbar-track { background: #1d171b; border-left: 2px solid #3a2929; }
+.dialog-content::-webkit-scrollbar-thumb, .terminal-output::-webkit-scrollbar-thumb, .orientation-dialog::-webkit-scrollbar-thumb { background: #a84d36; border: 2px solid #1d171b; box-shadow: inset 2px 2px 0 #f2b66d, inset -2px -2px 0 #86302a; }
+.dialog-content::-webkit-scrollbar-thumb:hover, .terminal-output::-webkit-scrollbar-thumb:hover, .orientation-dialog::-webkit-scrollbar-thumb:hover { background: #c45f43; }
+@supports not selector(::-webkit-scrollbar) {
+  .dialog-content, .terminal-output, .orientation-dialog { scrollbar-color: #a84d36 #1d171b; }
+}
 .dialog-content p { margin: 0 0 16px; }
 .dialog-content a { display: block; color: #f2b66d; padding: 12px 0; min-height: 48px; }
 .portfolio-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 16px 0; }
