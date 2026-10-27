@@ -33,3 +33,18 @@ test('a map smaller than the viewport is centered with symmetric padding', () =>
   assert.ok(landscape.x < 0);
   assert.ok(Math.abs((landscape.width - 640) / 2 + landscape.x) < 1e-10);
 });
+
+test('on a phone the map covers the whole screen and the camera scrolls', () => {
+  const map = { width: 512, height: 384 };
+  for (const [width, height] of [[698, 326], [360, 800]]) {
+    const view = computeView(width, height, map);
+    assert.ok(view.worldWidth <= map.width + 1e-10 && view.worldHeight <= map.height + 1e-10);
+    assert.ok(Math.abs(view.worldWidth - map.width) < 1e-10 || Math.abs(view.worldHeight - map.height) < 1e-10);
+    assert.deepEqual(computeBounds(map.width, map.height, view), { x: 0, y: 0, width: map.width, height: map.height });
+  }
+});
+
+test('large screens keep the whole map visible', () => {
+  const map = { width: 512, height: 384 };
+  assert.deepEqual(computeView(1440, 900, map), computeView(1440, 900));
+});

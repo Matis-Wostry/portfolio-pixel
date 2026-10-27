@@ -58,7 +58,7 @@ export default class GameScene extends Phaser.Scene {
 
   resizeViewport(size) {
     if (!this.mapSize) return;
-    const view = computeView(size.width, size.height);
+    const view = computeView(size.width, size.height, this.mapSize);
     const bounds = computeBounds(this.mapSize.width, this.mapSize.height, view);
     const camera = this.cameras.main;
     camera.setSize(size.width, size.height);
