@@ -49,36 +49,41 @@ canvas { display: block; image-rendering: pixelated; outline: none; }
 .portfolio-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
 .portfolio-links a { display: inline-flex; align-items: center; justify-content: center; padding: 8px 12px; min-height: 48px; border: 2px solid #a84d36; text-decoration: none; font-size: 14px; }
 .portfolio-links a:hover { background: #86302a; }
-/* Tableau blanc des compétences : les deux faces partagent la même case de grille et basculent ensemble
-   autour de l'axe horizontal ; titre au feutre, post-it et étiquettes aimantées à droite. */
-.skills-board { perspective: 1000px; outline-offset: 4px; }
+/* Tableau blanc des compétences, dessiné comme celui de la chambre (mêmes couleurs que le sprite) : cadre gris
+   en relief, surface rosée, aimants carrés, et un pied à deux montants qui tiennent le tableau par un pivot à
+   mi-hauteur. Les deux faces partagent la même case de grille et basculent autour de cet axe. */
+.skills-board { position: relative; padding: 0 22px 46px; perspective: 1000px; outline-offset: 4px; }
 .board { display: grid; grid-template-columns: minmax(0, 1fr); transform-style: preserve-3d; transition: transform .7s cubic-bezier(.5, .1, .3, 1.2); cursor: grab; touch-action: pan-x; user-select: none; }
 .board.is-dragging { transition: none; cursor: grabbing; }
-.board-face { grid-area: 1 / 1; display: flex; min-height: 260px; color: #1f3b8a; background: #f4f1ec; border: 10px solid #8f8a91; box-shadow: inset 0 0 0 2px #5c5660, 5px 5px 0 #1d171b; font-family: "Segoe Print", "Comic Sans MS", cursive; line-height: 1.3; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+.board-face { grid-area: 1 / 1; display: flex; min-height: 260px; color: #292355; background: #e3c5c3; border: 8px solid #8e838b; border-top-color: #afa7ad; border-bottom-color: #62565f; box-shadow: 0 0 0 2px #1d171b, inset 0 0 0 2px #4a3e47, inset 5px 5px 0 #a0818a; font-family: 'Pixelify Sans', ui-monospace, monospace; line-height: 1.3; overflow-wrap: break-word; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
 .board-face.is-back { transform: rotateX(180deg); }
-.board-content { flex: 1; min-width: 0; padding: 14px 18px; }
-.board-title { margin: 0 0 12px; font-size: 24px; color: #b3261e; overflow-wrap: break-word; }
+.board-content { flex: 1; min-width: 0; padding: 16px 18px 14px 20px; }
+.board-title { margin: 0 0 12px; font-size: 26px; color: #97345f; }
 .board-notes { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
-.board-notes li { padding: 6px 9px; font-size: 13px; color: #2b2025; background: #ffe86b; box-shadow: 2px 2px 0 #0002; transform: rotate(-2deg); }
-.board-notes li:nth-child(3n) { background: #ffb3c7; transform: rotate(3deg); }
-.board-notes li:nth-child(4n) { background: #a8e6a1; }
-.board-notes li:nth-child(3n+2) { transform: none; }
-.board-magnets { flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; width: 116px; padding: 22px 10px 12px 0; }
-.board-magnet { --tilt: -2deg; --shift: 0px; position: relative; padding: 13px 8px 6px; color: #2b2025; background: #fffdf5; border: 0; box-shadow: 2px 2px 0 #0003; font: inherit; font-size: 12px; line-height: 1.15; text-align: left; cursor: pointer; transform: translateX(var(--shift)) rotate(var(--tilt)); transition: transform .15s; touch-action: manipulation; }
-.board-magnet:nth-child(even) { --tilt: 2deg; }
+.board-notes li { padding: 5px 8px; font-size: 14px; color: #2b2025; background: #f7d774; box-shadow: inset 0 -3px 0 #0000001f, 2px 2px 0 #1d171b55; }
+.board-notes li:nth-child(3n) { background: #f2a9b7; }
+.board-notes li:nth-child(4n) { background: #a9d3a6; }
+.board-magnets { flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; width: 144px; padding: 22px 12px 12px 0; }
+.board-magnet { --shift: 0px; position: relative; padding: 12px 8px 6px; color: #2b2025; background: #ffece7; border: 0; box-shadow: 2px 2px 0 #1d171b55; font: inherit; font-size: 13px; line-height: 1.15; text-align: left; cursor: pointer; transform: translateX(var(--shift)); transition: transform .15s; touch-action: manipulation; }
 .board-magnet:hover { --shift: -3px; }
-.board-magnet[aria-pressed="true"] { --shift: -6px; background: #fff; outline: 2px solid var(--magnet); font-weight: bold; }
+.board-magnet[aria-pressed="true"] { --shift: -6px; background: #fff8f4; outline: 2px solid var(--magnet); font-weight: bold; }
 .board-magnet:focus-visible { outline: 3px solid #1d171b; outline-offset: 2px; }
-.board-magnet::before { content: ""; position: absolute; top: -8px; left: 50%; width: 16px; height: 16px; margin-left: -8px; background: var(--magnet); border: 2px solid #1d171b; border-radius: 50%; box-shadow: inset -2px -2px 0 #0003; }
-.board-stand { position: relative; height: 36px; }
-.board-stand::before, .board-stand::after { content: ""; position: absolute; top: 0; width: 10px; height: 36px; background: #5c5660; box-shadow: 2px 0 0 #1d171b; }
-.board-stand::before { left: 18px; }
-.board-stand::after { right: 18px; }
+.board-magnet::before { content: ""; position: absolute; top: -7px; left: 50%; width: 14px; height: 14px; margin-left: -7px; background: var(--magnet); box-shadow: 0 0 0 2px #1d171b, inset 3px 3px 0 #ffffff40, inset -2px -2px 0 #0000004d; }
+.board-stand { position: absolute; inset: 0; pointer-events: none; }
+.board-post { position: absolute; top: -8px; bottom: 16px; left: 4px; width: 14px; background: #8e838b; box-shadow: 0 0 0 2px #1d171b, inset 3px 0 0 #afa7ad, inset -3px 0 0 #62565f; }
+.board-post + .board-post { left: auto; right: 4px; }
+/* Pivot au milieu du tableau : le montant dépasse de 8px en haut et s'arrête 16px avant le bas du bloc (46px de pied),
+   donc le centre du tableau tombe 11px au-dessus du milieu du montant. */
+.board-pivot { position: absolute; top: calc(50% - 21px); left: 50%; width: 20px; height: 20px; margin-left: -10px; background: #62565f; box-shadow: 0 0 0 2px #1d171b, inset 3px 3px 0 #8e838b; }
+.board-foot { position: absolute; bottom: -4px; left: 50%; width: 56px; height: 10px; margin-left: -28px; background: #8e838b; box-shadow: 0 0 0 2px #1d171b, inset 0 3px 0 #afa7ad, inset 0 -3px 0 #62565f; }
+.board-foot::before, .board-foot::after { content: ""; position: absolute; bottom: -12px; width: 10px; height: 10px; background: #342a31; box-shadow: 0 0 0 2px #1d171b, inset 3px 3px 0 #4c3f48; }
+.board-foot::before { left: 2px; }
+.board-foot::after { right: 2px; }
 /* Le tableau tient lieu de fenêtre : ni cadre, ni barre de titre (gardée pour les lecteurs d'écran),
    juste un bouton × épinglé dans le coin ; rien ne rogne le tableau quand il bascule. */
 .portfolio-dialog.is-board { overflow: visible; background: none; border: 0; box-shadow: none; }
 .is-board .dialog-content { padding: 0; overflow: visible; line-height: normal; }
-.is-board .dialog-header { position: absolute; top: -14px; right: -14px; z-index: 1; padding: 0; border: 0; }
+.is-board .dialog-header { position: absolute; top: -18px; right: 36px; z-index: 1; padding: 0; border: 0; }
 .is-board .dialog-header h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .is-board .close-button { display: grid; place-items: center; width: 48px; padding: 0; font-size: 0; box-shadow: 3px 3px 0 #1d171b; cursor: pointer; }
 .is-board .close-button::before { content: "×"; font-size: 28px; line-height: 1; }

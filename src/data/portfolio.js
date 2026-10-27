@@ -78,10 +78,10 @@ export const PORTFOLIO = {
     links: [],
     // Tableau blanc affiché par SkillsBoard : une catégorie par face ; `color` est celle de son aimant.
     board: [
-      { title: 'Langages', color: '#e5533d', tags: ['HTML', 'CSS', 'JavaScript', 'PHP', 'SQL', 'Python', 'C', 'Java'] },
-      { title: 'Frameworks & CMS', color: '#3d7be5', tags: ['React', 'Laravel', 'Node.js', 'WordPress'] },
-      { title: 'Infrastructure', color: '#3fae5a', tags: ['API REST', 'MySQL', 'MongoDB', 'Docker', 'Linux', 'Git', 'GitHub'] },
-      { title: 'Design & SEO', color: '#e5b93d', tags: ['Figma', 'Photoshop', 'Illustrator', 'Canva', 'Analytics', 'Search Console', 'SEMrush'] },
+      { title: 'Langages', color: '#97345f', tags: ['HTML', 'CSS', 'JavaScript', 'PHP', 'SQL', 'Python', 'C', 'Java'] },
+      { title: 'Frameworks & CMS', color: '#3f4f9e', tags: ['React', 'Laravel', 'Node.js', 'WordPress'] },
+      { title: 'Infrastructure', color: '#63937e', tags: ['API REST', 'MySQL', 'MongoDB', 'Docker', 'Linux', 'Git', 'GitHub'] },
+      { title: 'Design & SEO', color: '#d98a3d', tags: ['Figma', 'Photoshop', 'Illustrator', 'Canva', 'Analytics', 'Search Console', 'SEMrush'] },
     ],
   },
   // Fiche persona : affichée par renderPersona (portrait, objectifs, curseurs, parcours).

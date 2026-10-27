@@ -26,10 +26,22 @@ export default class SkillsBoard {
     this.board.append(...this.faces);
     this.status = element('p', 'sr-only');
     this.status.setAttribute('aria-live', 'polite');
-    this.element.append(this.board, element('div', 'board-stand'), this.status);
+    this.element.append(this.board, this.createStand(), this.status);
     this.fill(this.faces[0], 0);
     this.faces[1].inert = true;
     this.bindGestures();
+  }
+
+  // Pied du tableau de la chambre : deux montants avec le pivot à mi-hauteur, un patin et ses roulettes en bas.
+  createStand() {
+    const stand = element('div', 'board-stand');
+    stand.setAttribute('aria-hidden', 'true');
+    for (let side = 0; side < 2; side += 1) {
+      const post = element('div', 'board-post');
+      post.append(element('span', 'board-pivot'), element('span', 'board-foot'));
+      stand.append(post);
+    }
+    return stand;
   }
 
   // Face visible : la première tant que le nombre de demi-tours est pair.
