@@ -37,6 +37,16 @@ test('project cards preserve the nine projects and their published destinations'
   assert.ok(pokedex.links.some(({ href }) => href === 'https://pokedex.matis-wostry.com/'));
 });
 
+test('skills fill a whiteboard with one colored magnet per category', () => {
+  const { board } = PORTFOLIO.skills;
+  assert.equal(board.length, 4);
+  board.forEach(({ title, color, tags }) => {
+    assert.ok(title && tags.length, title);
+    assert.match(color, /^#[0-9a-f]{6}$/);
+  });
+  assert.equal(new Set(board.map(({ color }) => color)).size, board.length);
+});
+
 test('contact and profile use the published identity and contact destinations', () => {
   assert.ok(PORTFOLIO.about.paragraphs.some((text) => text.includes('Matis Wostry')));
   assert.ok(PORTFOLIO.contact.links.some(({ href }) => href === 'mailto:matis.wostry@crea-inseec.com'));

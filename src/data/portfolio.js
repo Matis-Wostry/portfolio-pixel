@@ -74,13 +74,14 @@ export const PORTFOLIO = {
   },
   skills: {
     title: 'Compétences',
-    paragraphs: ['Du développement à la mise en ligne.'],
+    paragraphs: [],
     links: [],
-    cards: [
-      { title: 'Langages', tags: ['HTML', 'CSS', 'JavaScript', 'PHP', 'SQL', 'Python', 'C', 'Java'] },
-      { title: 'Frameworks & CMS', tags: ['React', 'Laravel', 'Node.js', 'WordPress'] },
-      { title: 'Infrastructure', tags: ['API REST', 'MySQL', 'MongoDB', 'Docker', 'Linux', 'Git', 'GitHub'] },
-      { title: 'Design & SEO', tags: ['Figma', 'Photoshop', 'Illustrator', 'Canva', 'Analytics', 'Search Console', 'SEMrush'] },
+    // Tableau blanc affiché par SkillsBoard : une catégorie par face ; `color` est celle de son aimant.
+    board: [
+      { title: 'Langages', color: '#e5533d', tags: ['HTML', 'CSS', 'JavaScript', 'PHP', 'SQL', 'Python', 'C', 'Java'] },
+      { title: 'Frameworks & CMS', color: '#3d7be5', tags: ['React', 'Laravel', 'Node.js', 'WordPress'] },
+      { title: 'Infrastructure', color: '#3fae5a', tags: ['API REST', 'MySQL', 'MongoDB', 'Docker', 'Linux', 'Git', 'GitHub'] },
+      { title: 'Design & SEO', color: '#e5b93d', tags: ['Figma', 'Photoshop', 'Illustrator', 'Canva', 'Analytics', 'Search Console', 'SEMrush'] },
     ],
   },
   // Fiche persona : affichée par renderPersona (portrait, objectifs, curseurs, parcours).

@@ -5,6 +5,7 @@ import { LandscapeSuggestion } from './orientation.mjs';
 import SoundButton from './SoundButton.js';
 import ChessView from './ChessView.js';
 import TerminalView from './TerminalView.js';
+import SkillsBoard from './SkillsBoard.js';
 import './game.css';
 import { INTERFACE_DIR, ACTION_ICONS, actionVerb } from '../config/interface.js';
 
@@ -216,15 +217,18 @@ export default class GameUI {
       return;
     }
     const body = this.dialog.querySelector('.dialog-content');
-    (content.persona ? renderPersona : renderContent)(body, content);
-    this.show(content.title);
+    // Les compétences s'affichent sur un tableau blanc qui tient lieu de fenêtre.
+    if (content.board) body.replaceChildren(new SkillsBoard({ categories: content.board, audio: this.audio }).element);
+    else (content.persona ? renderPersona : renderContent)(body, content);
+    this.show(content.title, { board: Boolean(content.board) });
     body.scrollTop = 0;
   }
 
   // Ouvre la fenêtre avec le contenu déjà en place ; `focusTarget` reçoit le clavier (le bouton Fermer par défaut).
-  show(title, { terminal = false, focusTarget = this.dialog.querySelector('.close-button') } = {}) {
+  show(title, { terminal = false, board = false, focusTarget = this.dialog.querySelector('.close-button') } = {}) {
     this.dialog.querySelector('h1').textContent = title;
     this.dialog.classList.toggle('is-terminal', terminal);
+    this.dialog.classList.toggle('is-board', board);
     this.audio?.play('open');
     this.dialog.showModal();
     this.syncPause();
