@@ -25,7 +25,7 @@ export const FURNITURE = [
   // Mur du fond, de gauche à droite : bibliothèque, bureau au centre, panier et serveur ; tableau posé devant, à gauche du bureau.
   { key: 'bibliotheque', file: 'meubles/bibliotheque.png', x: 12, y: 32, solid: [[0, 72, 64, 24]],
     zone: { id: 'bibliotheque', label: 'Présentation', action: 'about', rect: [0, 0, 64, 96] } },
-  { key: 'tableau', file: 'meubles/tableau-blanc.png', x: 100, y: 86, solid: [[0, 76, 82, 20]],
+  { key: 'tableau', file: 'meubles/tableau-blanc.png', x: 100, y: 78, solid: [[0, 76, 82, 20]],
     zone: { id: 'tableau', label: 'Compétences', action: 'skills', rect: [0, 0, 82, 96] } },
   { key: 'bureau', file: 'meubles/bureau.png', x: 208, y: 52, solid: [[0, 60, 98, 36]],
     zone: { id: 'bureau', label: 'Projets', action: 'projets', rect: [0, 0, 98, 96] },
