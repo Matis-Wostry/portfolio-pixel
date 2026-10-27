@@ -26,7 +26,6 @@ export default class GameUI {
       <div class="touch-controls">
         <div class="joystick" aria-label="Joystick de déplacement">
           <span class="joystick-knob"></span>
-          <span class="joystick-caption">Déplacer</span>
         </div>
         <button class="action-button" type="button" disabled>
           <img class="action-icon" src="${iconURL('projets')}" alt="">
