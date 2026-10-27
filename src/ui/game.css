@@ -2,8 +2,7 @@
 .portfolio-dialog h1 { font-family: 'Pixelify Sans', ui-monospace, monospace; }
 * { box-sizing: border-box; }
 html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #140f17; }
-canvas { display: block; image-rendering: pixelated; outline-offset: -4px; }
-canvas:focus-visible { outline: 3px solid #f2b66d; }
+canvas { display: block; image-rendering: pixelated; outline: none; }
 .game-ui { position: fixed; inset: 0; pointer-events: none; color: #ffece7; z-index: 10; }
 .game-help { position: absolute; left: 50%; transform: translateX(-50%); max-width: calc(100% - 144px); width: max-content; text-align: center; background: #2b2025ed; border: 2px solid #a84d36; padding: 10px 14px; }
 .game-help { top: max(12px, env(safe-area-inset-top)); font-size: 13px; }
