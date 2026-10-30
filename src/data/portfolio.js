@@ -29,7 +29,7 @@ export const PORTFOLIO = {
       },
       {
         id: 'compresseur-images', category: 'pro', title: 'Compresseur d’images',
-        description: 'Application Python qui compresse des images au format WebP, réalisée en freelance.', tags: ['Python'],
+        description: 'Application Python qui compresse les photos au format WebP, créée pour faciliter mes missions de freelance.', tags: ['Python'],
         links: [{ label: 'Code', href: 'https://github.com/Matis-Wostry/compresseur-img-python' }],
       },
       {
