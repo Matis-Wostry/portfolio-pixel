@@ -83,6 +83,12 @@ export const SKILL_LOGOS = {
   Claude: 'logos/claude.svg',
   'Claude Code': 'logos/claudecode.svg',
   OpenAI: 'logos/openai.svg',
+  Gemini: 'logos/googlegemini.svg',
+  MCP: 'logos/modelcontextprotocol.svg',
+  'GitHub Copilot': 'logos/githubcopilot.svg',
+  Ollama: 'logos/ollama.svg',
+  'Hugging Face': 'logos/huggingface.svg',
+  n8n: 'logos/n8n.svg',
 };
 
 // Verbe du bouton tactile et de l'aide, selon l'action.

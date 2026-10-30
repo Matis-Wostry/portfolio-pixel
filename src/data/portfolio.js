@@ -90,7 +90,7 @@ export const PORTFOLIO = {
       { title: 'DevOps & outils', color: '#63937e', tags: ['Docker', 'Docker Compose', 'Linux', 'WSL', 'Git', 'GitHub', 'GitHub Actions', 'Vite', 'Vitest', 'npm', 'VS Code', 'Nginx', 'SSH / VPS'] },
       { title: 'Design', color: '#d98a3d', tags: ['Figma', 'Photoshop', 'Illustrator', 'Canva', 'Claude Design'] },
       { title: 'SEO & analyse', color: '#8a5fb0', tags: ['Google Analytics', 'Google Tag Manager', 'Search Console', 'SEMrush', 'SE Ranking', 'PageSpeed Insights', 'Lighthouse', 'Yoast SEO', 'Hotjar'] },
-      { title: 'IA', color: '#c4562f', tags: ['Claude', 'Claude Code', 'OpenAI'] },
+      { title: 'IA', color: '#c4562f', tags: ['Claude', 'Claude Code', 'MCP', 'OpenAI', 'Gemini', 'GitHub Copilot', 'Ollama', 'Hugging Face', 'n8n'] },
     ],
   },
   // Fiche persona : affichée par renderPersona (portrait, objectifs, curseurs, parcours).
