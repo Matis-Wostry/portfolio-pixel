@@ -29,8 +29,8 @@ test('every interaction has real portfolio content and safe links', () => {
   }
 });
 
-test('project cards preserve the nine projects and their published destinations', () => {
-  assert.equal(PORTFOLIO.projets.cards.length, 9);
+test('project cards preserve the ten projects and their published destinations', () => {
+  assert.equal(PORTFOLIO.projets.cards.length, 10);
   const weather = PORTFOLIO.projets.cards.find((card) => card.id === 'meteo');
   assert.ok(weather.tags.includes('Laravel'));
   assert.ok(weather.links.some(({ href }) => href === 'https://github.com/Matis-Wostry/iut-weather'));
@@ -40,7 +40,7 @@ test('project cards preserve the nine projects and their published destinations'
 
 test('skills fill a whiteboard with one colored magnet per category', () => {
   const { board } = PORTFOLIO.skills;
-  assert.equal(board.length, 4);
+  assert.equal(board.length, 7);
   board.forEach(({ title, color, tags }) => {
     assert.ok(title && tags.length, title);
     assert.match(color, /^#[0-9a-f]{6}$/);

@@ -70,6 +70,12 @@ export const PORTFOLIO = {
         description: 'Script Python qui réécrit automatiquement des articles WordPress avec l’API d’OpenAI.', tags: ['Python', 'OpenAI', 'API'],
         links: [{ label: 'Code', href: 'https://github.com/Matis-Wostry/SEO-article' }],
       },
+      {
+        id: 'usage-limits', category: 'perso', title: 'Usage Limits',
+        description: 'Mod pour Claude Code qui affiche ta consommation des limites (session de 5 h et semaine) avec un verdict de rythme.',
+        tags: ['TypeScript', 'Claude Code'],
+        links: [{ label: 'Code', href: 'https://github.com/Matis-Wostry/usage-limits' }],
+      },
     ],
   },
   skills: {
@@ -78,10 +84,13 @@ export const PORTFOLIO = {
     links: [],
     // Tableau blanc affiché par SkillsBoard : une catégorie par face ; `color` est celle de son aimant.
     board: [
-      { title: 'Langages', color: '#97345f', tags: ['HTML', 'CSS', 'JavaScript', 'PHP', 'SQL', 'Python', 'C', 'Java'] },
+      { title: 'Langages', color: '#97345f', tags: ['HTML', 'CSS', 'JavaScript', 'PHP', 'Python', 'C', 'Java'] },
       { title: 'Frameworks & CMS', color: '#3f4f9e', tags: ['React', 'Laravel', 'Node.js', 'WordPress'] },
-      { title: 'Infrastructure', color: '#63937e', tags: ['API REST', 'MySQL', 'MongoDB', 'Docker', 'Linux', 'Git', 'GitHub'] },
-      { title: 'Design & SEO', color: '#d98a3d', tags: ['Figma', 'Photoshop', 'Illustrator', 'Canva', 'Analytics', 'Search Console', 'SEMrush'] },
+      { title: 'Données & API', color: '#3d8fa3', tags: ['SQL', 'MySQL', 'MongoDB', 'API REST'] },
+      { title: 'Outils & système', color: '#63937e', tags: ['Docker', 'Linux', 'Git', 'GitHub'] },
+      { title: 'Design', color: '#d98a3d', tags: ['Figma', 'Photoshop', 'Illustrator', 'Canva'] },
+      { title: 'SEO & analyse', color: '#8a5fb0', tags: ['Analytics', 'Search Console', 'SEMrush'] },
+      { title: 'IA', color: '#c4562f', tags: ['Claude', 'Claude Code', 'OpenAI'] },
     ],
   },
   // Fiche persona : affichée par renderPersona (portrait, objectifs, curseurs, parcours).
