@@ -37,7 +37,7 @@ Dans la chambre, quatre meubles sont interactifs : le bureau (projets), le table
 
 Les premiers contenus sont adaptés de [matis-wostry.com](https://matis-wostry.com/) et de son [CV public](https://matis-wostry.com/assets/cv/CV_Matis_Wostry.pdf), consultés le 11 octobre 2026 : six projets, compétences, présentation, formation et contact. Ces données sont une copie locale modifiable dans `src/data/portfolio.js` ; elles ne se synchronisent pas automatiquement.
 
-Les logos des post-it de compétences (`public/assets/interface/logos/`) viennent de [Simple Icons](https://simpleicons.org/) 16.36.0 (CC0, sauf le CSS3 en bouclier, retiré des versions récentes et pris dans la 9.21.0), recolorés dans la couleur de chaque marque, sauf quelques licences propres : JavaScript (MIT), PHP (CC BY-SA 4.0), OpenJDK utilisé pour Java (BSD-3-Clause) et Git (CC BY 3.0, Jason Long). Photoshop, Illustrator et Claude Code, absents de Simple Icons, sont redessinés à la main. Les marques restent la propriété de leurs détenteurs. La correspondance compétence → logo est dans `src/config/interface.js`.
+Les logos des post-it de compétences (`public/assets/interface/logos/`) viennent de [Simple Icons](https://simpleicons.org/) 16.36.0 (CC0, sauf le CSS3 en bouclier, retiré des versions récentes et pris dans la 9.21.0), recolorés dans la couleur de chaque marque, sauf quelques licences propres : JavaScript (MIT), PHP (CC BY-SA 4.0), OpenJDK utilisé pour Java (BSD-3-Clause) et Git (CC BY 3.0, Jason Long). Photoshop, Illustrator, Claude Code et Phaser, absents de Simple Icons, sont redessinés à la main. Les marques restent la propriété de leurs détenteurs. La correspondance compétence → logo est dans `src/config/interface.js`.
 
 ## Son
 

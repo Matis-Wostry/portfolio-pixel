@@ -85,9 +85,9 @@ export const PORTFOLIO = {
     // Tableau blanc affiché par SkillsBoard : une catégorie par face ; `color` est celle de son aimant.
     board: [
       { title: 'Langages', color: '#97345f', tags: ['HTML', 'CSS', 'SCSS', 'JavaScript', 'TypeScript', 'PHP', 'Python', 'C', 'Java'] },
-      { title: 'Frameworks & CMS', color: '#3f4f9e', tags: ['React', 'Laravel', 'Node.js', 'WordPress'] },
-      { title: 'Données & API', color: '#3d8fa3', tags: ['SQL', 'MySQL', 'MongoDB', 'API REST'] },
-      { title: 'Outils & système', color: '#63937e', tags: ['Docker', 'Linux', 'Git', 'GitHub'] },
+      { title: 'Frameworks & CMS', color: '#3f4f9e', tags: ['React', 'Vue.js', 'Tailwind CSS', 'DaisyUI', 'Node.js', 'Express', 'Laravel', 'WordPress', 'Phaser'] },
+      { title: 'Données & API', color: '#3d8fa3', tags: ['SQL', 'MySQL', 'MongoDB', 'API REST', 'Swagger'] },
+      { title: 'Outils & système', color: '#63937e', tags: ['Docker', 'Linux', 'Git', 'GitHub', 'Vite'] },
       { title: 'Design', color: '#d98a3d', tags: ['Figma', 'Photoshop', 'Illustrator', 'Canva'] },
       { title: 'SEO & analyse', color: '#8a5fb0', tags: ['Analytics', 'Search Console', 'SEMrush'] },
       { title: 'IA', color: '#c4562f', tags: ['Claude', 'Claude Code', 'OpenAI'] },
