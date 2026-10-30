@@ -26,6 +26,8 @@ export const SKILL_LOGOS = {
   HTML: 'logos/html5.svg',
   CSS: 'logos/css.svg',
   JavaScript: 'logos/javascript.svg',
+  TypeScript: 'logos/typescript.svg',
+  SCSS: 'logos/sass.svg',
   PHP: 'logos/php.svg',
   Python: 'logos/python.svg',
   C: 'logos/c.svg',
@@ -46,6 +48,9 @@ export const SKILL_LOGOS = {
   Analytics: 'logos/googleanalytics.svg',
   'Search Console': 'logos/googlesearchconsole.svg',
   SEMrush: 'logos/semrush.svg',
+  Claude: 'logos/claude.svg',
+  'Claude Code': 'logos/claudecode.svg',
+  OpenAI: 'logos/openai.svg',
 };
 
 // Verbe du bouton tactile et de l'aide, selon l'action.
