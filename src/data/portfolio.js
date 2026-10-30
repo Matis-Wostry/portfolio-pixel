@@ -14,18 +14,23 @@ export const PORTFOLIO = {
     cards: [
       {
         id: 'mieuxdisant', category: 'pro', title: 'Le MieuxDisant',
-        description: 'Site WordPress conçu sur Figma puis développé pendant mon alternance.', tags: ['WordPress', 'Figma'],
+        description: 'Site WordPress conçu sur Figma puis développé en alternance.', tags: ['WordPress', 'Figma'],
         links: [{ label: 'Site', href: 'https://lemieuxdisant.fr/' }],
       },
       {
         id: 'mb-ventilation', category: 'pro', title: 'MB Ventilation',
-        description: 'Site WordPress dédié aux systèmes de ventilation.', tags: ['WordPress'],
+        description: 'Site WordPress dédié aux systèmes de ventilation, réalisé en freelance.', tags: ['WordPress'],
         links: [{ label: 'Site', href: 'https://mb-ventilation.fr/' }],
       },
       {
         id: 'mb-home', category: 'pro', title: 'MB Home',
-        description: 'Site WordPress dédié au carrelage, au placo et à la démolition.', tags: ['WordPress'],
+        description: 'Site WordPress dédié au carrelage, au placo et à la démolition, réalisé en freelance.', tags: ['WordPress'],
         links: [{ label: 'Site', href: 'https://mb-home.fr/' }],
+      },
+      {
+        id: 'compresseur-images', category: 'pro', title: 'Compresseur d’images',
+        description: 'Application Python qui compresse des images au format WebP, réalisée en freelance.', tags: ['Python'],
+        links: [{ label: 'Code', href: 'https://github.com/Matis-Wostry/compresseur-img-python' }],
       },
       {
         id: 'pokedex', category: 'ecole', title: 'Pokédex',
@@ -60,6 +65,21 @@ export const PORTFOLIO = {
         ],
       },
       {
+        id: 'veille-mcp', category: 'ecole', title: 'Veille techno MCP',
+        description: 'Veille technique automatisée : l’actualité GitHub et Dev.to est synthétisée en français par Claude, stockée dans SQLite et exposée par un serveur MCP déployé.',
+        tags: ['TypeScript', 'Claude', 'MCP', 'SQLite'],
+        links: [
+          { label: 'Code', href: 'https://github.com/Matis-Wostry/MCP-Crea' },
+          { label: 'Serveur MCP', href: 'https://mcp-crea-production-3669.up.railway.app/mcp' },
+        ],
+      },
+      {
+        id: 'calendrier-php', category: 'ecole', title: 'Calendrier PHP',
+        description: 'Calendrier dynamique en PHP natif : événements avec images en CRUD, mois mémorisé en session et dimanches désactivés.',
+        tags: ['PHP', 'Tailwind CSS', 'JavaScript'],
+        links: [{ label: 'Code', href: 'https://github.com/Matis-Wostry/calendrier-php' }],
+      },
+      {
         id: 'chambre-du-dev', category: 'perso', title: 'La Chambre du Dev',
         description: 'Ce portfolio : une chambre en pixel art à explorer, avec un moteur d’échecs, des sons synthétisés et ce terminal.',
         tags: ['Phaser', 'JavaScript', 'Vite', 'PixelArt', 'WebAudio'],
@@ -87,7 +107,7 @@ export const PORTFOLIO = {
       { title: 'Langages', color: '#97345f', tags: ['HTML', 'CSS', 'SCSS', 'JavaScript', 'TypeScript', 'PHP', 'Python', 'C', 'Java'] },
       { title: 'Frameworks & CMS', color: '#3f4f9e', tags: ['React', 'Vue.js', 'Tailwind CSS', 'DaisyUI', 'Node.js', 'Express', 'Laravel', 'WordPress', 'Phaser'] },
       { title: 'Données & API', color: '#3d8fa3', tags: ['SQL', 'MySQL', 'PostgreSQL', 'SQLite', 'MongoDB', 'Supabase', 'JDBC', 'Drizzle', 'API REST', 'Swagger', 'Postman', 'JWT'] },
-      { title: 'DevOps & outils', color: '#63937e', tags: ['Docker', 'Docker Compose', 'Linux', 'WSL', 'Git', 'GitHub', 'GitHub Actions', 'Vite', 'Vitest', 'npm', 'VS Code', 'Nginx', 'SSH / VPS'] },
+      { title: 'DevOps & outils', color: '#63937e', tags: ['Docker', 'Docker Compose', 'Linux', 'WSL', 'Git', 'GitHub', 'GitHub Actions', 'Vite', 'Vitest', 'npm', 'VS Code', 'Caddy', 'SSH / VPS'] },
       { title: 'Design', color: '#d98a3d', tags: ['Figma', 'Photoshop', 'Illustrator', 'Canva', 'Claude Design'] },
       { title: 'SEO & analyse', color: '#8a5fb0', tags: ['Google Analytics', 'Google Tag Manager', 'Search Console', 'SEMrush', 'SE Ranking', 'PageSpeed Insights', 'Lighthouse', 'Yoast SEO', 'Hotjar'] },
       { title: 'IA', color: '#c4562f', tags: ['Claude', 'Claude Code', 'MCP', 'OpenAI', 'Gemini', 'GitHub Copilot', 'Ollama', 'Hugging Face', 'n8n'] },

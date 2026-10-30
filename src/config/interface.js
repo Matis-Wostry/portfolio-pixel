@@ -59,7 +59,7 @@ export const SKILL_LOGOS = {
   Vitest: 'logos/vitest.svg',
   npm: 'logos/npm.svg',
   'VS Code': 'logos/vscode.svg',
-  Nginx: 'logos/nginx.svg',
+  Caddy: 'logos/caddy.svg',
   'SSH / VPS': 'logos/ssh.svg',
   Vite: 'logos/vite.svg',
   Swagger: 'logos/swagger.svg',
