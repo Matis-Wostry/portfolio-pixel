@@ -86,7 +86,7 @@ export const PORTFOLIO = {
     board: [
       { title: 'Langages', color: '#97345f', tags: ['HTML', 'CSS', 'SCSS', 'JavaScript', 'TypeScript', 'PHP', 'Python', 'C', 'Java'] },
       { title: 'Frameworks & CMS', color: '#3f4f9e', tags: ['React', 'Vue.js', 'Tailwind CSS', 'DaisyUI', 'Node.js', 'Express', 'Laravel', 'WordPress', 'Phaser'] },
-      { title: 'Données & API', color: '#3d8fa3', tags: ['SQL', 'MySQL', 'MongoDB', 'API REST', 'Swagger'] },
+      { title: 'Données & API', color: '#3d8fa3', tags: ['SQL', 'MySQL', 'PostgreSQL', 'SQLite', 'MongoDB', 'Supabase', 'JDBC', 'Drizzle', 'API REST', 'Swagger', 'Postman', 'JWT'] },
       { title: 'Outils & système', color: '#63937e', tags: ['Docker', 'Linux', 'Git', 'GitHub', 'Vite'] },
       { title: 'Design', color: '#d98a3d', tags: ['Figma', 'Photoshop', 'Illustrator', 'Canva'] },
       { title: 'SEO & analyse', color: '#8a5fb0', tags: ['Analytics', 'Search Console', 'SEMrush'] },
