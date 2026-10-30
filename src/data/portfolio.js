@@ -84,7 +84,7 @@ export const PORTFOLIO = {
     links: [],
     // Tableau blanc affiché par SkillsBoard : une catégorie par face ; `color` est celle de son aimant.
     board: [
-      { title: 'Langages', color: '#97345f', tags: ['HTML', 'CSS', 'JavaScript', 'PHP', 'Python', 'C', 'Java'] },
+      { title: 'Langages', color: '#97345f', tags: ['HTML', 'CSS', 'SCSS', 'JavaScript', 'TypeScript', 'PHP', 'Python', 'C', 'Java'] },
       { title: 'Frameworks & CMS', color: '#3f4f9e', tags: ['React', 'Laravel', 'Node.js', 'WordPress'] },
       { title: 'Données & API', color: '#3d8fa3', tags: ['SQL', 'MySQL', 'MongoDB', 'API REST'] },
       { title: 'Outils & système', color: '#63937e', tags: ['Docker', 'Linux', 'Git', 'GitHub'] },
