@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { safeLink } from '../src/ui/content.mjs';
 import { PORTFOLIO } from '../src/data/portfolio.js';
 import { SKILL_LOGOS } from '../src/config/interface.js';
@@ -50,6 +50,7 @@ test('skills fill a whiteboard with one colored magnet per category', () => {
   for (const [tag, file] of Object.entries(SKILL_LOGOS)) {
     assert.ok(tags.has(tag), `logo sans compétence : ${tag}`);
     assert.ok(existsSync(new URL(`../public/assets/interface/${file}`, import.meta.url)), file);
+    assert.match(readFileSync(new URL(`../public/assets/interface/${file}`, import.meta.url), 'utf8'), /<svg[\s\S]*<path|<svg[\s\S]*<rect|<svg[\s\S]*<circle/, `logo vide : ${file}`);
   }
 });
 
