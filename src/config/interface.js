@@ -69,6 +69,8 @@ export const SKILL_LOGOS = {
   Figma: 'logos/figma.svg',
   Photoshop: 'logos/photoshop.svg',
   Illustrator: 'logos/illustrator.svg',
+  Canva: 'logos/canva.svg',
+  'Claude Design': 'logos/claudedesign.svg',
   Analytics: 'logos/googleanalytics.svg',
   'Search Console': 'logos/googlesearchconsole.svg',
   SEMrush: 'logos/semrush.svg',

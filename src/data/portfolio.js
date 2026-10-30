@@ -88,7 +88,7 @@ export const PORTFOLIO = {
       { title: 'Frameworks & CMS', color: '#3f4f9e', tags: ['React', 'Vue.js', 'Tailwind CSS', 'DaisyUI', 'Node.js', 'Express', 'Laravel', 'WordPress', 'Phaser'] },
       { title: 'Données & API', color: '#3d8fa3', tags: ['SQL', 'MySQL', 'PostgreSQL', 'SQLite', 'MongoDB', 'Supabase', 'JDBC', 'Drizzle', 'API REST', 'Swagger', 'Postman', 'JWT'] },
       { title: 'DevOps & outils', color: '#63937e', tags: ['Docker', 'Docker Compose', 'Linux', 'WSL', 'Git', 'GitHub', 'GitHub Actions', 'Vite', 'Vitest', 'npm', 'VS Code', 'Nginx', 'SSH / VPS'] },
-      { title: 'Design', color: '#d98a3d', tags: ['Figma', 'Photoshop', 'Illustrator', 'Canva'] },
+      { title: 'Design', color: '#d98a3d', tags: ['Figma', 'Photoshop', 'Illustrator', 'Canva', 'Claude Design'] },
       { title: 'SEO & analyse', color: '#8a5fb0', tags: ['Analytics', 'Search Console', 'SEMrush'] },
       { title: 'IA', color: '#c4562f', tags: ['Claude', 'Claude Code', 'OpenAI'] },
     ],
