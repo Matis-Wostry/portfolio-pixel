@@ -89,7 +89,7 @@ export const PORTFOLIO = {
       { title: 'Données & API', color: '#3d8fa3', tags: ['SQL', 'MySQL', 'PostgreSQL', 'SQLite', 'MongoDB', 'Supabase', 'JDBC', 'Drizzle', 'API REST', 'Swagger', 'Postman', 'JWT'] },
       { title: 'DevOps & outils', color: '#63937e', tags: ['Docker', 'Docker Compose', 'Linux', 'WSL', 'Git', 'GitHub', 'GitHub Actions', 'Vite', 'Vitest', 'npm', 'VS Code', 'Nginx', 'SSH / VPS'] },
       { title: 'Design', color: '#d98a3d', tags: ['Figma', 'Photoshop', 'Illustrator', 'Canva', 'Claude Design'] },
-      { title: 'SEO & analyse', color: '#8a5fb0', tags: ['Google Analytics', 'Search Console', 'SEMrush', 'SE Ranking'] },
+      { title: 'SEO & analyse', color: '#8a5fb0', tags: ['Google Analytics', 'Google Tag Manager', 'Search Console', 'SEMrush', 'SE Ranking', 'PageSpeed Insights', 'Lighthouse', 'Yoast SEO', 'Hotjar'] },
       { title: 'IA', color: '#c4562f', tags: ['Claude', 'Claude Code', 'OpenAI'] },
     ],
   },
