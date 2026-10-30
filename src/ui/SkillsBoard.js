@@ -56,9 +56,11 @@ export default class SkillsBoard {
   }
 
   fill(face, index) {
-    const { title, tags } = this.categories[index];
+    const { title, tags, color } = this.categories[index];
     const content = element('div', 'board-content');
     const notes = element('ul', 'board-notes');
+    // Les post-it reprennent la couleur de l'aimant de leur catégorie.
+    notes.style.setProperty('--magnet', color);
     tags.forEach((tag) => {
       const note = element('li');
       if (SKILL_LOGOS[tag]) {
