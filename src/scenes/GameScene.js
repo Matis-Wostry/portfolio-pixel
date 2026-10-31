@@ -8,6 +8,7 @@ import { PORTFOLIO } from '../data/portfolio.js';
 import { ROOM, ROOM_ZONES, SEATS } from '../data/room.js';
 import { computeView, computeBounds } from '../config/viewport.mjs';
 import AudioManager from '../audio/AudioManager.js';
+import CollisionOverlay, { collisionOverlayAvailable } from '../debug/CollisionOverlay.js';
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -47,6 +48,7 @@ export default class GameScene extends Phaser.Scene {
     const bounds = room.walkBounds;
     this.physics.world.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
     this.player.setCollideWorldBounds(true);
+    if (collisionOverlayAvailable()) new CollisionOverlay(this, { room, player: this.player });
 
     // --- Caméra ---
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
