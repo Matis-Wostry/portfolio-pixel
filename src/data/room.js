@@ -46,7 +46,7 @@ export const FURNITURE = [
   { key: 'serveur', file: 'meubles/serveur.png', x: 470, y: 72, solid: [[0, 20, 32, 44]],
     leds: [1, 2, 3].map((n) => `effets/serveur-led-${n}.png`) },
   // Coin jeu en bas à gauche, coin télé contre le mur de droite.
-  { key: 'coin-jeu', file: 'meubles/coin-jeu.png', x: 63, y: 264, solid: [[0, 6, 128, 58]],
+  { key: 'coin-jeu', file: 'meubles/coin-jeu.png', x: 63, y: 264, solid: [[0, 8, 26, 56], [26, 12, 76, 52], [102, 8, 26, 56]],
     zone: { id: 'echecs', label: 'Échecs', action: 'chess', rect: [30, 4, 68, 60] }, chess: true },
   { key: 'coin-gaming', file: 'meubles/coin-gaming.png', x: 350, y: 216,
     solid: [[0, 24, 48, 104], [64, 60, 38, 58], [121, 24, 30, 102]],
