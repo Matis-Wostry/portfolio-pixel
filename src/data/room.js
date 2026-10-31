@@ -48,8 +48,10 @@ export const FURNITURE = [
   // Coin jeu en bas à gauche, coin télé contre le mur de droite.
   { key: 'coin-jeu', file: 'meubles/coin-jeu.png', x: 63, y: 264, solid: [[0, 8, 26, 56], [26, 12, 76, 52], [102, 8, 26, 56]],
     zone: { id: 'echecs', label: 'Échecs', action: 'chess', rect: [30, 4, 68, 60] }, chess: true },
+  // Le fauteuil est une image à part pour se décaler de 8 px vers la gauche sans bouger la table ni la télé.
+  { key: 'fauteuil', file: 'meubles/fauteuil.png', x: 342, y: 216, solid: [[0, 24, 48, 104]] },
   { key: 'coin-gaming', file: 'meubles/coin-gaming.png', x: 350, y: 216,
-    solid: [[0, 24, 48, 104], [64, 60, 38, 58], [121, 24, 30, 102]],
+    solid: [[64, 60, 38, 58], [121, 24, 30, 102]],
     zone: { id: 'coin-gaming', label: 'Contact', action: 'contact', rect: [112, 24, 40, 104] },
     overlays: [{ key: 'coin-gaming-lumiere', file: 'effets/tele-lumiere.png', effect: 'glow' }] },
 ];
