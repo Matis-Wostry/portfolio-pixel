@@ -26,7 +26,9 @@ export const FURNITURE = [
   // ligne que la poubelle (y = 112) ; tableau posé devant, à gauche du bureau.
   { key: 'bibliotheque', file: 'meubles/bibliotheque.png', x: 12, y: 16, solid: [[0, 56, 64, 40]],
     zone: { id: 'bibliotheque', label: 'Présentation', action: 'about', rect: [0, 0, 64, 96] } },
-  { key: 'tableau', file: 'meubles/tableau-blanc.png', x: 100, y: 78, solid: [[0, 14, 82, 82]],
+  // Empreinte du tableau en escalier, qui suit le dessin : son haut, qui penche, reste libre.
+  { key: 'tableau', file: 'meubles/tableau-blanc.png', x: 100, y: 78, depthBySolid: true,
+    solid: [[0, 41, 20, 54], [20, 37, 15, 45], [35, 34, 15, 42], [50, 30, 15, 40], [65, 28, 11, 37], [76, 57, 7, 13]],
     zone: { id: 'tableau', label: 'Compétences', action: 'skills', rect: [0, 0, 82, 96] } },
   { key: 'bureau', file: 'meubles/bureau.png', x: 208, y: 52, solid: [[0, 40, 98, 56]],
     zone: { id: 'bureau', label: 'Projets', action: 'projets', rect: [0, 0, 98, 96] },

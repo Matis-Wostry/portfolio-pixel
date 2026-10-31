@@ -41,6 +41,7 @@ export default class GameScene extends Phaser.Scene {
     this.interactions = new InteractionSystem(this, ROOM_ZONES, () => this.controls.requestAction());
 
     this.player = new Player(this, ROOM.spawn.x, ROOM.spawn.y);
+    this.player.solidRects = room.solidRects;
     this.game.canvas.tabIndex = 0;
     this.game.canvas.setAttribute('aria-label', 'La Chambre du Dev : déplace-toi avec les flèches, ZQSD ou WASD et utilise E pour interagir.');
     this.player.setDepth(this.player.getFeet().y);

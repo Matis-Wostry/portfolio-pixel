@@ -12,6 +12,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.body.setSize(config.hitbox.width, config.hitbox.height);
     this.body.setOffset(config.hitbox.x, config.hitbox.y);
     this.lastDirection = 'down';
+    // Renseigné par la scène une fois la chambre construite.
+    this.solidRects = [];
     this.createArms(scene, config);
     // L'ombre reste au sol, sous les meubles, et suit les pieds après chaque pas de la physique.
     if (config.shadow && scene.textures.exists(config.shadow.texture)) {
@@ -57,10 +59,18 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     });
   }
 
+  // Derrière un meuble (pieds au-dessus du haut de son empreinte, bras au-dessus de elle) : les bras passent derrière lui.
+  isBehindFurniture(from, to) {
+    const feet = this.body.bottom;
+    return this.solidRects.some(({ left, right, top }) => from < right && to > left && feet <= top + 0.5);
+  }
+
   syncArms() {
+    const origin = this.x - this.config.origin.x * this.config.frameWidth;
     this.arms.forEach(({ left, columnWidth, sprite }) => {
       sprite.setVisible(!this.seat);
       if (this.seat) return;
+      sprite.setDepth(this.isBehindFurniture(origin + left, origin + left + columnWidth) ? this.depth + 0.01 : this.config.armsDepth);
       sprite.setTexture(this.texture.key, this.frame.name).setPosition(this.x, this.y).setFlip(this.flipX, this.flipY);
       const { top, bottom } = this.config.armsRows;
       sprite.setCrop(left, top, columnWidth, bottom - top);

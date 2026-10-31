@@ -10,6 +10,8 @@ export default class Room {
     this.width = ROOM.columns * TILE;
     this.height = ROOM.rows * TILE;
     this.solids = scene.physics.add.staticGroup();
+    // Empreintes bloquantes en coordonnées de la chambre, pour savoir si le joueur est derrière un meuble.
+    this.solidRects = [];
     // Profondeur de chaque meuble, pour placer le joueur assis devant ou derrière.
     this.depths = {};
     this.buildTiles();
@@ -53,9 +55,11 @@ export default class Room {
     const image = scene.add.image(item.x, item.y, item.key).setOrigin(0);
     const depth = item.wall ? -500 : item.y + image.height;
     image.setDepth(depth);
+    if (item.depthBySolid) this.sliceByFloor(item, image);
     this.depths[item.key] = depth;
     item.solid?.forEach(([x, y, width, height]) => {
       this.solids.add(scene.add.zone(item.x + x + width / 2, item.y + y + height / 2, width, height));
+      this.solidRects.push({ left: item.x + x, right: item.x + x + width, top: item.y + y });
     });
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     item.overlays?.forEach((overlay) => {
@@ -79,6 +83,18 @@ export default class Room {
     });
     if (item.leds) this.animateLeds(item, depth + 0.5);
     if (item.chess) this.chess = new TableChess(scene, { x: item.x, y: item.y, depth: depth + 0.5 });
+  }
+
+  // Meuble dont le bord au sol est en diagonale : l'image est découpée en tranches (une par empreinte bloquante),
+  // chacune à la profondeur de son bord au sol, pour que le joueur passe devant la tranche dont il a dépassé le bord.
+  sliceByFloor(item, image) {
+    const solids = [...item.solid].sort((a, b) => a[0] - b[0]);
+    image.setVisible(false);
+    solids.forEach(([x, y, width, height], index) => {
+      const right = index === solids.length - 1 ? image.width : x + width;
+      this.scene.add.image(item.x, item.y, item.key).setOrigin(0).setCrop(x, 0, right - x, image.height)
+        .setDepth(item.y + y + height - 0.5);
+    });
   }
 
   // Change d'intensité au hasard : monte ou descend image par image vers un niveau tiré au sort, puis attend.
