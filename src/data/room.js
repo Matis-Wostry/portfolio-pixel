@@ -46,7 +46,7 @@ export const FURNITURE = [
   { key: 'serveur', file: 'meubles/serveur.png', x: 470, y: 72, solid: [[0, 20, 32, 44]],
     leds: [1, 2, 3].map((n) => `effets/serveur-led-${n}.png`) },
   // Coin jeu en bas à gauche, coin télé contre le mur de droite.
-  { key: 'coin-jeu', file: 'meubles/coin-jeu.png', x: 63, y: 264, solid: [[0, 8, 26, 56], [26, 12, 76, 52], [102, 8, 26, 56]],
+  { key: 'coin-jeu', file: 'meubles/coin-jeu.png', x: 63, y: 264, solid: [[0, 18, 26, 39], [35, 11, 64, 53], [105, 20, 23, 39]],
     zone: { id: 'echecs', label: 'Échecs', action: 'chess', rect: [30, 4, 68, 60] }, chess: true },
   // Le fauteuil est une image à part pour se décaler de 8 px vers la gauche sans bouger la table ni la télé.
   { key: 'fauteuil', file: 'meubles/fauteuil.png', x: 342, y: 216, solid: [[0, 24, 48, 104]] },
