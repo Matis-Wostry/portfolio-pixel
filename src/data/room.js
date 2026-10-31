@@ -22,8 +22,9 @@ export const TILES = {
 };
 
 export const FURNITURE = [
-  // Mur du fond, de gauche à droite : bibliothèque, bureau au centre, panier et serveur ; tableau posé devant, à gauche du bureau.
-  { key: 'bibliotheque', file: 'meubles/bibliotheque.png', x: 12, y: 32, solid: [[0, 56, 64, 40]],
+  // Mur du fond, de gauche à droite : bibliothèque, bureau au centre, panier et serveur ; la bibliothèque et le serveur reposent sur la même
+  // ligne que la poubelle (y = 112) ; tableau posé devant, à gauche du bureau.
+  { key: 'bibliotheque', file: 'meubles/bibliotheque.png', x: 12, y: 16, solid: [[0, 56, 64, 40]],
     zone: { id: 'bibliotheque', label: 'Présentation', action: 'about', rect: [0, 0, 64, 96] } },
   { key: 'tableau', file: 'meubles/tableau-blanc.png', x: 100, y: 78, solid: [[0, 14, 82, 82]],
     zone: { id: 'tableau', label: 'Compétences', action: 'skills', rect: [0, 0, 82, 96] } },
@@ -43,7 +44,7 @@ export const FURNITURE = [
   // Poubelle sous le panier, qui reçoit les boules de papier ; la zone est à sa gauche pour que la bulle ne cache pas le filet.
   { key: 'poubelle', file: 'meubles/poubelle.png', x: 356, y: 85, solid: [[0, 7, 20, 20]],
     zone: { id: 'panier', label: 'Panier', action: 'shoot', rect: [-46, 5, 40, 30] } },
-  { key: 'serveur', file: 'meubles/serveur.png', x: 470, y: 72, solid: [[0, 20, 32, 44]],
+  { key: 'serveur', file: 'meubles/serveur.png', x: 470, y: 56, solid: [[0, 20, 32, 44]],
     leds: [1, 2, 3].map((n) => `effets/serveur-led-${n}.png`) },
   // Coin jeu en bas à gauche, coin télé contre le mur de droite.
   { key: 'coin-jeu', file: 'meubles/coin-jeu.png', x: 63, y: 264, solid: [[0, 18, 26, 39], [35, 11, 64, 53], [105, 20, 23, 39]],
