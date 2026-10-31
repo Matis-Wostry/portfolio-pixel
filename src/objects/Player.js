@@ -12,6 +12,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.body.setSize(config.hitbox.width, config.hitbox.height);
     this.body.setOffset(config.hitbox.x, config.hitbox.y);
     this.lastDirection = 'down';
+    this.createArms(scene, config);
     // L'ombre reste au sol, sous les meubles, et suit les pieds après chaque pas de la physique.
     if (config.shadow && scene.textures.exists(config.shadow.texture)) {
       this.shadow = scene.add.image(x, y + config.shadow.offsetY, config.shadow.texture).setDepth(-900);
@@ -39,6 +40,30 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
           frames: [{ key: config.texture, frame: start }],
         });
       }
+    });
+  }
+
+  // Deux copies du sprite rognées sur les colonnes hors de la hitbox et sur les lignes des bras, toujours au-dessus des meubles.
+  createArms(scene, config) {
+    const { x, width } = config.hitbox;
+    const columns = [[0, x], [x + width, config.frameWidth - x - width]];
+    this.arms = columns.map(([left, columnWidth]) => ({
+      left, columnWidth, sprite: scene.add.sprite(this.x, this.y, config.texture).setOrigin(config.origin.x, config.origin.y).setDepth(config.armsDepth),
+    }));
+    scene.events.on(Phaser.Scenes.Events.POST_UPDATE, this.syncArms, this);
+    this.once(Phaser.GameObjects.Events.DESTROY, () => {
+      scene.events.off(Phaser.Scenes.Events.POST_UPDATE, this.syncArms, this);
+      this.arms.forEach(({ sprite }) => sprite.destroy());
+    });
+  }
+
+  syncArms() {
+    this.arms.forEach(({ left, columnWidth, sprite }) => {
+      sprite.setVisible(!this.seat);
+      if (this.seat) return;
+      sprite.setTexture(this.texture.key, this.frame.name).setPosition(this.x, this.y).setFlip(this.flipX, this.flipY);
+      const { top, bottom } = this.config.armsRows;
+      sprite.setCrop(left, top, columnWidth, bottom - top);
     });
   }
 

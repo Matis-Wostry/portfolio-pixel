@@ -14,6 +14,11 @@ export const PLAYER = {
   rows: 4,
   origin: { x: 0.5, y: 1 },
   hitbox: { width: 16, height: 8, x: 8, y: 56 },
+  // Les bras (colonnes de part et d'autre de la hitbox, des épaules aux mains) sont redessinés par-dessus les meubles
+  // (dont la profondeur ne dépasse pas 400), sous le cadre et la boule en l'air : le corps, les jambes et les pieds
+  // passent derrière un meuble, pas les bras. `armsRows` : lignes du sprite, jambes et bottes exclues.
+  armsDepth: 8000,
+  armsRows: { top: 22, bottom: 47 },
   speed: 120,
   frameRate: 8,
   directions: ['down', 'up', 'left', 'right'],
