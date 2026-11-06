@@ -65,12 +65,17 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     return this.solidRects.some(({ left, right, top }) => from < right && to > left && feet <= top + 0.5);
   }
 
+  // Changer la profondeur relance le tri de toute la scène : uniquement si elle change vraiment.
+  updateDepth(object, depth) {
+    if (object.depth !== depth) object.setDepth(depth);
+  }
+
   syncArms() {
     const origin = this.x - this.config.origin.x * this.config.frameWidth;
     this.arms.forEach(({ left, columnWidth, sprite }) => {
       sprite.setVisible(!this.seat);
       if (this.seat) return;
-      sprite.setDepth(this.isBehindFurniture(origin + left, origin + left + columnWidth) ? this.depth + 0.01 : this.config.armsDepth);
+      this.updateDepth(sprite, this.isBehindFurniture(origin + left, origin + left + columnWidth) ? this.depth + 0.01 : this.config.armsDepth);
       sprite.setTexture(this.texture.key, this.frame.name).setPosition(this.x, this.y).setFlip(this.flipX, this.flipY);
       const { top, bottom } = this.config.armsRows;
       sprite.setCrop(left, top, columnWidth, bottom - top);
@@ -113,6 +118,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.setVelocity(x * this.config.speed, y * this.config.speed);
     this.lastDirection = facingDirection({ x, y }, this.lastDirection);
     this.play(`${this.config.texture}-${x || y ? 'walk' : 'idle'}-${this.lastDirection}`, true);
-    this.setDepth(this.getFeet().y);
+    this.updateDepth(this, this.getFeet().y);
   }
 }

@@ -9,6 +9,7 @@ export default class InteractionSystem {
     this.target = null;
     this.excluded = null;
     this.enabled = true;
+    this.touchQuery = window.matchMedia('(any-pointer: coarse), (max-width: 760px)');
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.zones.forEach((zone) => {
       const position = interactionCue(zone);
@@ -46,7 +47,7 @@ export default class InteractionSystem {
   }
 
   refreshCues() {
-    const touch = window.matchMedia('(any-pointer: coarse), (max-width: 760px)').matches;
+    const touch = this.touchQuery.matches;
     this.cues.forEach((cue) => {
       cue.container.setVisible(isCueVisible(cue.zone, this));
       const state = interactionCue(cue.zone, { active: this.enabled && cue.zone === this.target, touch });
