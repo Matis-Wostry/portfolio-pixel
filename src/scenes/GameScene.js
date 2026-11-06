@@ -90,8 +90,8 @@ export default class GameScene extends Phaser.Scene {
     this.interactions.exclude(id);
   }
 
-  standUp() {
-    this.player.stand();
+  standUp(direction) {
+    this.player.stand(direction);
     this.interactions.exclude(null);
   }
 
@@ -107,7 +107,7 @@ export default class GameScene extends Phaser.Scene {
     if (!this.player) return;
     const direction = this.controls.getDirection();
     // Assis, un déplacement fait se relever.
-    if (this.player.seat && !this.paused && (direction.x || direction.y)) this.standUp();
+    if (this.player.seat && !this.paused && (direction.x || direction.y)) this.standUp(direction);
     this.player.update(direction);
     if (this.paused) return;
     this.ui.setTarget(this.interactions.update(this.player.getFeet()));

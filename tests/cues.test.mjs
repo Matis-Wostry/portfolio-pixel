@@ -16,6 +16,10 @@ test('cue placement follows edited object geometry', () => {
   assert.equal(cue.y, 220);
 });
 
+test('a zone can place its cue explicitly when the default would leave the screen', () => {
+  assert.equal(interactionCue({ ...zone, cueY: 42 }).y, 42);
+});
+
 test('portfolio cues stay visible while the others only appear within reach', () => {
   const projets = { ...zone, id: 'bureau', action: 'projets' };
   const panier = { ...zone, id: 'panier', action: 'shoot' };

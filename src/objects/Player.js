@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { PLAYER } from '../config/player.js';
 import { facingDirection } from '../input/direction.mjs';
+import { armsBehindFurniture } from '../systems/arms.mjs';
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, config = PLAYER) {
@@ -59,10 +60,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     });
   }
 
-  // Derrière un meuble (pieds au-dessus du haut de son empreinte, bras au-dessus de elle) : les bras passent derrière lui.
   isBehindFurniture(from, to) {
-    const feet = this.body.bottom;
-    return this.solidRects.some(({ left, right, top }) => from < right && to > left && feet <= top + 0.5);
+    const { frameHeight, origin, armsRows } = this.config;
+    const armsBottom = this.y - origin.y * frameHeight + armsRows.bottom;
+    return armsBehindFurniture(this.solidRects, { from, to, feet: this.body.bottom, armsBottom });
   }
 
   // Changer la profondeur relance le tri de toute la scène : uniquement si elle change vraiment.
@@ -99,11 +100,14 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.shadow?.setVisible(false);
   }
 
-  stand() {
+  // Se lève du côté demandé si la place a une sortie dans cette direction, sinon là où le joueur s'est assis.
+  stand({ x = 0, y = 0 } = {}) {
     if (!this.seat) return;
+    const exit = x || y ? this.seat.exits?.[facingDirection({ x, y })] : null;
+    const { x: standX, y: standY } = exit ?? this.standPosition;
     this.seat = null;
     this.body.enable = true;
-    this.body.reset(this.standPosition.x, this.standPosition.y);
+    this.body.reset(standX, standY);
     this.shadow?.setVisible(true);
     this.update();
   }

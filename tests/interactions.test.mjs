@@ -11,6 +11,11 @@ test('normalizes Tiled properties and supplies the default radius', () => {
   assert.deepEqual(normalizeZone(object), { ...zone('bureau'), label: 'Bureau' });
 });
 
+test('an explicit cue position survives normalization', () => {
+  assert.equal(normalizeZone({ ...zone('a'), cueY: 42 }).cueY, 42);
+  assert.equal('cueY' in normalizeZone(zone('a')), false);
+});
+
 test('invalid rectangles, actions and rotated shapes are rejected', () => {
   for (const invalid of [{ width: -1 }, { x: NaN }, { radius: -1 }, { rotation: 10 }, { ellipse: true }, { action: 'unknown' }, { id: '' }]) {
     assert.equal(normalizeZone({ ...zone('a'), ...invalid }), null);

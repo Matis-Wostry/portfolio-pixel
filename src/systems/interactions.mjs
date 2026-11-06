@@ -16,6 +16,7 @@ export function normalizeZone(object) {
   if (!ACTIONS.has(zone.action)) return null;
   if (![zone.x, zone.y, zone.width, zone.height, zone.radius].every(Number.isFinite)) return null;
   if (zone.width <= 0 || zone.height <= 0 || zone.radius < 0) return null;
+  if (Number.isFinite(object.cueY)) zone.cueY = object.cueY;
   return zone;
 }
 

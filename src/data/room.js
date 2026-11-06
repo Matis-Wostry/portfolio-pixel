@@ -25,7 +25,8 @@ export const FURNITURE = [
   // Mur du fond, de gauche à droite : bibliothèque, bureau au centre, panier et serveur ; la bibliothèque et le serveur reposent sur la même
   // ligne que la poubelle (y = 112) ; tableau posé devant, à gauche du bureau.
   { key: 'bibliotheque', file: 'meubles/bibliotheque.png', x: 12, y: 16, solid: [[0, 56, 64, 40]],
-    zone: { id: 'bibliotheque', label: 'Présentation', action: 'about', rect: [0, 0, 64, 96] } },
+    // La bibliothèque touche le haut de la chambre : sa bulle se pose sur les étagères pour rester à l'écran sur téléphone.
+    zone: { id: 'bibliotheque', label: 'Présentation', action: 'about', rect: [0, 0, 64, 96], cueY: 26 } },
   // Empreinte du tableau en escalier, qui suit le dessin : son haut, qui penche, reste libre.
   { key: 'tableau', file: 'meubles/tableau-blanc.png', x: 100, y: 78, depthBySolid: true,
     solid: [[0, 41, 20, 54], [20, 37, 15, 45], [35, 34, 15, 42], [50, 30, 15, 40], [65, 28, 11, 37], [76, 57, 7, 13]],
@@ -62,8 +63,10 @@ export const FURNITURE = [
 // Places assises : position du joueur assis (bas des pieds, en coordonnées de la chambre), pose
 // (`personnage/assis-<pose>.png`), meuble de référence pour la profondeur et zone d'approche [x, y, largeur, hauteur].
 // `behind: true` place le joueur derrière le meuble (le dossier de la chaise de bureau cache le bas du corps).
+// `exits` : où le joueur se relève selon la direction demandée (pieds, en coordonnées de la chambre) ; le haut, côté bureau, n'en a pas.
 export const SEATS = [
-  { id: 'chaise-bureau', label: 'Chaise de bureau', pose: 'dos', x: 278, y: 156, furniture: 'chaise', behind: true, rect: [257, 148, 42, 40] },
+  { id: 'chaise-bureau', label: 'Chaise de bureau', pose: 'dos', x: 278, y: 156, furniture: 'chaise', behind: true, rect: [257, 148, 42, 40],
+    exits: { left: { x: 248, y: 170 }, right: { x: 308, y: 170 }, down: { x: 278, y: 197 } } },
 ];
 
 // Échiquier dessiné sur la table du coin jeu : coin haut-gauche dans l'image, cases de 2 pixels.
@@ -115,6 +118,7 @@ export const ROOM_ZONES = [
   ...FURNITURE.filter((item) => item.zone).map(({ x, y, zone }) => ({
     id: zone.id, label: zone.label, action: zone.action,
     x: x + zone.rect[0], y: y + zone.rect[1], width: zone.rect[2], height: zone.rect[3],
+    ...(zone.cueY === undefined ? {} : { cueY: y + zone.cueY }),
   })),
   ...SEATS.map(({ id, label, rect: [x, y, width, height] }) => ({ id, label, action: 'sit', x, y, width, height })),
 ];

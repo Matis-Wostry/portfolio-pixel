@@ -59,7 +59,7 @@ export default class Room {
     this.depths[item.key] = depth;
     item.solid?.forEach(([x, y, width, height]) => {
       this.solids.add(scene.add.zone(item.x + x + width / 2, item.y + y + height / 2, width, height));
-      this.solidRects.push({ left: item.x + x, right: item.x + x + width, top: item.y + y });
+      this.solidRects.push({ left: item.x + x, right: item.x + x + width, top: item.y + y, imageTop: item.y });
     });
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     item.overlays?.forEach((overlay) => {

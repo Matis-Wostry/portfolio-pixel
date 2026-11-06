@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { ROOM_ZONES, SEATS, FURNITURE, CHESS_TABLE, PAPER_SHOT } from '../src/data/room.js';
+import { ROOM, TILE, ROOM_ZONES, SEATS, FURNITURE, CHESS_TABLE, PAPER_SHOT } from '../src/data/room.js';
+import { interactionCue } from '../src/systems/cues.mjs';
+import { armsBehindFurniture } from '../src/systems/arms.mjs';
 import { fromFEN, gameStatus, isAttacked } from '../src/chess/engine.mjs';
 import { PLAYER } from '../src/config/player.js';
 import { ACTION_ICONS } from '../src/config/interface.js';
@@ -20,6 +22,49 @@ test('seats use an existing pose and furniture, and every action has an icon', (
     assert.ok(keys.has(seat.furniture), seat.id);
   });
   ROOM_ZONES.forEach(({ action }) => assert.ok(ACTION_ICONS[action], action));
+});
+
+const solidRects = () => FURNITURE.flatMap((item) => (item.solid ?? []).map(([x, y, width, height]) => ({
+  left: item.x + x, right: item.x + x + width, top: item.y + y, bottom: item.y + y + height,
+})));
+
+// La bulle doit rester à l'écran quand le joueur est à portée, même avec la chambre plein écran sur téléphone (844 × 390).
+test('the bookcase cue stays on screen while its zone is in reach on a landscape phone', () => {
+  const zoom = Math.max(844 / (ROOM.columns * TILE), 390 / (ROOM.rows * TILE));
+  const halfView = 390 / zoom / 2;
+  // Bulle de 26 px, décalée de 2 px et qui flotte de 4 px vers le haut.
+  const BUBBLE_TOP = 15;
+  const zone = normalizeZones(ROOM_ZONES).find(({ id }) => id === 'bibliotheque');
+  const { y } = interactionCue(zone);
+  const farthestFeet = zone.y + zone.height + zone.radius;
+  const cameraTop = Math.max(0, farthestFeet - halfView);
+  assert.ok(y - BUBBLE_TOP >= cameraTop, `bulle à ${y}, haut de l'écran à ${cameraTop}`);
+});
+
+test('standing up in any direction lands the player clear of every obstacle', () => {
+  const { width, height, x: hitX, y: hitY } = PLAYER.hitbox;
+  SEATS.forEach((seat) => {
+    assert.deepEqual(Object.keys(seat.exits).sort(), ['down', 'left', 'right'], seat.id);
+    Object.entries(seat.exits).forEach(([direction, exit]) => {
+      const left = exit.x - PLAYER.frameWidth * PLAYER.origin.x + hitX;
+      const top = exit.y - PLAYER.frameHeight * PLAYER.origin.y + hitY;
+      const blocked = solidRects().some((solid) => left < solid.right && left + width > solid.left && top < solid.bottom && top + height > solid.top);
+      assert.equal(blocked, false, `${seat.id} : sortie ${direction}`);
+    });
+    assert.ok(seat.exits.left.x < seat.x && seat.exits.right.x > seat.x && seat.exits.down.y > seat.y, seat.id);
+  });
+});
+
+test('the arms only hide behind furniture that actually reaches their height', () => {
+  const rects = FURNITURE.flatMap((item) => (item.solid ?? []).map(([x, y, width]) => ({
+    left: item.x + x, right: item.x + x + width, top: item.y + y, imageTop: item.y,
+  })));
+  // Bras gauche à côté de la bibliothèque : le coin jeu est 150 px plus bas, il ne compte pas.
+  assert.equal(armsBehindFurniture(rects, { from: 68, to: 76, feet: 105, armsBottom: 88 }), false);
+  // Derrière le tableau, au-dessus de son empreinte et à hauteur de son image : les bras passent derrière.
+  assert.equal(armsBehindFurniture(rects, { from: 122, to: 130, feet: 100, armsBottom: 83 }), true);
+  // Devant le même tableau, les pieds sous son empreinte : les bras restent visibles.
+  assert.equal(armsBehindFurniture(rects, { from: 122, to: 130, feet: 180, armsBottom: 163 }), false);
 });
 
 test('the table chess positions are light, legal and playable', () => {
