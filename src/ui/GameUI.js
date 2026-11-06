@@ -225,10 +225,11 @@ export default class GameUI {
   }
 
   // Ouvre la fenêtre avec le contenu déjà en place ; `focusTarget` reçoit le clavier (le bouton Fermer par défaut).
-  show(title, { terminal = false, board = false, focusTarget = this.dialog.querySelector('.close-button') } = {}) {
+  show(title, { terminal = false, board = false, chess = false, focusTarget = this.dialog.querySelector('.close-button') } = {}) {
     this.dialog.querySelector('h1').textContent = title;
     this.dialog.classList.toggle('is-terminal', terminal);
     this.dialog.classList.toggle('is-board', board);
+    this.dialog.classList.toggle('is-chess', chess);
     this.audio?.play('open');
     this.dialog.showModal();
     this.syncPause();
@@ -241,7 +242,7 @@ export default class GameUI {
     this.chess = this.chess ?? new ChessView({ audio: this.audio });
     this.dialog.querySelector('.dialog-content').replaceChildren(this.chess.element);
     this.chess.render();
-    this.show('Échecs');
+    this.show('Échecs', { chess: true });
   }
 
   openTerminal(content) {

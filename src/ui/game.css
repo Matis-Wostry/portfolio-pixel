@@ -94,6 +94,25 @@ canvas { display: block; image-rendering: pixelated; outline: none; }
   .board-face { flex-direction: column; }
   .board-magnets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 10px; width: auto; padding: 14px; }
 }
+/* Téléphone en paysage : rien ne peut défiler sur le tableau (glisser le fait basculer), tout doit donc tenir à l'écran.
+   Sans pied et sans roulettes, les montants descendent jusqu'en bas ; le pivot reste au milieu du tableau. */
+@media (max-height: 520px) and (min-width: 541px) {
+  .portfolio-dialog.is-board { width: min(760px, calc(100% - 32px)); max-height: calc(100dvh - 8px); }
+  .skills-board { padding: 0 22px; }
+  .board-post { top: calc(50% - 10px); bottom: 0; }
+  .board-foot { display: none; }
+  .board-face { min-height: min(calc(100dvh - 40px), 300px); }
+  .board-content { padding: 8px 10px 6px 14px; }
+  .board-title { margin: 0 0 6px; font-size: 20px; }
+  .board-notes { gap: 5px; }
+  .board-notes li { gap: 4px; padding: 3px 6px; font-size: 12px; }
+  .board-logo { width: 14px; height: 14px; }
+  .board-magnets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 10px 6px; width: clamp(170px, 30vw, 230px); padding: 10px 8px 6px 0; }
+  .board-magnet { padding: 8px 5px 3px; font-size: 11px; }
+  .board-magnet::before { top: -5px; width: 10px; height: 10px; margin-left: -5px; }
+  .is-board .dialog-header { top: -4px; right: -6px; }
+  .is-board .close-button { width: 40px; min-width: 40px; min-height: 40px; }
+}
 .orientation-dialog { width: min(440px, calc(100% - 32px)); overflow-y: auto; }
 .orientation-content { padding: 24px; text-align: center; line-height: 1.6; }
 .orientation-content h1 { font-size: 24px; margin: 8px 0; }
@@ -129,6 +148,18 @@ canvas { display: block; image-rendering: pixelated; outline: none; }
 .chess-square:focus-visible { outline: 3px solid #ffece7; outline-offset: -3px; z-index: 1; }
 .chess-new { min-height: 48px; padding: 8px 16px; color: #ffece7; background: #86302a; border: 2px solid #1d171b; font: inherit; cursor: pointer; }
 .chess-new:focus-visible { outline: 3px solid #ffece7; outline-offset: 3px; }
+/* Téléphone en paysage : l'échiquier prend toute la hauteur à gauche, le reste passe à droite ; le titre reste
+   pour les lecteurs d'écran et le bouton Fermer se cale dans le coin. */
+@media (max-height: 520px) {
+  .portfolio-dialog.is-chess { max-height: calc(100dvh - 16px); }
+  .is-chess .dialog-header { position: absolute; top: 8px; right: 8px; z-index: 1; padding: 0; border: 0; }
+  .is-chess .dialog-header h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .is-chess .dialog-content { padding: 8px 12px; }
+  .chess { grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 1fr auto; align-items: center; gap: 8px 16px; }
+  .chess-board { --square: min(48px, calc((100vw - 200px) / 8), calc((100dvh - 56px) / 8)); grid-area: 1 / 1 / 3 / 2; }
+  .chess-status { grid-area: 1 / 2; padding-top: 48px; }
+  .chess-new { grid-area: 2 / 2; }
+}
 /* Terminal de l'ordinateur : écran sombre, texte à chasse fixe, commandes cliquables soulignées en pointillés. */
 .portfolio-dialog.is-terminal { width: min(720px, calc(100% - 32px)); height: min(560px, calc(100dvh - 48px)); background: #140f17; }
 .is-terminal .dialog-content { display: flex; padding: 0; overflow: hidden; }
