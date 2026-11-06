@@ -98,7 +98,7 @@ canvas { display: block; image-rendering: pixelated; outline: none; }
 .orientation-content { padding: 24px; text-align: center; line-height: 1.6; }
 .orientation-content h1 { font-size: 24px; margin: 8px 0; }
 .orientation-phone { width: 80px; height: 80px; color: #f2b66d; animation: turn-phone 2.4s ease-in-out infinite; }
-.orientation-note { font-size: 13px; color: #1d171b; }
+.orientation-note { font-size: 13px; color: #afa7ad; }
 @keyframes turn-phone { 0%, 20% { transform: rotate(0); } 65%, 100% { transform: rotate(90deg); } }
 @media (prefers-reduced-motion: reduce) { .orientation-phone { animation: none; transform: rotate(90deg); } }
 @media (any-pointer: coarse), (max-width: 760px) {
@@ -175,7 +175,7 @@ canvas { display: block; image-rendering: pixelated; outline: none; }
 .carousel-slide[data-offset="-1"]:hover, .carousel-slide[data-offset="1"]:hover { opacity: 0.7; }
 .carousel-slide[data-offset="-2"], .carousel-slide[data-offset="2"] { opacity: 0; pointer-events: none; transform: scale(0.6); }
 .carousel-nav { display: flex; align-items: center; justify-content: center; gap: 4px; }
-.carousel-arrow { min-width: 40px; min-height: 40px; margin: 0 8px; padding: 0; color: #ffece7; background: #2b2025; border: 2px solid #a84d36; font: 22px/1 inherit; cursor: pointer; touch-action: manipulation; }
+.carousel-arrow { min-width: 40px; min-height: 40px; margin: 0 8px; padding: 0; color: #ffece7; background: #2b2025; border: 2px solid #a84d36; font-family: inherit; font-size: 22px; line-height: 1; cursor: pointer; touch-action: manipulation; }
 .carousel-arrow:hover { background: #86302a; }
 .carousel-dot { display: grid; place-items: center; width: 28px; height: 28px; padding: 0; background: none; border: 0; cursor: pointer; }
 .carousel-dot::before { content: ''; width: 10px; height: 10px; background: #3a2929; border: 2px solid #a84d36; }
