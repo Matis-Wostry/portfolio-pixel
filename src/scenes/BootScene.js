@@ -15,8 +15,8 @@ export default class BootScene extends Phaser.Scene {
   }
 
   preload() {
-    // Le JavaScript est arrivé : la barre de progression prend le relais du message de index.html.
-    document.getElementById('boot-screen')?.remove();
+    // Le jeu est arrivé : sa barre de progression prend le relais de l'écran-titre.
+    document.getElementById('title-screen')?.remove();
     this.failedFiles = new Set();
     const onError = (file) => this.failedFiles.add(file.key);
     this.load.on('loaderror', onError);

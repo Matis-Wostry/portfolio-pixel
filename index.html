@@ -19,19 +19,28 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     html, body { margin: 0; height: 100%; background: #140f17; color: #ffece7; font-family: system-ui, sans-serif; }
-    .boot-screen { display: grid; place-items: center; height: 100%; }
     .no-script { max-width: 560px; padding: 24px; line-height: 1.6; }
     .no-script a { color: #f2b66d; }
   </style>
 </head>
 <body>
-  <div class="boot-screen" id="boot-screen" role="status">Chargement de la chambre…</div>
+  <main class="title-screen" id="title-screen">
+    <h1 class="title-name">La Chambre du Dev</h1>
+    <div class="title-menu">
+      <button class="title-item is-selected" type="button" data-enter>Entrer dans le jeu</button>
+      <a class="title-item" href="https://portfolio.matis-wostry.com/">Portfolio classique</a>
+    </div>
+    <p class="title-keys">↑ ↓ pour choisir · Entrée pour valider · ou clique</p>
+    <p class="title-status" role="status"></p>
+    <p class="title-credit">Matis Wostry · Développeur full-stack junior</p>
+  </main>
   <noscript>
-    <style>.boot-screen { display: none; }</style>
+    <style>#title-screen { display: none; }</style>
     <div class="no-script">
       <h1>La Chambre du Dev</h1>
-      <p>Le portfolio de Matis Wostry, développeur full-stack junior, est une chambre en pixel art à explorer : il a besoin de JavaScript pour s'afficher.</p>
+      <p>Le portfolio de Matis Wostry, développeur full-stack junior, est une chambre en pixel art à explorer : le jeu a besoin de JavaScript pour s'afficher.</p>
       <p>
+        <a href="https://portfolio.matis-wostry.com/">Portfolio classique</a> ·
         <a href="https://matis-wostry.com/assets/cv/CV_Matis_Wostry.pdf">CV (PDF)</a> ·
         <a href="https://www.linkedin.com/in/matis-wostry/">LinkedIn</a> ·
         <a href="https://github.com/Matis-Wostry">GitHub</a> ·

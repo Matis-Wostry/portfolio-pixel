@@ -25,6 +25,10 @@ npm run build
 
 Les tests des déplacements, commandes, interactions et calculs de caméra s'exécutent avec `npm test` (Node.js 20 ou supérieur recommandé).
 
+## Écran-titre
+
+`matis-wostry.com` s'ouvre sur un menu de jeu écrit dans `index.html` (`src/ui/titleScreen.js`, `src/ui/title.css`) : « Entrer dans le jeu » ou « Portfolio classique », vers `portfolio.matis-wostry.com`. Phaser n'est téléchargé qu'en entrant dans le jeu (`src/game.js`).
+
 ## Commandes
 
 - Ordinateur : flèches, ZQSD ou WASD pour bouger ; E ou Espace pour interagir.
@@ -41,7 +45,6 @@ Les logos des post-it de compétences (`public/assets/interface/logos/`) viennen
 
 ## Son
 
-Le jeu s'ouvre directement sur la chambre.
 Les bruitages sont synthétisés dans le navigateur ; aucune musique n'est jouée sans fichier.
 Le bouton son, en haut à droite, est mémorisé dans le navigateur.
 
@@ -61,7 +64,8 @@ Un fichier absent ou invalide est ignoré avec un avertissement.
 │       └── personnage/     # Un fichier par pas : face-1.png … droite-4.png
 ├── scripts/                # Génération d'assets (écrans du bureau, icônes, échecs) et leurs sources
 ├── src/
-│   ├── main.js             # Initialisation du jeu
+│   ├── main.js             # Écran-titre, puis chargement du jeu à la demande
+│   ├── game.js             # Initialisation de Phaser
 │   ├── audio/              # Sons synthétisés et préférence de sourdine
 │   ├── chess/              # Moteur d'échecs sans dépendance
 │   ├── config/             # Sprite, hitbox et calculs de caméra
