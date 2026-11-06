@@ -1,15 +1,9 @@
 import { appendLinks } from './renderContent.js';
 import { PLAYER } from '../config/player.js';
 import { INTERFACE_DIR } from '../config/interface.js';
+import { element } from './dom.js';
 
 const PORTRAIT = `${import.meta.env.BASE_URL}${PLAYER.dir}/face-1.png`;
-
-const element = (tag, className, text) => {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  if (text !== undefined) node.textContent = text;
-  return node;
-};
 
 function section(title, ...children) {
   const block = element('section', 'persona-section');

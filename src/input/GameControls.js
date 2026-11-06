@@ -14,7 +14,6 @@ export default class GameControls {
     this.visibility = visibility;
     this.enabled = true;
     this.pressed = new Set();
-    this.blocked = new Set();
     this.joystick = { x: 0, y: 0 };
     this.action = false;
     this.onKeyDown = (event) => {
@@ -25,15 +24,12 @@ export default class GameControls {
       // Un bouton de l'interface (son, Ouvrir) garde Espace/Entrée ; les déplacements restent au jeu.
       if (ACTION.has(event.code) && event.target?.closest?.('button')) return;
       event.preventDefault();
+      // Une touche restée enfoncée pendant une fenêtre ne compte qu'après avoir été relâchée : ses répétitions sont ignorées.
       if (event.repeat || this.pressed.has(event.code)) return;
-      this.blocked.delete(event.code);
       this.pressed.add(event.code);
       if (ACTION.has(event.code)) this.requestAction();
     };
-    this.onKeyUp = (event) => {
-      this.pressed.delete(event.code);
-      this.blocked.delete(event.code);
-    };
+    this.onKeyUp = (event) => this.pressed.delete(event.code);
     this.onBlur = () => this.reset();
     this.onVisibility = () => { if (visibility.hidden) this.reset(); };
     target.addEventListener('keydown', this.onKeyDown);
@@ -46,7 +42,7 @@ export default class GameControls {
     if (!this.enabled) return { x: 0, y: 0 };
     const direction = { x: 0, y: 0 };
     // Multiple keys for the same direction count as one input.
-    const values = [...this.pressed].filter((key) => !this.blocked.has(key)).map((key) => MOVEMENT[key]).filter(Boolean);
+    const values = [...this.pressed].map((key) => MOVEMENT[key]).filter(Boolean);
     direction.x = Number(values.some(([x]) => x > 0)) - Number(values.some(([x]) => x < 0));
     direction.y = Number(values.some(([, y]) => y > 0)) - Number(values.some(([, y]) => y < 0));
     return values.length ? resolveDirection(direction) : resolveDirection({}, this.joystick);
@@ -67,7 +63,6 @@ export default class GameControls {
   }
 
   reset() {
-    this.pressed.forEach((key) => this.blocked.add(key));
     this.pressed.clear();
     this.joystick = { x: 0, y: 0 };
     this.action = false;

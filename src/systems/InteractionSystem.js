@@ -36,10 +36,6 @@ export default class InteractionSystem {
     return this.target;
   }
 
-  activate() {
-    return this.target?.action ?? null;
-  }
-
   // Ignore une zone (la place où le joueur est assis) ; null pour toutes les reprendre.
   exclude(id) {
     this.excluded = id;

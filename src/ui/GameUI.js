@@ -19,10 +19,7 @@ export default class GameUI {
     this.root = document.createElement('div');
     this.root.className = 'game-ui';
     this.root.innerHTML = `
-      <div class="game-help">
-        <span class="desktop-help">Flèches / ZQSD / WASD · Approche une bulle et appuie sur E pour ouvrir</span>
-        <span class="mobile-help">Joystick pour bouger · Approche une bulle puis touche Ouvrir</span>
-      </div>
+      <div class="game-help">Flèches / ZQSD / WASD · Approche une bulle et appuie sur E pour ouvrir</div>
       <p class="interaction-hint sr-only" role="status" aria-live="polite"></p>
       <div class="touch-controls">
         <div class="joystick" aria-label="Joystick de déplacement">

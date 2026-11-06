@@ -4,7 +4,7 @@ export const PORTFOLIO = {
   // Ouvert dans le terminal de l'ordinateur : un dossier par contexte (`categories`), un projet par carte.
   projets: {
     title: 'Projets',
-    paragraphs: ['Des projets en ligne, du site vitrine à l’API, pensés, codés et déployés de bout en bout.'],
+    paragraphs: [],
     links: [],
     categories: [
       { id: 'pro', title: 'Projets pro', description: 'En entreprise et en freelance.' },
@@ -113,10 +113,7 @@ export const PORTFOLIO = {
   // Fiche persona : affichée par renderPersona (portrait, objectifs, curseurs, parcours).
   about: {
     title: 'Présentation',
-    paragraphs: [
-      'Je suis Matis Wostry, développeur full-stack junior et étudiant à CREA Genève.',
-      'Je recherche une alternance d’un an à Genève, à partir de septembre 2027.',
-    ],
+    paragraphs: [],
     persona: {
       name: 'Matis Wostry',
       role: 'Développeur full-stack junior',

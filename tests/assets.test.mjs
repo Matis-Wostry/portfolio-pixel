@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { isSafeAssetPath, listConfigured, isUsableArtSize } from '../src/systems/assetManifest.mjs';
+import { isSafeAssetPath, listConfigured } from '../src/systems/assetManifest.mjs';
 
 test('accepts only relative paths inside public', () => {
   for (const path of ['assets/title/sky.png', 'assets/audio/sfx/click.mp3']) assert.equal(isSafeAssetPath(path), true, path);
@@ -20,11 +20,4 @@ test('reports unsafe or malformed entries without loading them', () => {
   assert.deepEqual(result.files, []);
   assert.deepEqual(result.invalid, ['sky', 'city', 'building', 'street']);
   assert.deepEqual(listConfigured('music-', null), { files: [], invalid: [] });
-});
-
-test('accepts designer layers only at the world size', () => {
-  const world = { width: 480, height: 300 };
-  assert.equal(isUsableArtSize({ width: 480, height: 300 }, world), true);
-  assert.equal(isUsableArtSize({ width: 960, height: 600 }, world), false);
-  assert.equal(isUsableArtSize(null, world), false);
 });

@@ -12,7 +12,6 @@ canvas { display: block; image-rendering: pixelated; outline: none; }
 .sound-button:focus-visible { outline: 3px solid #ffece7; outline-offset: 3px; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 .touch-controls { display: none; }
-.mobile-help { display: none; }
 .joystick { position: absolute; left: max(20px, env(safe-area-inset-left)); bottom: max(28px, env(safe-area-inset-bottom)); width: 120px; height: 120px; border: 3px solid #1d171b; border-radius: 50%; background: #2b2025cc; pointer-events: auto; touch-action: none; user-select: none; }
 .joystick-knob { position: absolute; inset: 35px; border-radius: 50%; background: #f7cc9b; border: 3px solid #5a2522; }
 .action-button { position: absolute; right: max(20px, env(safe-area-inset-right)); bottom: max(40px, env(safe-area-inset-bottom)); min-width: 100px; min-height: 64px; padding: 12px; border: 3px solid #1d171b; border-radius: 12px; background: #86302a; color: #ffece7; font: inherit; pointer-events: auto; touch-action: manipulation; }
@@ -40,12 +39,6 @@ canvas { display: block; image-rendering: pixelated; outline: none; }
 }
 .dialog-content p { margin: 0 0 16px; }
 .dialog-content a { display: block; color: #f2b66d; padding: 12px 0; min-height: 48px; }
-.portfolio-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 16px 0; }
-.portfolio-card { display: flex; flex-direction: column; padding: 16px; border: 2px solid #a84d36; background: #3a2929; }
-.portfolio-card h2 { margin: 0 0 8px; font-size: 17px; line-height: 1.4; }
-.portfolio-card p { font-size: 14px; margin-bottom: 12px; }
-.portfolio-tags { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; margin: 0 0 12px; }
-.portfolio-tags li { padding: 2px 6px; font-size: 12px; color: #f7cc9b; background: #86302a; border: 1px solid #a84d36; }
 .portfolio-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
 .portfolio-links a { display: inline-flex; align-items: center; justify-content: center; padding: 8px 12px; min-height: 48px; border: 2px solid #a84d36; text-decoration: none; font-size: 14px; }
 .portfolio-links a:hover { background: #86302a; }
@@ -88,7 +81,6 @@ canvas { display: block; image-rendering: pixelated; outline: none; }
 .is-board .close-button::before { content: "×"; font-size: 28px; line-height: 1; }
 @media (prefers-reduced-motion: reduce) { .board { transition: none; } }
 @media (max-width: 540px) {
-  .portfolio-cards { grid-template-columns: 1fr; }
   .dialog-content { padding: 16px; }
   /* Sur téléphone, les étiquettes passent sous les post-it, deux par ligne. */
   .board-face { flex-direction: column; }
@@ -122,8 +114,6 @@ canvas { display: block; image-rendering: pixelated; outline: none; }
 @media (prefers-reduced-motion: reduce) { .orientation-phone { animation: none; transform: rotate(90deg); } }
 @media (any-pointer: coarse), (max-width: 760px) {
   .touch-controls { display: block; }
-  .desktop-help { display: none; }
-  .mobile-help { display: inline; }
   /* Sur téléphone, la chambre remplit l'écran : pas de bandeau d'aide et des commandes plus compactes. */
   .game-help { display: none; }
   .sound-button { width: 40px; height: 40px; border-width: 2px; }

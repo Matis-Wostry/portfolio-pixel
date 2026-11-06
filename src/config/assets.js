@@ -3,5 +3,5 @@
 // Voir docs/design/demandes-designer.md pour les formats attendus.
 export const AUDIO_FILES = {
   music: { room: null },
-  sfx: { click: null, open: null, close: null, enter: null, swish: null, rim: null, key: null },
+  sfx: { click: null, open: null, close: null, swish: null, rim: null, key: null },
 };

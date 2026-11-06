@@ -15,7 +15,3 @@ export function listConfigured(prefix, entries) {
   });
   return { files, invalid };
 }
-
-export function isUsableArtSize(size, world) {
-  return Boolean(size) && size.width === world.width && size.height === world.height;
-}

@@ -1,14 +1,8 @@
 import { INTERFACE_DIR, SKILL_LOGOS } from '../config/interface.js';
+import { element } from './dom.js';
 
 // Degrés de rotation par pixel de glissé pendant qu'on tient le tableau.
 const DRAG_RATIO = 1.2;
-
-const element = (tag, className, text) => {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  if (text !== undefined) node.textContent = text;
-  return node;
-};
 
 // Compétences sur un tableau blanc sur pied, une catégorie par face : titre au feutre, technos en post-it et,
 // à droite, une étiquette aimantée par catégorie. Le tableau bascule de haut en bas pour changer de catégorie :

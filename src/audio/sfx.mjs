@@ -6,7 +6,6 @@ export const SFX = {
   click: [tone('square', 520, 660, 0, 0.05, 0.15)],
   open: [tone('square', 392, 392, 0, 0.07, 0.12), tone('square', 587, 587, 0.07, 0.1, 0.12)],
   close: [tone('square', 587, 587, 0, 0.07, 0.12), tone('square', 392, 392, 0.07, 0.1, 0.12)],
-  enter: [tone('triangle', 220, 880, 0, 0.45, 0.18)],
   // Boule de papier : froissement du filet, ou choc métallique sur l'arceau.
   swish: [tone('noise', 3000, 1200, 0, 0.22, 0.2)],
   // Touche du clavier du terminal : petit clic sec.
