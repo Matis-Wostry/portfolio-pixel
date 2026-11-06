@@ -81,7 +81,7 @@ export default class Room {
         scene.tweens.add({ targets: layer, alpha: { from: 0.55, to: 1 }, duration: 1400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
       }
     });
-    if (item.leds) this.animateLeds(item, depth + 0.5);
+    if (item.leds) this.animateLeds(item, depth + 0.5, reducedMotion);
     if (item.chess) this.chess = new TableChess(scene, { x: item.x, y: item.y, depth: depth + 0.5 });
   }
 
@@ -119,9 +119,10 @@ export default class Room {
     next();
   }
 
-  animateLeds(item, depth) {
+  animateLeds(item, depth, reducedMotion) {
     const keys = item.leds.map((_, index) => ledKey(index));
     const led = this.scene.add.image(item.x, item.y, keys[0]).setOrigin(0).setDepth(depth);
+    if (reducedMotion) return;
     let index = 0;
     this.scene.time.addEvent({
       delay: 350,
