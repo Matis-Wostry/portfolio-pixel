@@ -106,7 +106,12 @@ export default class SkillsBoard {
       drag = { y: event.clientY, moved: false, direction: 0, tilt: 0 };
     });
     this.board.addEventListener('pointermove', (event) => {
-      if (!drag) return;
+      if (!drag || drag.released) return;
+      // Bouton relâché hors du tableau, avant la capture : le survol ne doit pas continuer le glissé.
+      if (!event.buttons) {
+        release();
+        return;
+      }
       const dy = event.clientY - drag.y;
       if (!drag.moved && Math.abs(dy) < 6) return;
       if (!drag.moved) {
