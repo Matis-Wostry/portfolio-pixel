@@ -19,6 +19,8 @@ export default class GameControls {
     this.action = false;
     this.onKeyDown = (event) => {
       if (!MOVEMENT[event.code] && !ACTION.has(event.code)) return;
+      // Ctrl+S, Alt+← ou Cmd+D restent au navigateur.
+      if (event.ctrlKey || event.altKey || event.metaKey) return;
       if (!this.enabled || event.target?.closest?.('input, textarea, select, dialog, [contenteditable]')) return;
       // Un bouton de l'interface (son, Ouvrir) garde Espace/Entrée ; les déplacements restent au jeu.
       if (ACTION.has(event.code) && event.target?.closest?.('button')) return;

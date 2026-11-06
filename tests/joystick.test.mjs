@@ -50,6 +50,19 @@ test('dialog resets inputs and held keys require release before resuming', () =>
   controls.destroy();
 });
 
+test('browser shortcuts stay with the browser and do not move the player', () => {
+  const { controls, key } = setup();
+  for (const extra of [{ ctrlKey: true }, { altKey: true }, { metaKey: true }]) {
+    assert.equal(key('keydown', 'KeyS', extra).defaultPrevented, false);
+    assert.equal(key('keydown', 'ArrowLeft', extra).defaultPrevented, false);
+    assert.equal(key('keydown', 'KeyE', extra).defaultPrevented, false);
+  }
+  assert.deepEqual(controls.getDirection(), { x: 0, y: 0 });
+  assert.equal(controls.consumeAction(), false);
+  assert.equal(key('keydown', 'KeyS', { shiftKey: true }).defaultPrevented, true);
+  controls.destroy();
+});
+
 test('tactile action does not cancel joystick and cancellation clears both', () => {
   const { controls } = setup();
   controls.setJoystick({ x: 0, y: -0.5 });
