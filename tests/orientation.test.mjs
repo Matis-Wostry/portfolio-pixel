@@ -11,6 +11,12 @@ test('suggests landscape only for a mobile portrait layout', () => {
   assert.equal(suggestion.shouldOpen({ width: 0, height: 800, coarsePointer: true }), false);
 });
 
+test('a narrow desktop window without touch is never asked to rotate', () => {
+  const suggestion = new LandscapeSuggestion();
+  assert.equal(suggestion.shouldOpen({ width: 683, height: 728, coarsePointer: false }), false);
+  assert.equal(suggestion.mobilePortrait, false);
+});
+
 test('dismissal survives portrait resizing and resets on a new portrait visit', () => {
   const suggestion = new LandscapeSuggestion();
   const portrait = { width: 390, height: 844, coarsePointer: true };
