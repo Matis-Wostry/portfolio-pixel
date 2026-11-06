@@ -15,6 +15,8 @@ export default class BootScene extends Phaser.Scene {
   }
 
   preload() {
+    // Le JavaScript est arrivé : la barre de progression prend le relais du message de index.html.
+    document.getElementById('boot-screen')?.remove();
     this.failedFiles = new Set();
     const onError = (file) => this.failedFiles.add(file.key);
     this.load.on('loaderror', onError);
@@ -35,10 +37,10 @@ export default class BootScene extends Phaser.Scene {
       });
     }
     this.optionalFiles = [
-      ...this.configuredFiles('music-', AUDIO_FILES.music, 'audio'),
-      ...this.configuredFiles('sfx-', AUDIO_FILES.sfx, 'audio'),
+      ...this.configuredFiles('music-', AUDIO_FILES.music),
+      ...this.configuredFiles('sfx-', AUDIO_FILES.sfx),
     ];
-    this.optionalFiles.forEach(({ key, path, type }) => this.load[type](key, assetURL(path)));
+    this.optionalFiles.forEach(({ key, path }) => this.load.audio(key, assetURL(path)));
     const { width, height } = this.scale;
     const bar = this.add.rectangle(width / 2, height / 2, 0, 8, 0xffffff);
     const progress = (value) => bar.setSize(width * value, 8);
@@ -58,16 +60,16 @@ export default class BootScene extends Phaser.Scene {
     }
     // Un fichier absent peut revenir en 200 (page HTML du serveur) et échouer au décodage
     // sans loaderror : on vérifie donc ce qui a réellement été chargé.
-    this.optionalFiles.filter(({ key, type }) => !(type === 'image' ? this.textures.exists(key) : this.cache.audio.exists(key)))
+    this.optionalFiles.filter(({ key }) => !this.cache.audio.exists(key))
       .forEach(({ key, path }) => console.warn(`Fichier ${path} inutilisable pour ${key} : version générée utilisée.`));
     if (!this.textures.exists(PLAYER.texture) && !this.createPlayerSheet()) this.createPlaceholder();
     this.scene.start('GameScene');
   }
 
-  configuredFiles(prefix, entries, type) {
+  configuredFiles(prefix, entries) {
     const { files, invalid } = listConfigured(prefix, entries);
     invalid.forEach((name) => console.warn(`Chemin ignoré pour ${prefix}${name} : indiquer un chemin relatif au dossier public/.`));
-    return files.map((file) => ({ ...file, type }));
+    return files;
   }
 
   showError() {
