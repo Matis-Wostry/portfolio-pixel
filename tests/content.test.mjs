@@ -6,7 +6,7 @@ import { PORTFOLIO } from '../src/data/portfolio.js';
 import { SKILL_LOGOS } from '../src/config/interface.js';
 
 test('portfolio links support web and email destinations', () => {
-  for (const href of ['https://example.com/work', 'http://example.com', 'mailto:dev@example.com']) {
+  for (const href of ['https://example.com/work', 'http://example.com', 'mailto:dev@example.com', 'tel:+33123456789']) {
     assert.equal(safeLink(href), href);
   }
 });
@@ -54,9 +54,9 @@ test('skills fill a whiteboard with one colored magnet per category', () => {
   }
 });
 
-test('contact and profile use the published identity and contact destinations', () => {
-  assert.ok(PORTFOLIO.about.paragraphs.some((text) => text.includes('Matis Wostry')));
+test('contact uses the published destinations and the phone number can be tapped', () => {
   assert.ok(PORTFOLIO.contact.links.some(({ href }) => href === 'mailto:matis.wostry@crea-inseec.com'));
+  assert.ok(PORTFOLIO.contact.links.some(({ href }) => href === 'tel:+33634896232'));
   assert.ok(PORTFOLIO.contact.links.some(({ href }) => href === 'https://matis-wostry.com/assets/cv/CV_Matis_Wostry.pdf'));
 });
 

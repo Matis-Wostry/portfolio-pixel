@@ -166,9 +166,10 @@ export const PORTFOLIO = {
   },
   contact: {
     title: 'Contact',
-    paragraphs: ['Discutons d’un projet ou d’une alternance.', '+33 6 34 89 62 32'],
+    paragraphs: ['Discutons d’un projet ou d’une alternance.'],
     links: [
       { label: 'Email', href: 'mailto:matis.wostry@crea-inseec.com' },
+      { label: '+33 6 34 89 62 32', href: 'tel:+33634896232' },
       { label: 'LinkedIn', href: 'https://www.linkedin.com/in/matis-wostry/' },
       { label: 'GitHub', href: 'https://github.com/Matis-Wostry' },
       { label: 'CV (PDF)', href: 'https://matis-wostry.com/assets/cv/CV_Matis_Wostry.pdf' },
