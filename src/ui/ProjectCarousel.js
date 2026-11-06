@@ -51,6 +51,12 @@ export default class ProjectCarousel {
       slide.setAttribute('aria-label', `${index + 1} sur ${cards.length} : ${card.title}`);
       // Une voisine en retrait se met au centre au clic, sans suivre ses liens.
       slide.addEventListener('click', (event) => {
+        // Le clic qui suit un glissé à la souris ne doit ni ramener à la carte de départ ni suivre un lien.
+        if (this.swiped) {
+          this.swiped = false;
+          event.preventDefault();
+          return;
+        }
         if (index === this.current) return;
         event.preventDefault();
         this.go(index);
@@ -98,13 +104,20 @@ export default class ProjectCarousel {
       this.go(this.current + (event.key === 'ArrowLeft' ? -1 : 1));
     });
     let start = null;
-    this.track.addEventListener('pointerdown', (event) => { start = { x: event.clientX, y: event.clientY }; });
+    this.track.addEventListener('pointerdown', (event) => {
+      start = { x: event.clientX, y: event.clientY };
+      // Au doigt, aucun clic ne suit un glissé : le prochain appui repart de zéro.
+      this.swiped = false;
+    });
     this.track.addEventListener('pointerup', (event) => {
       if (!start) return;
       const dx = event.clientX - start.x;
       const dy = event.clientY - start.y;
       start = null;
-      if (Math.abs(dx) > SWIPE_DISTANCE && Math.abs(dx) > Math.abs(dy)) this.go(this.current + (dx < 0 ? 1 : -1));
+      if (Math.abs(dx) > SWIPE_DISTANCE && Math.abs(dx) > Math.abs(dy)) {
+        this.swiped = true;
+        this.go(this.current + (dx < 0 ? 1 : -1));
+      }
     });
     this.track.addEventListener('pointercancel', () => { start = null; });
   }
