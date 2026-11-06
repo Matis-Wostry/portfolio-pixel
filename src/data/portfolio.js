@@ -66,12 +66,9 @@ export const PORTFOLIO = {
       },
       {
         id: 'veille-mcp', category: 'ecole', title: 'Veille techno MCP',
-        description: 'Veille technique automatisée : l’actualité GitHub et Dev.to est synthétisée en français par Claude, stockée dans SQLite et exposée par un serveur MCP déployé.',
+        description: 'Veille technique automatisée : l’actualité GitHub et Dev.to est synthétisée en français par Claude, stockée dans SQLite et exposée par un serveur MCP.',
         tags: ['TypeScript', 'Claude', 'MCP', 'SQLite'],
-        links: [
-          { label: 'Code', href: 'https://github.com/Matis-Wostry/MCP-Crea' },
-          { label: 'Serveur MCP', href: 'https://mcp-crea-production-3669.up.railway.app/mcp' },
-        ],
+        links: [{ label: 'Code', href: 'https://github.com/Matis-Wostry/MCP-Crea' }],
       },
       {
         id: 'calendrier-php', category: 'ecole', title: 'Calendrier PHP',
